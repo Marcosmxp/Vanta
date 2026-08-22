@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { darkTheme } from '../../../design-system';
 import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
+import { WalletTransactionDetailsRouteScreen } from '../screens/WalletTransactionDetailsRouteScreen';
 import type { MainStackParamList } from '../types';
 import { MainTabsNavigator } from './MainTabsNavigator';
 
@@ -22,6 +23,11 @@ export function MainStackNavigator() {
       <Stack.Screen name="Tabs" component={MainTabsNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="BetHistory" component={BetHistoryRouteScreen} options={{ title: 'Apostas' }} />
       <Stack.Screen name="BetDetails" component={BetDetailsRouteScreen} options={{ title: 'Detalhe da aposta' }} />
+      <Stack.Screen
+        name="WalletTransactionDetails"
+        component={WalletTransactionDetailsRouteScreen}
+        options={{ title: 'Detalhe do movimento' }}
+      />
     </Stack.Navigator>
   );
 }
