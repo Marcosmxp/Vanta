@@ -35,6 +35,12 @@ export type KycStackParamList = {
   Retry: undefined;
 };
 
+export type MainStackParamList = {
+  Tabs: undefined;
+  BetHistory: undefined;
+  BetDetails: { betId: string };
+};
+
 export type MainTabParamList = {
   Home: undefined;
   Play: undefined;

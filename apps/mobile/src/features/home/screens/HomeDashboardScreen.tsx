@@ -12,12 +12,14 @@ export interface HomeDashboardScreenProps {
   onOpenWallet: () => void;
   onOpenPlay: () => void;
   onOpenProfile: () => void;
+  onOpenBetHistory?: () => void;
 }
 
 export function HomeDashboardScreen({
   onOpenWallet,
   onOpenPlay,
   onOpenProfile,
+  onOpenBetHistory,
 }: HomeDashboardScreenProps) {
   const snapshot = disconnectedHomeSnapshot;
 
@@ -63,7 +65,10 @@ export function HomeDashboardScreen({
 
         <FeaturedGameCard game={snapshot.featuredGame} onPlay={onOpenPlay} />
 
-        <ActivityPreview items={snapshot.recentActivity} />
+        <ActivityPreview
+          items={snapshot.recentActivity}
+          onOpenBetHistory={onOpenBetHistory}
+        />
 
         <ResponsibleGamingBanner />
 

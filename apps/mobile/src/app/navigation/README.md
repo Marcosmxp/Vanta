@@ -39,6 +39,14 @@ The onboarding and form screens live under `features/auth`; the navigator only o
 
 Only the document category may be passed through navigation. Raw document images, document numbers, selfies, biometric media, provider session secrets, and capture payloads are forbidden in navigation state.
 
+### Main stack
+
+- `Tabs` — the main bottom-tab application shell.
+- `BetHistory` — read-only list of authenticated-player bets.
+- `BetDetails` — read-only detail route receiving only an opaque `betId`.
+
+Betting history is intentionally above the tab navigator so it can be opened from Home or other authenticated surfaces without becoming a permanent fifth tab.
+
 ### Main tabs
 
 - `Home`
@@ -56,10 +64,10 @@ Route visibility is not authorization. Sensitive backend operations must continu
 
 Credentials, passwords, OTP values, raw KYC media, secrets, canonical balances, RNG state, payout rules, and settlement authority must never be stored in route parameters or navigation state.
 
+Bet details routes carry only `betId`. Full bet records, ledger entries, private RNG material and authorization state must never be copied into route params.
+
 The authentication and KYC presentation layers validate UX state only. They do not mint sessions, create local OTPs, approve KYC locally, or grant access to protected backend operations.
 
 ## Entry and future coordination
 
-The root navigator still starts at `Auth`. Phase 06 registers `Kyc` as a separate root flow, but intentionally does not create a client-side shortcut from a locally validated OTP into KYC or from a KYC screen into `Main`.
-
-The future trusted authentication/session coordinator will decide among `Auth`, `Kyc`, `Main`, `AccountBlocked`, or another compliance-required flow using authenticated server state.
+The root navigator still starts at `Auth`. The trusted authentication/session coordinator will eventually decide among `Auth`, `Kyc`, `Main`, `AccountBlocked`, or another compliance-required flow using authenticated server state.
