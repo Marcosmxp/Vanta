@@ -1,12 +1,16 @@
-import { ScreenScaffold } from './ScreenScaffold';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-export function HomeScreen() {
+import { HomeDashboardScreen } from '../../../features/home/screens/HomeDashboardScreen';
+import type { MainTabParamList } from '../types';
+
+type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
+
+export function HomeScreen({ navigation }: Props) {
   return (
-    <ScreenScaffold
-      eyebrow="Vanta"
-      title="Home"
-      description="Ponto de entrada principal para saldo, destaques, jogos e atividade recente."
-      statusLabel="Home route ready"
+    <HomeDashboardScreen
+      onOpenWallet={() => navigation.navigate('Wallet')}
+      onOpenPlay={() => navigation.navigate('Play')}
+      onOpenProfile={() => navigation.navigate('Profile')}
     />
   );
 }
