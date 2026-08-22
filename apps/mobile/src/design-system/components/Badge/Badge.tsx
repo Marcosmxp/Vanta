@@ -20,15 +20,15 @@ const toneStyles: Record<BadgeTone, { backgroundColor: string; color: string }> 
     color: darkTheme.colors.text.onBrand,
   },
   success: {
-    backgroundColor: 'rgba(41, 209, 125, 0.16)',
+    backgroundColor: darkTheme.colors.statusSurface.success,
     color: darkTheme.colors.status.success,
   },
   warning: {
-    backgroundColor: 'rgba(255, 176, 32, 0.16)',
+    backgroundColor: darkTheme.colors.statusSurface.warning,
     color: darkTheme.colors.status.warning,
   },
   danger: {
-    backgroundColor: 'rgba(255, 77, 90, 0.16)',
+    backgroundColor: darkTheme.colors.statusSurface.danger,
     color: darkTheme.colors.status.danger,
   },
 };
