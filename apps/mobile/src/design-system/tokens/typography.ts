@@ -1,4 +1,10 @@
 export const typography = {
+  brandWordmark: {
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: '800' as const,
+    letterSpacing: 4,
+  },
   display: {
     fontSize: 32,
     lineHeight: 40,
