@@ -38,6 +38,9 @@ jobs:
       - name: Typecheck mobile application
         run: pnpm mobile:typecheck
 
+      - name: Validate application Android bundle
+        run: pnpm --filter @vanta/mobile app:validate
+
       - name: Validate Storybook Android bundle
         run: pnpm --filter @vanta/mobile storybook:validate
 
