@@ -21,7 +21,7 @@ export const shadows = {
     elevation: 8,
   },
   brandGlow: {
-    shadowColor: '#FF3344',
+    shadowColor: '#FF3B30',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.28,
     shadowRadius: 18,
