@@ -16,12 +16,13 @@ function formatMinorAmount(amountMinor: number, currency: 'EUR') {
 
 export function WalletSummaryCard({ wallet, onOpenWallet }: WalletSummaryCardProps) {
   const [balanceVisible, setBalanceVisible] = useState(true);
-  const hasBalance = wallet.availability === 'ready' && wallet.availableBalanceMinor !== null;
+  const balanceAmount = wallet.availableBalanceMinor;
+  const hasBalance = wallet.availability === 'ready' && balanceAmount !== null;
 
   const balanceLabel = !hasBalance
     ? '—'
-    : balanceVisible
-      ? formatMinorAmount(wallet.availableBalanceMinor, wallet.currency)
+    : balanceVisible && balanceAmount !== null
+      ? formatMinorAmount(balanceAmount, wallet.currency)
       : '••••••';
 
   return (
@@ -48,7 +49,7 @@ export function WalletSummaryCard({ wallet, onOpenWallet }: WalletSummaryCardPro
       </Text>
 
       <Text style={styles.helper}>
-        {wallet.availability === 'ready'
+        {hasBalance
           ? 'Valor apresentado a partir do estado recebido do servidor.'
           : wallet.availability === 'restricted'
             ? 'Carteira temporariamente indisponível devido ao estado da conta.'
