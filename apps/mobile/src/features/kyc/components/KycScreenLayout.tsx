@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     gap: darkTheme.spacing.md,
   },
   title: {
-    ...darkTheme.typography.headingH1,
+    ...darkTheme.typography.heading1,
     color: darkTheme.colors.text.primary,
   },
   description: {
