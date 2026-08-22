@@ -55,6 +55,11 @@ export const colors = {
     warning: colorPrimitives.amber[500],
     danger: colorPrimitives.red[400],
   },
+  statusSurface: {
+    success: 'rgba(41, 209, 125, 0.16)',
+    warning: 'rgba(255, 176, 32, 0.16)',
+    danger: 'rgba(255, 77, 90, 0.16)',
+  },
   overlay: {
     scrim: 'rgba(7, 9, 12, 0.72)',
   },
