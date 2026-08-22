@@ -46,18 +46,18 @@ type BalanceReadModel struct {
 }
 
 type TransactionReadModel struct {
-	TransactionID    string
-	WalletID         string
-	Kind             TransactionKind
-	Direction        TransactionDirection
-	Status           TransactionStatus
-	AmountMinor      int64
-	Currency         string
-	OccurredAt       time.Time
-	ReferenceID      string
-	Description      string
+	TransactionID     string
+	WalletID          string
+	Kind              TransactionKind
+	Direction         TransactionDirection
+	Status            TransactionStatus
+	AmountMinor       int64
+	Currency          string
+	OccurredAt        time.Time
+	ReferenceID       string
+	Description       string
 	BalanceAfterMinor *int64
-	SettledAt        *time.Time
+	SettledAt         *time.Time
 }
 
 type Snapshot struct {
