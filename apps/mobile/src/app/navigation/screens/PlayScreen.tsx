@@ -1,12 +1,5 @@
-import { ScreenScaffold } from './ScreenScaffold';
+import { PlinkoGameScreen } from '../../../features/games/plinko/screens/PlinkoGameScreen';
 
 export function PlayScreen() {
-  return (
-    <ScreenScaffold
-      eyebrow="Gameplay"
-      title="Jogar"
-      description="Área dedicada aos jogos Vanta. O Plinko será a primeira experiência implementada."
-      statusLabel="Gameplay route ready"
-    />
-  );
+  return <PlinkoGameScreen />;
 }
