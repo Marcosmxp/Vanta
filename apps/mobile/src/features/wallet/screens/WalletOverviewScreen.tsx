@@ -10,12 +10,16 @@ import type { WalletSnapshot } from '../types';
 
 export interface WalletOverviewScreenProps {
   snapshot?: WalletSnapshot;
+  onDeposit: () => void;
+  onWithdraw: () => void;
   onOpenBetHistory: () => void;
   onOpenTransaction: (transactionId: string) => void;
 }
 
 export function WalletOverviewScreen({
   snapshot = disconnectedWalletSnapshot,
+  onDeposit,
+  onWithdraw,
   onOpenBetHistory,
   onOpenTransaction,
 }: WalletOverviewScreenProps) {
@@ -34,7 +38,7 @@ export function WalletOverviewScreen({
         </View>
 
         <WalletBalanceCard balance={snapshot.balance} />
-        <WalletActionsCard enabled={false} />
+        <WalletActionsCard onDeposit={onDeposit} onWithdraw={onWithdraw} />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
