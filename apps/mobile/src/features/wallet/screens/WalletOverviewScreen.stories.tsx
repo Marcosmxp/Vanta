@@ -44,6 +44,8 @@ const meta = {
   title: 'Features/Wallet/Overview',
   component: WalletOverviewScreen,
   args: {
+    onDeposit: () => undefined,
+    onWithdraw: () => undefined,
     onOpenBetHistory: () => undefined,
     onOpenTransaction: () => undefined,
   },
