@@ -39,6 +39,7 @@ export type MainStackParamList = {
   Tabs: undefined;
   BetHistory: undefined;
   BetDetails: { betId: string };
+  WalletTransactionDetails: { transactionId: string };
 };
 
 export type MainTabParamList = {
