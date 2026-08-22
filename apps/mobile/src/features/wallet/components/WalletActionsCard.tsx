@@ -3,36 +3,24 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, darkTheme } from '../../../design-system';
 
 export interface WalletActionsCardProps {
-  enabled?: boolean;
-  onDeposit?: () => void;
-  onWithdraw?: () => void;
+  onDeposit: () => void;
+  onWithdraw: () => void;
 }
 
-export function WalletActionsCard({
-  enabled = false,
-  onDeposit,
-  onWithdraw,
-}: WalletActionsCardProps) {
+export function WalletActionsCard({ onDeposit, onWithdraw }: WalletActionsCardProps) {
   return (
     <Card style={styles.card}>
       <View style={styles.copy}>
         <Text style={styles.eyebrow}>MOVIMENTAR FUNDOS</Text>
         <Text style={styles.title}>Depósitos e levantamentos</Text>
         <Text style={styles.description}>
-          As operações financeiras permanecem bloqueadas até que pagamentos, KYC, limites,
-          idempotência e ledger estejam integrados de ponta a ponta.
+          Pode consultar e preencher os fluxos financeiros. A confirmação permanece bloqueada quando o backend não autorizar métodos, limites ou elegibilidade.
         </Text>
       </View>
 
       <View style={styles.actions}>
-        <Button label="Depositar" fullWidth disabled={!enabled} onPress={onDeposit} />
-        <Button
-          label="Levantar"
-          variant="secondary"
-          fullWidth
-          disabled={!enabled}
-          onPress={onWithdraw}
-        />
+        <Button label="Depositar" fullWidth onPress={onDeposit} />
+        <Button label="Levantar" variant="secondary" fullWidth onPress={onWithdraw} />
       </View>
     </Card>
   );
