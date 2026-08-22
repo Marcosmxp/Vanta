@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "storybook": "cross-env STORYBOOK_ENABLED=true expo start --dev-client",
     "storybook:android": "cross-env STORYBOOK_ENABLED=true expo run:android",
-    "storybook:ios": "cross-env STORYBOOK_ENABLED=true expo run:ios"
+    "storybook:ios": "cross-env STORYBOOK_ENABLED=true expo run:ios",
+    "storybook:validate": "cross-env STORYBOOK_ENABLED=true expo export --platform android --output-dir .storybook-build"
   },
   "dependencies": {
     "expo": "~57.0.0",
