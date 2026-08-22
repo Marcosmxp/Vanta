@@ -11,6 +11,8 @@ export function WalletScreen({ navigation }: Props) {
 
   return (
     <WalletOverviewScreen
+      onDeposit={() => mainStack?.navigate('Deposit')}
+      onWithdraw={() => mainStack?.navigate('Withdrawal')}
       onOpenBetHistory={() => mainStack?.navigate('BetHistory')}
       onOpenTransaction={(transactionId) =>
         mainStack?.navigate('WalletTransactionDetails', { transactionId })
