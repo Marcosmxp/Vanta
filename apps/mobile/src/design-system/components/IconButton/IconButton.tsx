@@ -18,12 +18,14 @@ export function IconButton({
   disabled = false,
   ...props
 }: IconButtonProps) {
+  const isDisabled = disabled === true;
+
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ disabled: isDisabled }}
+      disabled={isDisabled}
       hitSlop={8}
       style={({ pressed }) => [
         styles.base,
@@ -32,7 +34,7 @@ export function IconButton({
           backgroundColor: pressed
             ? pressedBackground[variant]
             : background[variant],
-          opacity: disabled ? 0.45 : 1,
+          opacity: isDisabled ? 0.45 : 1,
         },
       ]}
       {...props}
