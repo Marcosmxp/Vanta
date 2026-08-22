@@ -11,10 +11,10 @@ export function SessionExpiredScreen({ navigation }: Props) {
     <ScreenScaffold
       eyebrow="Segurança"
       title="Sessão expirada"
-      description="Rota modal reservada para expiração de sessão e reautenticação segura."
-      statusLabel="Session state ready"
+      description="Por segurança, volte a autenticar-se antes de continuar. A sessão anterior não deve ser reutilizada."
+      statusLabel="Reauthentication required"
     >
-      <Button label="Fechar" variant="secondary" onPress={() => navigation.goBack()} />
+      <Button label="Voltar a autenticar" onPress={() => navigation.replace('Auth')} />
     </ScreenScaffold>
   );
 }
