@@ -4,17 +4,26 @@
 
 ### Root stack
 
-- `Auth` — authentication and onboarding entry point.
+- `Auth` — onboarding and authentication entry point. This is now the default application entry.
 - `Main` — authenticated application shell.
-- `SessionExpired` — security/session interruption presented modally.
+- `SessionExpired` — security interruption that forces reauthentication.
 - `AccountBlocked` — non-dismissible account security state.
 
 ### Auth stack
 
+- `Splash`
+- `OnboardingOne`
+- `OnboardingTwo`
+- `OnboardingThree`
+- `Eligibility`
 - `Welcome`
 - `Login`
+- `CreateAccount`
+- `Verification`
+- `ForgotPassword`
+- `ResetPassword`
 
-These are structural placeholders only. Phase 05 replaces them with the production authentication and onboarding flow.
+The onboarding and form screens live under `features/auth`; the navigator only owns route composition and transitions.
 
 ### Main tabs
 
@@ -31,8 +40,10 @@ Navigation never decides whether a player is authenticated, eligible, funded, KY
 
 Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, responsible-gaming limits, idempotency, and financial invariants server-side.
 
-No credentials, secrets, canonical balances, RNG state, payout rules, or settlement authority belong in route parameters or navigation state.
+Credentials, passwords, OTP values, secrets, canonical balances, RNG state, payout rules, and settlement authority must never be stored in route parameters or navigation state.
 
-## Current bootstrap behavior
+Phase 05 validates form shape locally for UX only. It does not mint sessions, persist passwords, create local OTPs, or grant access to protected backend operations.
 
-Until Phase 05 introduces the authentication coordinator, the root navigator starts at `Main` so the application shell can be developed and reviewed independently. The `Auth` stack already exists and is ready to become the real entry flow.
+## Entry behavior
+
+The root navigator starts at `Auth`. Splash transitions into onboarding, then age eligibility and the Welcome screen. `Main` remains available as a route for the future trusted authentication coordinator, but the Phase 05 forms do not navigate to it after local validation alone.
