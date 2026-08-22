@@ -3,7 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { darkTheme } from '../../../design-system';
 import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
+import { DepositRouteScreen } from '../screens/DepositRouteScreen';
 import { WalletTransactionDetailsRouteScreen } from '../screens/WalletTransactionDetailsRouteScreen';
+import { WithdrawalRouteScreen } from '../screens/WithdrawalRouteScreen';
 import type { MainStackParamList } from '../types';
 import { MainTabsNavigator } from './MainTabsNavigator';
 
@@ -28,6 +30,8 @@ export function MainStackNavigator() {
         component={WalletTransactionDetailsRouteScreen}
         options={{ title: 'Detalhe do movimento' }}
       />
+      <Stack.Screen name="Deposit" component={DepositRouteScreen} options={{ title: 'Depositar' }} />
+      <Stack.Screen name="Withdrawal" component={WithdrawalRouteScreen} options={{ title: 'Levantar' }} />
     </Stack.Navigator>
   );
 }
