@@ -4,6 +4,10 @@ import { darkTheme } from '../../../design-system';
 import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
 import { DepositRouteScreen } from '../screens/DepositRouteScreen';
+import { LegalRouteScreen } from '../screens/LegalRouteScreen';
+import { ResponsibleGamingRouteScreen } from '../screens/ResponsibleGamingRouteScreen';
+import { SecurityCenterRouteScreen } from '../screens/SecurityCenterRouteScreen';
+import { SupportRouteScreen } from '../screens/SupportRouteScreen';
 import { WalletTransactionDetailsRouteScreen } from '../screens/WalletTransactionDetailsRouteScreen';
 import { WithdrawalRouteScreen } from '../screens/WithdrawalRouteScreen';
 import type { MainStackParamList } from '../types';
@@ -32,6 +36,14 @@ export function MainStackNavigator() {
       />
       <Stack.Screen name="Deposit" component={DepositRouteScreen} options={{ title: 'Depositar' }} />
       <Stack.Screen name="Withdrawal" component={WithdrawalRouteScreen} options={{ title: 'Levantar' }} />
+      <Stack.Screen name="SecurityCenter" component={SecurityCenterRouteScreen} options={{ title: 'Segurança' }} />
+      <Stack.Screen
+        name="ResponsibleGaming"
+        component={ResponsibleGamingRouteScreen}
+        options={{ title: 'Jogo responsável' }}
+      />
+      <Stack.Screen name="Support" component={SupportRouteScreen} options={{ title: 'Suporte' }} />
+      <Stack.Screen name="Legal" component={LegalRouteScreen} options={{ title: 'Legal e privacidade' }} />
     </Stack.Navigator>
   );
 }
