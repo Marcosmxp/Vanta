@@ -42,6 +42,10 @@ export type MainStackParamList = {
   WalletTransactionDetails: { transactionId: string };
   Deposit: undefined;
   Withdrawal: undefined;
+  SecurityCenter: undefined;
+  ResponsibleGaming: undefined;
+  Support: undefined;
+  Legal: undefined;
 };
 
 export type MainTabParamList = {
