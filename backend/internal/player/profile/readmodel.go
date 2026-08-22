@@ -39,17 +39,17 @@ const (
 )
 
 type IdentityReadModel struct {
-	PlayerID     string
-	DisplayName  string
-	EmailMasked  string
-	PhoneMasked  string
-	CountryCode  string
-	MemberSince  time.Time
+	PlayerID    string
+	DisplayName string
+	EmailMasked string
+	PhoneMasked string
+	CountryCode string
+	MemberSince time.Time
 }
 
 type VerificationReadModel struct {
-	AgeVerified  *bool
-	KYCStatus    KYCStatus
+	AgeVerified   *bool
+	KYCStatus     KYCStatus
 	AccountStatus AccountStatus
 }
 
