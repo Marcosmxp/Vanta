@@ -45,8 +45,10 @@ Only the document category may be passed through navigation. Raw document images
 - `BetHistory` — read-only list of authenticated-player bets.
 - `BetDetails` — read-only detail route receiving only an opaque `betId`.
 - `WalletTransactionDetails` — read-only financial detail route receiving only an opaque `transactionId`.
+- `Deposit` — guarded deposit-intent UX.
+- `Withdrawal` — guarded withdrawal-intent UX.
 
-Betting history and wallet transaction details sit above the tab navigator so they can be opened from authenticated surfaces without becoming permanent tabs.
+Betting history, wallet details and payment flows sit above the tab navigator so they can be opened from authenticated surfaces without becoming permanent tabs.
 
 ### Main tabs
 
@@ -61,13 +63,13 @@ The custom tab bar is backed by the Vanta `BottomNavigation` design-system compo
 
 Navigation never decides whether a player is authenticated, eligible, funded, KYC-approved, allowed to wager, allowed to deposit, or allowed to withdraw. Those decisions come from trusted application/backend state and server-authoritative APIs.
 
-Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, responsible-gaming limits, idempotency, and financial invariants server-side.
+Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, KYC/AML, jurisdiction, responsible-gaming limits, idempotency, payment state and financial invariants server-side.
 
 Credentials, passwords, OTP values, raw KYC media, secrets, canonical balances, payment secrets, RNG state, payout rules, and settlement authority must never be stored in route parameters or navigation state.
 
-Bet details routes carry only `betId`; wallet transaction details carry only `transactionId`. Full financial records, ledger entries, private RNG material and authorization state must never be copied into route params. Future handlers must perform player ownership checks for every identifier to prevent IDOR.
+Bet details routes carry only `betId`; wallet transaction details carry only `transactionId`. Deposit and withdrawal routes carry no financial record or authorization state. Full financial records, ledger entries, provider secrets, private RNG material and authorization state must never be copied into route params. Future handlers must perform player ownership checks for every opaque identifier to prevent IDOR.
 
-The authentication and KYC presentation layers validate UX state only. They do not mint sessions, create local OTPs, approve KYC locally, or grant access to protected backend operations.
+The authentication, KYC and payment presentation layers validate UX state only. They do not mint sessions, approve KYC, credit balances, authorize withdrawals, confirm provider settlement or grant access to protected backend operations.
 
 ## Entry and future coordination
 
