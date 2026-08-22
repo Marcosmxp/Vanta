@@ -1,0 +1,15 @@
+{
+  "name": "vanta-platform",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vanta mobile betting platform monorepo",
+  "scripts": {
+    "mobile:start": "pnpm --filter @vanta/mobile start",
+    "mobile:android": "pnpm --filter @vanta/mobile android",
+    "mobile:ios": "pnpm --filter @vanta/mobile ios",
+    "mobile:typecheck": "pnpm --filter @vanta/mobile typecheck",
+    "api:test": "cd backend && go test ./...",
+    "api:run": "cd backend && go run ./cmd/api",
+    "check": "pnpm mobile:typecheck && pnpm api:test"
+  }
+}
