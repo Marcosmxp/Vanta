@@ -22,3 +22,12 @@ export const disconnectedWalletSnapshot: WalletSnapshot = {
   nextCursor: null,
   message: 'A carteira será apresentada quando a API financeira autenticada estiver ligada.',
 };
+
+export const disconnectedWalletProvider: WalletProvider = {
+  async getSnapshot() {
+    return disconnectedWalletSnapshot;
+  },
+  async getTransaction(_transactionId: string) {
+    return null;
+  },
+};
