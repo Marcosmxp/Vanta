@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Badge, Card, darkTheme } from '../../../design-system';
 import type { HomeActivityItem } from '../types';
 
 export interface ActivityPreviewProps {
   items: readonly HomeActivityItem[];
+  onOpenBetHistory?: () => void;
 }
 
 function formatAmount(item: HomeActivityItem) {
@@ -25,7 +26,7 @@ function kindLabel(kind: HomeActivityItem['kind']) {
   }
 }
 
-export function ActivityPreview({ items }: ActivityPreviewProps) {
+export function ActivityPreview({ items, onOpenBetHistory }: ActivityPreviewProps) {
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
@@ -63,6 +64,17 @@ export function ActivityPreview({ items }: ActivityPreviewProps) {
           })}
         </View>
       )}
+
+      {onOpenBetHistory ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Abrir histórico de apostas"
+          onPress={onOpenBetHistory}
+          style={({ pressed }) => [styles.historyButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.historyButtonLabel}>Ver histórico de apostas</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -134,5 +146,22 @@ const styles = StyleSheet.create({
   timestamp: {
     ...darkTheme.typography.caption,
     color: darkTheme.colors.text.secondary,
+  },
+  historyButton: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: darkTheme.radius.md,
+    borderWidth: 1,
+    borderColor: darkTheme.colors.border.default,
+    backgroundColor: darkTheme.colors.surface.default,
+    paddingHorizontal: darkTheme.spacing.lg,
+  },
+  historyButtonLabel: {
+    ...darkTheme.typography.bodyStrong,
+    color: darkTheme.colors.text.primary,
+  },
+  pressed: {
+    opacity: 0.75,
   },
 });
