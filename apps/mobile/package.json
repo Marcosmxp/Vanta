@@ -8,7 +8,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "cross-env STORYBOOK_ENABLED=true expo start --dev-client",
+    "storybook:android": "cross-env STORYBOOK_ENABLED=true expo run:android",
+    "storybook:ios": "cross-env STORYBOOK_ENABLED=true expo run:ios"
   },
   "dependencies": {
     "expo": "~57.0.0",
@@ -17,7 +20,14 @@
     "react-native": "0.86.0"
   },
   "devDependencies": {
+    "@react-native-community/datetimepicker": "^8.4.4",
+    "@react-native-community/slider": "^5.0.1",
+    "@storybook/addon-ondevice-actions": "10.5.4",
+    "@storybook/addon-ondevice-backgrounds": "10.5.4",
+    "@storybook/addon-ondevice-controls": "10.5.4",
+    "@storybook/react-native": "10.5.4",
     "@types/react": "^19.2.0",
+    "cross-env": "^10.0.0",
     "typescript": "^5.9.0"
   }
 }
