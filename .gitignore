@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Expo / React Native
+.expo/
+.expo-shared/
+dist/
+web-build/
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/build/
+*.xcworkspace/xcuserdata/
+
+# Go
+backend/bin/
+backend/coverage.out
+*.test
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+*.cer
+
+# Local infrastructure data
+.infrastructure-data/
+postgres-data/
+redis-data/
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+
+# Logs / coverage
+*.log
+coverage/
+.nyc_output/
+
+# Build caches
+.turbo/
+.cache/
+tmp/
+temp/
+
+# Sensitive exports and local artifacts
+secrets/
+credentials/
+private/
+*.sqlite
+*.db

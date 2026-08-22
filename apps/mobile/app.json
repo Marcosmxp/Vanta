@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Vanta",
+    "slug": "vanta-mobile",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.marcosmxp.vanta"
+    },
+    "android": {
+      "package": "com.marcosmxp.vanta",
+      "versionCode": 1
+    },
+    "githubUrl": "https://github.com/Marcosmxp/Vanta"
+  }
+}
