@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Badge, Card, darkTheme } from '../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../design-system';
 import type { HomeActivityItem } from '../types';
 
 export interface ActivityPreviewProps {
@@ -38,15 +38,12 @@ export function ActivityPreview({ items, onOpenBetHistory }: ActivityPreviewProp
       </View>
 
       {items.length === 0 ? (
-        <Card style={styles.emptyCard}>
-          <View style={styles.emptyMark} />
-          <View style={styles.emptyCopy}>
-            <Text style={styles.emptyTitle}>Ainda não existe atividade</Text>
-            <Text style={styles.emptyDescription}>
-              Apostas e movimentos financeiros aparecerão aqui apenas depois de serem recebidos da API autenticada.
-            </Text>
-          </View>
-        </Card>
+        <SystemState
+          kind="empty"
+          compact
+          title="Ainda não existe atividade"
+          description="Apostas e movimentos financeiros aparecerão aqui apenas depois de serem recebidos da API autenticada."
+        />
       ) : (
         <View style={styles.list}>
           {items.slice(0, 3).map((item) => {
@@ -97,31 +94,6 @@ const styles = StyleSheet.create({
   title: {
     ...darkTheme.typography.heading3,
     color: darkTheme.colors.text.primary,
-  },
-  emptyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: darkTheme.spacing.lg,
-  },
-  emptyMark: {
-    width: 40,
-    height: 40,
-    borderRadius: darkTheme.radius.full,
-    borderWidth: 1,
-    borderColor: darkTheme.colors.border.strong,
-    backgroundColor: darkTheme.colors.surface.raised,
-  },
-  emptyCopy: {
-    flex: 1,
-    gap: darkTheme.spacing.xs,
-  },
-  emptyTitle: {
-    ...darkTheme.typography.bodyStrong,
-    color: darkTheme.colors.text.primary,
-  },
-  emptyDescription: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.text.secondary,
   },
   list: {
     gap: darkTheme.spacing.sm,
