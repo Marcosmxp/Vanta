@@ -9,13 +9,13 @@ const digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 func TestLicensedDisclosureRequiresLicenseReference(t *testing.T) {
 	disclosure := RegulatoryDisclosureReadModel{
-		JurisdictionCode:    "PT",
-		OperatorLegalName:   "Example Operator, S.A.",
-		OperatorContact:     "support@example.invalid",
-		OperatorAddress:     "Lisboa, Portugal",
-		LicensingStatus:     LicensingLicensed,
-		Regulator:           AuthorityLinkReadModel{Name: "SRIJ", URL: "https://www.srij.turismodeportugal.pt/"},
-		LicenseNotice:       "Verified licensing disclosure",
+		JurisdictionCode:     "PT",
+		OperatorLegalName:    "Example Operator, S.A.",
+		OperatorContact:      "support@example.invalid",
+		OperatorAddress:      "Lisboa, Portugal",
+		LicensingStatus:      LicensingLicensed,
+		Regulator:            AuthorityLinkReadModel{Name: "SRIJ", URL: "https://www.srij.turismodeportugal.pt/"},
+		LicenseNotice:        "Verified licensing disclosure",
 		ComplaintsDocumentID: "complaints_v1",
 	}
 
@@ -26,11 +26,11 @@ func TestLicensedDisclosureRequiresLicenseReference(t *testing.T) {
 
 func TestUnconfiguredDisclosureRejectsLicenseReferences(t *testing.T) {
 	disclosure := RegulatoryDisclosureReadModel{
-		JurisdictionCode:    "PT",
-		LicensingStatus:     LicensingUnconfigured,
-		Regulator:           AuthorityLinkReadModel{Name: "SRIJ", URL: "https://www.srij.turismodeportugal.pt/"},
-		LicenseReferences:   []LicenseReferenceReadModel{{LicenseID: "001", Scope: "example"}},
-		LicenseNotice:       "Not configured",
+		JurisdictionCode:     "PT",
+		LicensingStatus:      LicensingUnconfigured,
+		Regulator:            AuthorityLinkReadModel{Name: "SRIJ", URL: "https://www.srij.turismodeportugal.pt/"},
+		LicenseReferences:    []LicenseReferenceReadModel{{LicenseID: "001", Scope: "example"}},
+		LicenseNotice:        "Not configured",
 		ComplaintsDocumentID: "complaints_v1",
 	}
 
