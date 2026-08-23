@@ -26,16 +26,19 @@ function formatPendingDate(value: string | null): string {
 }
 
 export function LimitCard(props: LimitCardProps) {
-  const pending = props.limit.pendingChange;
   const title = props.type === 'money' ? moneyLimitKindLabel(props.limit.kind) : 'Tempo de sessão';
   const subtitle = props.type === 'money' ? limitPeriodLabel(props.limit.period) : 'Por sessão';
   const currentValue =
     props.type === 'money' ? formatEuroMinor(props.limit.amountMinor) : `${props.limit.minutes} min`;
-  const pendingValue = pending
-    ? props.type === 'money'
-      ? formatEuroMinor(pending.requestedAmountMinor)
-      : `${pending.requestedMinutes} min`
-    : null;
+  const pending = props.limit.pendingChange;
+  const pendingValue =
+    props.type === 'money'
+      ? props.limit.pendingChange
+        ? formatEuroMinor(props.limit.pendingChange.requestedAmountMinor)
+        : null
+      : props.limit.pendingChange
+        ? `${props.limit.pendingChange.requestedMinutes} min`
+        : null;
 
   return (
     <Card style={styles.card}>
