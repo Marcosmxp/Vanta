@@ -7,5 +7,6 @@ export * from './IconButton/IconButton';
 export * from './Input/Input';
 export * from './Modal/VantaModal';
 export * from './SegmentedControl/SegmentedControl';
+export * from './SystemState/SystemState';
 export * from './Tabs/Tabs';
 export * from './Toast/Toast';
