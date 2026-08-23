@@ -9,9 +9,10 @@ type Props = NativeStackScreenProps<MainStackParamList, 'ResponsibleGamingLimitC
 export function ResponsibleGamingLimitChangeRouteScreen({ route }: Props) {
   const snapshot = disconnectedResponsibleGamingSnapshot;
   const canSubmit = snapshot.availability === 'ready' && snapshot.policy.canRequestLimitChange;
+  const params = route.params;
 
-  if (route.params.target === 'money') {
-    const limit = snapshot.limits.find((item) => item.limitId === route.params.limitId) ?? null;
+  if (params.target === 'money') {
+    const limit = snapshot.limits.find((item) => item.limitId === params.limitId) ?? null;
     return <ResponsibleGamingLimitChangeScreen mode="money" limit={limit} canSubmit={canSubmit} />;
   }
 
