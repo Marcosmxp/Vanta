@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../design-system';
 import type { SupportRequestStatus, SupportRequestSummary } from '../types';
 
 export interface SupportRequestDetailsScreenProps {
@@ -28,34 +28,33 @@ export function SupportRequestDetailsScreen({ requestId, request }: SupportReque
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.eyebrow}>PEDIDO DE SUPORTE</Text>
-          <Text style={styles.title}>{request?.subject ?? 'Pedido indisponível'}</Text>
+          <Text style={styles.title}>{request?.subject ?? 'A carregar pedido'}</Text>
           <Text style={styles.subtitle}>
             O detalhe é sempre recarregado pela API autenticada usando apenas o identificador opaco do pedido.
           </Text>
         </View>
 
-        <Card style={styles.card}>
-          {request ? (
-            <>
-              <View style={styles.rowBetween}>
-                <Text style={styles.label}>Estado</Text>
-                <Badge
-                  label={statusLabel(request.status)}
-                  tone={request.status === 'resolved' ? 'success' : request.status === 'waiting-player' ? 'warning' : 'neutral'}
-                />
-              </View>
-              <View style={styles.row}><Text style={styles.label}>ID</Text><Text style={styles.value}>{request.requestId}</Text></View>
-              <View style={styles.row}><Text style={styles.label}>Categoria</Text><Text style={styles.value}>{request.category}</Text></View>
-              <View style={styles.row}><Text style={styles.label}>Criado</Text><Text style={styles.value}>{new Date(request.createdAt).toLocaleString('pt-PT')}</Text></View>
-              <View style={styles.row}><Text style={styles.label}>Atualizado</Text><Text style={styles.value}>{new Date(request.updatedAt).toLocaleString('pt-PT')}</Text></View>
-            </>
-          ) : (
-            <>
-              <View style={styles.row}><Text style={styles.label}>ID solicitado</Text><Text style={styles.value}>{requestId}</Text></View>
-              <Text style={styles.empty}>O pedido será carregado quando a API autenticada estiver disponível e confirmar ownership.</Text>
-            </>
-          )}
-        </Card>
+        {request ? (
+          <Card style={styles.card}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.label}>Estado</Text>
+              <Badge
+                label={statusLabel(request.status)}
+                tone={request.status === 'resolved' ? 'success' : request.status === 'waiting-player' ? 'warning' : 'neutral'}
+              />
+            </View>
+            <View style={styles.row}><Text style={styles.label}>ID</Text><Text style={styles.value}>{request.requestId}</Text></View>
+            <View style={styles.row}><Text style={styles.label}>Categoria</Text><Text style={styles.value}>{request.category}</Text></View>
+            <View style={styles.row}><Text style={styles.label}>Criado</Text><Text style={styles.value}>{new Date(request.createdAt).toLocaleString('pt-PT')}</Text></View>
+            <View style={styles.row}><Text style={styles.label}>Atualizado</Text><Text style={styles.value}>{new Date(request.updatedAt).toLocaleString('pt-PT')}</Text></View>
+          </Card>
+        ) : (
+          <SystemState
+            kind="loading"
+            title="A carregar pedido de suporte"
+            description={`O pedido ${requestId} só será apresentado depois de a API autenticada confirmar ownership.`}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -73,5 +72,4 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: darkTheme.spacing.lg, borderTopWidth: 1, borderTopColor: darkTheme.colors.border.default, paddingTop: darkTheme.spacing.md },
   label: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   value: { ...darkTheme.typography.bodyStrong, flexShrink: 1, textAlign: 'right', color: darkTheme.colors.text.primary },
-  empty: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
 });
