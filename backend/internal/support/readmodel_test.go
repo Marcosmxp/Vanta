@@ -31,8 +31,8 @@ func TestSnapshotValidateReadySupport(t *testing.T) {
 	snapshot := Snapshot{
 		PlayerID:     "player_1",
 		Availability: AvailabilityReady,
-		Topics: []TopicReadModel{{TopicID: "topic_security", Category: "security", Title: "Account security"}},
-		Channels: []ChannelReadModel{{ChannelID: "channel_inapp", Type: ChannelInApp, Label: "In-app", Target: "support"}},
+		Topics:       []TopicReadModel{{TopicID: "topic_security", Category: "security", Title: "Account security"}},
+		Channels:     []ChannelReadModel{{ChannelID: "channel_inapp", Type: ChannelInApp, Label: "In-app", Target: "support"}},
 		RecentRequests: []RequestSummaryReadModel{{
 			RequestID: "support_1",
 			PlayerID:  "player_1",
