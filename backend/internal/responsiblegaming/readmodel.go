@@ -43,12 +43,12 @@ type PendingMoneyLimitChange struct {
 }
 
 type MoneyLimitReadModel struct {
-	LimitID        string
-	Kind           MoneyLimitKind
-	Period         LimitPeriod
-	Currency       string
-	AmountMinor    int64
-	PendingChange  *PendingMoneyLimitChange
+	LimitID       string
+	Kind          MoneyLimitKind
+	Period        LimitPeriod
+	Currency      string
+	AmountMinor   int64
+	PendingChange *PendingMoneyLimitChange
 }
 
 type PendingSessionLimitChange struct {
@@ -85,14 +85,14 @@ type PolicyReadModel struct {
 }
 
 type Snapshot struct {
-	PlayerID       string
-	Availability   Availability
-	State          ProtectionState
-	Limits         []MoneyLimitReadModel
-	SessionLimit   *SessionLimitReadModel
-	ActiveTimeOut  *ActiveRestrictionReadModel
-	SelfExclusion  *ActiveRestrictionReadModel
-	Policy         PolicyReadModel
+	PlayerID      string
+	Availability  Availability
+	State         ProtectionState
+	Limits        []MoneyLimitReadModel
+	SessionLimit  *SessionLimitReadModel
+	ActiveTimeOut *ActiveRestrictionReadModel
+	SelfExclusion *ActiveRestrictionReadModel
+	Policy        PolicyReadModel
 }
 
 func (s Snapshot) Validate() error {
