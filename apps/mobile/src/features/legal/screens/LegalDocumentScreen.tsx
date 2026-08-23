@@ -5,10 +5,11 @@ import { Badge, Card, darkTheme } from '../../../design-system';
 import type { LegalDocumentDetail } from '../types';
 
 export interface LegalDocumentScreenProps {
+  documentId: string;
   document: LegalDocumentDetail | null;
 }
 
-export function LegalDocumentScreen({ document }: LegalDocumentScreenProps) {
+export function LegalDocumentScreen({ documentId, document }: LegalDocumentScreenProps) {
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -36,7 +37,8 @@ export function LegalDocumentScreen({ document }: LegalDocumentScreenProps) {
             </Card>
           </>
         ) : (
-          <Card>
+          <Card style={styles.metaCard}>
+            <Text style={styles.meta}>ID solicitado: {documentId}</Text>
             <Text style={styles.empty}>O documento será apresentado quando a API legal confirmar a versão e integridade do conteúdo.</Text>
           </Card>
         )}
