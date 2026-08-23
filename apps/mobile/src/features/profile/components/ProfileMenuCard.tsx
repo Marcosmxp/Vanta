@@ -12,31 +12,36 @@ const items: readonly {
   destination: ProfileDestination;
   title: string;
   description: string;
-  phase: string;
+  status: string;
+  active: boolean;
 }[] = [
   {
     destination: 'security',
     title: 'Security Center',
     description: 'Sessões, dispositivos, autenticação e proteção da conta.',
-    phase: 'Fase 13',
+    status: 'Ativo',
+    active: true,
   },
   {
     destination: 'responsible-gaming',
     title: 'Jogo responsável',
     description: 'Limites, pausas, autoexclusão e controlos de proteção.',
-    phase: 'Fase 14',
+    status: 'Ativo',
+    active: true,
   },
   {
     destination: 'support',
     title: 'Suporte',
     description: 'Ajuda, contacto e acompanhamento de pedidos.',
-    phase: 'Fase 15',
+    status: 'Fase 15',
+    active: false,
   },
   {
     destination: 'legal',
     title: 'Legal e privacidade',
     description: 'Termos, privacidade, regras e informação regulatória.',
-    phase: 'Fase 15',
+    status: 'Fase 15',
+    active: false,
   },
 ];
 
@@ -62,7 +67,7 @@ export function ProfileMenuCard({ onOpenDestination }: ProfileMenuCardProps) {
               <Text style={styles.rowDescription}>{item.description}</Text>
             </View>
             <View style={styles.rowMeta}>
-              <Badge label={item.phase} tone="neutral" />
+              <Badge label={item.status} tone={item.active ? 'success' : 'neutral'} />
               <Text style={styles.chevron}>›</Text>
             </View>
           </Pressable>
