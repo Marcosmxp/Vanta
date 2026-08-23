@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Card, darkTheme } from '../../../design-system';
+import { Card, SystemState, darkTheme } from '../../../design-system';
 import { ProtectionStateCard } from '../components/ProtectionStateCard';
 import {
   ResponsibleGamingActionCard,
@@ -19,6 +19,7 @@ export function ResponsibleGamingOverviewScreen({
   snapshot = disconnectedResponsibleGamingSnapshot,
   onOpenDestination,
 }: ResponsibleGamingOverviewScreenProps) {
+  const ready = snapshot.availability === 'ready';
   const configuredLimits = snapshot.limits.length + (snapshot.sessionLimit ? 1 : 0);
 
   return (
@@ -32,24 +33,34 @@ export function ResponsibleGamingOverviewScreen({
           </Text>
         </View>
 
-        <ProtectionStateCard snapshot={snapshot} />
+        {ready ? (
+          <>
+            <ProtectionStateCard snapshot={snapshot} />
 
-        <Card style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <View style={styles.summaryCopy}>
-              <Text style={styles.summaryLabel}>Limites configurados</Text>
-              <Text style={styles.summaryValue}>{configuredLimits}</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.summaryCopy}>
-              <Text style={styles.summaryLabel}>Estado</Text>
-              <Text style={styles.summaryState}>{snapshot.availability === 'ready' ? 'Sincronizado' : 'Protegido'}</Text>
-            </View>
-          </View>
-          <Text style={styles.summaryHint}>
-            Aumentos de limite e datas de vigência são definidos pela política server-side. O aplicativo não calcula cooling-off.
-          </Text>
-        </Card>
+            <Card style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <View style={styles.summaryCopy}>
+                  <Text style={styles.summaryLabel}>Limites configurados</Text>
+                  <Text style={styles.summaryValue}>{configuredLimits}</Text>
+                </View>
+                <View style={styles.divider} />
+                <View style={styles.summaryCopy}>
+                  <Text style={styles.summaryLabel}>Estado</Text>
+                  <Text style={styles.summaryState}>Sincronizado</Text>
+                </View>
+              </View>
+              <Text style={styles.summaryHint}>
+                Aumentos de limite e datas de vigência são definidos pela política server-side. O aplicativo não calcula cooling-off.
+              </Text>
+            </Card>
+          </>
+        ) : (
+          <SystemState
+            kind="error"
+            title="Proteções não sincronizadas"
+            description={snapshot.message ?? 'O estado de jogo responsável não está disponível. Operações reguladas continuam sujeitas à validação server-side e não são liberadas pelo cliente.'}
+          />
+        )}
 
         <ResponsibleGamingActionCard onOpenDestination={onOpenDestination} />
 

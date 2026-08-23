@@ -4,6 +4,7 @@ export type RootStackParamList = {
   Auth: undefined;
   Kyc: undefined;
   Main: undefined;
+  Maintenance: undefined;
   SessionExpired: undefined;
   AccountBlocked: undefined;
 };

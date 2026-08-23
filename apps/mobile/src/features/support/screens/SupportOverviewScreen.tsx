@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Button, Card, darkTheme } from '../../../design-system';
+import { Badge, Button, Card, SystemState, darkTheme } from '../../../design-system';
 import {
   disconnectedSupportCapabilities,
   disconnectedSupportSnapshot,
@@ -35,6 +35,7 @@ export function SupportOverviewScreen({
   onOpenRequest,
 }: SupportOverviewScreenProps) {
   const ready = snapshot.availability === 'ready';
+  const unavailableDescription = snapshot.message ?? 'Os dados de suporte só são apresentados depois de confirmados pela API autenticada.';
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -70,7 +71,12 @@ export function SupportOverviewScreen({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tópicos de ajuda</Text>
           {snapshot.topics.length === 0 ? (
-            <Card><Text style={styles.emptyText}>Nenhum tópico disponível no momento.</Text></Card>
+            <SystemState
+              kind={ready ? 'empty' : 'error'}
+              compact
+              title={ready ? 'Nenhum tópico disponível' : 'Tópicos indisponíveis'}
+              description={ready ? 'Não existem tópicos publicados para apresentar neste momento.' : unavailableDescription}
+            />
           ) : (
             snapshot.topics.map((topic) => (
               <Card key={topic.topicId} style={styles.listCard}>
@@ -85,7 +91,12 @@ export function SupportOverviewScreen({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Canais oficiais</Text>
           {snapshot.channels.length === 0 ? (
-            <Card><Text style={styles.emptyText}>Os canais oficiais ainda não foram carregados.</Text></Card>
+            <SystemState
+              kind={ready ? 'empty' : 'error'}
+              compact
+              title={ready ? 'Nenhum canal publicado' : 'Canais oficiais indisponíveis'}
+              description={ready ? 'O backend ainda não publicou canais de contacto para este contexto.' : unavailableDescription}
+            />
           ) : (
             snapshot.channels.map((channel) => (
               <Card key={channel.channelId} style={styles.channelCard}>
@@ -107,7 +118,12 @@ export function SupportOverviewScreen({
             <Text style={styles.count}>{snapshot.recentRequests.length}</Text>
           </View>
           {snapshot.recentRequests.length === 0 ? (
-            <Card><Text style={styles.emptyText}>Nenhum pedido de suporte disponível.</Text></Card>
+            <SystemState
+              kind={ready ? 'empty' : 'error'}
+              compact
+              title={ready ? 'Nenhum pedido de suporte' : 'Pedidos indisponíveis'}
+              description={ready ? 'Os pedidos criados pela sua conta aparecerão aqui.' : unavailableDescription}
+            />
           ) : (
             snapshot.recentRequests.map((request) => (
               <Pressable
@@ -166,7 +182,6 @@ const styles = StyleSheet.create({
   itemTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
   itemText: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   meta: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
-  emptyText: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   count: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.brand.primary },
   warningCard: { gap: darkTheme.spacing.sm, borderColor: darkTheme.colors.status.warning },
   warningTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.status.warning },

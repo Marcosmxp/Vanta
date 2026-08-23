@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Button, Card, darkTheme } from '../../../design-system';
+import { Badge, Button, SystemState, darkTheme } from '../../../design-system';
 import { ProfileIdentityCard } from '../components/ProfileIdentityCard';
 import { ProfileMenuCard, type ProfileDestination } from '../components/ProfileMenuCard';
 import { ProfilePreferencesCard } from '../components/ProfilePreferencesCard';
@@ -20,6 +20,8 @@ export function ProfileOverviewScreen({
   onOpenDestination,
   onSignOut,
 }: ProfileOverviewScreenProps) {
+  const ready = snapshot.availability === 'ready';
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -34,15 +36,20 @@ export function ProfileOverviewScreen({
           <Badge label="18+" tone="neutral" />
         </View>
 
-        {snapshot.message ? (
-          <Card>
-            <Text style={styles.notice}>{snapshot.message}</Text>
-          </Card>
-        ) : null}
+        {ready ? (
+          <>
+            <ProfileIdentityCard snapshot={snapshot} />
+            <ProfileVerificationCard snapshot={snapshot} />
+            <ProfilePreferencesCard snapshot={snapshot} />
+          </>
+        ) : (
+          <SystemState
+            kind="error"
+            title="Perfil indisponível"
+            description={snapshot.message ?? 'Os dados da conta só serão apresentados depois de confirmados pela API autenticada.'}
+          />
+        )}
 
-        <ProfileIdentityCard snapshot={snapshot} />
-        <ProfileVerificationCard snapshot={snapshot} />
-        <ProfilePreferencesCard snapshot={snapshot} />
         <ProfileMenuCard onOpenDestination={onOpenDestination} />
 
         <View style={styles.sessionSection}>
@@ -98,10 +105,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...darkTheme.typography.bodyLarge,
-    color: darkTheme.colors.text.secondary,
-  },
-  notice: {
-    ...darkTheme.typography.bodyMedium,
     color: darkTheme.colors.text.secondary,
   },
   sessionSection: {

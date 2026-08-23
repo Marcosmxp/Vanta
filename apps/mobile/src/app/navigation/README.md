@@ -7,6 +7,7 @@
 - `Auth` — onboarding and authentication entry point. This is the default application entry.
 - `Kyc` — identity-verification flow owned separately from authentication and the main application shell.
 - `Main` — authenticated application shell.
+- `Maintenance` — non-dismissible platform-maintenance presentation surface selected only by trusted bootstrap/platform state.
 - `SessionExpired` — security interruption that forces reauthentication.
 - `AccountBlocked` — non-dismissible account security state.
 
@@ -73,9 +74,15 @@ Betting history, wallet details, payment flows, security screens, responsible-ga
 
 The custom tab bar is backed by the Vanta `BottomNavigation` design-system component.
 
+## System-state ownership
+
+Loading, empty, offline and request-error presentation is standardized by the core `system-state` layer and reusable design-system `SystemState` component. Feature screens may select presentation based on their typed read-model availability, but they do not convert missing backend data into synthetic business state.
+
+`Maintenance` is a root-level interruption because it can apply before authentication or to the authenticated shell. The route itself does not decide whether maintenance is active. A future trusted bootstrap/platform coordinator must select it from server/platform availability state.
+
 ## Security boundaries
 
-Navigation never decides whether a player is authenticated, eligible, funded, KYC-approved, allowed to wager, allowed to deposit, allowed to withdraw, authorized to mutate account security, allowed to bypass a responsible-gaming restriction, allowed to access another player's support request, or entitled to a legal/licensing claim. Those decisions come from trusted application/backend state and server-authoritative APIs.
+Navigation never decides whether a player is authenticated, eligible, funded, KYC-approved, allowed to wager, allowed to deposit, allowed to withdraw, authorized to mutate account security, allowed to bypass a responsible-gaming restriction, allowed to access another player's support request, entitled to a legal/licensing claim, or whether a protected backend operation succeeded during an offline/error state. Those decisions come from trusted application/backend state and server-authoritative APIs.
 
 Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, KYC/AML, jurisdiction, responsible-gaming limits/restrictions, idempotency, payment state, session ownership, support-request ownership, step-up authentication and financial invariants server-side.
 
@@ -83,8 +90,8 @@ Credentials, passwords, OTP values, raw KYC media, full legal identity data, tok
 
 Bet details carry only `betId`; wallet transaction details carry only `transactionId`; security-session details carry only `sessionId`; responsible-gaming limit changes carry only the limit target and opaque `limitId` when required; support-request details carry only `requestId`; legal-document details carry only `documentId`. Deposit and withdrawal routes carry no financial record or authorization state. Profile destination routes carry no identity record or privilege state. Handlers must perform authenticated ownership checks for every player-owned opaque identifier to prevent IDOR.
 
-The authentication, KYC, payment, profile, security, responsible-gaming, support and legal presentation layers validate or present UX state only. They do not mint sessions, approve KYC, alter account privileges, revoke sessions locally, mark MFA active locally, credit balances, authorize withdrawals, confirm provider settlement, apply limits locally, end a time-out, revoke self-exclusion, create support records locally, declare a licence locally or grant access to protected backend operations.
+The authentication, KYC, payment, profile, security, responsible-gaming, support, legal and system-state presentation layers validate or present UX state only. They do not mint sessions, approve KYC, alter account privileges, revoke sessions locally, mark MFA active locally, credit balances, authorize withdrawals, confirm provider settlement, apply limits locally, end a time-out, revoke self-exclusion, create support records locally, declare a licence locally, declare maintenance locally or grant access to protected backend operations.
 
 ## Entry and future coordination
 
-The root navigator still starts at `Auth`. The trusted authentication/session coordinator will eventually decide among `Auth`, `Kyc`, `Main`, `AccountBlocked`, or another compliance-required flow using authenticated server state.
+The root navigator still starts at `Auth`. The trusted authentication/session/platform coordinator will eventually decide among `Auth`, `Kyc`, `Main`, `Maintenance`, `AccountBlocked`, or another compliance-required flow using authenticated and platform-authoritative state.

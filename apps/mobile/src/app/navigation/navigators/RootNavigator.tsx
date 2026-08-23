@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { darkTheme } from '../../../design-system';
 import { AccountBlockedScreen } from '../screens/AccountBlockedScreen';
+import { MaintenanceRouteScreen } from '../screens/MaintenanceRouteScreen';
 import { SessionExpiredScreen } from '../screens/SessionExpiredScreen';
 import type { RootStackParamList } from '../types';
 import { AuthStackNavigator } from './AuthStackNavigator';
@@ -22,6 +23,11 @@ export function RootNavigator() {
       <Stack.Screen name="Auth" component={AuthStackNavigator} />
       <Stack.Screen name="Kyc" component={KycStackNavigator} />
       <Stack.Screen name="Main" component={MainStackNavigator} />
+      <Stack.Screen
+        name="Maintenance"
+        component={MaintenanceRouteScreen}
+        options={{ gestureEnabled: false }}
+      />
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="SessionExpired" component={SessionExpiredScreen} />

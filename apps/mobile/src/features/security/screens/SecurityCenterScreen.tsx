@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Card, darkTheme } from '../../../design-system';
+import { SystemState, darkTheme } from '../../../design-system';
 import { SecuritySessionCard } from '../components/SecuritySessionCard';
 import { SecurityStatusCard } from '../components/SecurityStatusCard';
 import {
@@ -25,6 +25,8 @@ export function SecurityCenterScreen({
   onBeginMfaEnrollment,
   onRevokeOtherSessions,
 }: SecurityCenterScreenProps) {
+  const sessionsReady = snapshot.availability === 'ready';
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -50,12 +52,17 @@ export function SecurityCenterScreen({
           </View>
 
           {snapshot.sessions.length === 0 ? (
-            <Card style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>Sessões não disponíveis</Text>
-              <Text style={styles.emptyDescription}>
-                {snapshot.message ?? 'As sessões serão apresentadas quando a API autenticada estiver disponível.'}
-              </Text>
-            </Card>
+            <SystemState
+              kind={sessionsReady ? 'empty' : 'error'}
+              compact
+              title={sessionsReady ? 'Nenhuma sessão adicional' : 'Sessões não disponíveis'}
+              description={
+                snapshot.message ??
+                (sessionsReady
+                  ? 'Não existem outras sessões para apresentar neste momento.'
+                  : 'As sessões só serão apresentadas depois de confirmadas pela API autenticada.')
+              }
+            />
           ) : (
             <View style={styles.list}>
               {snapshot.sessions.map((session) => (
@@ -94,8 +101,5 @@ const styles = StyleSheet.create({
   sectionTitle: { ...darkTheme.typography.heading3, color: darkTheme.colors.text.primary },
   sectionCount: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.brand.primary },
   list: { gap: darkTheme.spacing.sm },
-  emptyCard: { gap: darkTheme.spacing.xs },
-  emptyTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
-  emptyDescription: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   footer: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled, textAlign: 'center' },
 });
