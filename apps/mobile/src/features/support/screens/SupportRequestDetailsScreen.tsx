@@ -5,6 +5,7 @@ import { Badge, Card, darkTheme } from '../../../design-system';
 import type { SupportRequestStatus, SupportRequestSummary } from '../types';
 
 export interface SupportRequestDetailsScreenProps {
+  requestId: string;
   request: SupportRequestSummary | null;
 }
 
@@ -21,7 +22,7 @@ function statusLabel(status: SupportRequestStatus) {
   }
 }
 
-export function SupportRequestDetailsScreen({ request }: SupportRequestDetailsScreenProps) {
+export function SupportRequestDetailsScreen({ requestId, request }: SupportRequestDetailsScreenProps) {
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -49,7 +50,10 @@ export function SupportRequestDetailsScreen({ request }: SupportRequestDetailsSc
               <View style={styles.row}><Text style={styles.label}>Atualizado</Text><Text style={styles.value}>{new Date(request.updatedAt).toLocaleString('pt-PT')}</Text></View>
             </>
           ) : (
-            <Text style={styles.empty}>O pedido será carregado quando a API autenticada estiver disponível e confirmar ownership.</Text>
+            <>
+              <View style={styles.row}><Text style={styles.label}>ID solicitado</Text><Text style={styles.value}>{requestId}</Text></View>
+              <Text style={styles.empty}>O pedido será carregado quando a API autenticada estiver disponível e confirmar ownership.</Text>
+            </>
           )}
         </Card>
       </ScrollView>
