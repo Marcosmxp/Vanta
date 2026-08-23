@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Button, Card, darkTheme } from '../../../design-system';
+import { Badge, Button, SystemState, darkTheme } from '../../../design-system';
 import { WalletActionsCard } from '../components/WalletActionsCard';
 import { WalletBalanceCard } from '../components/WalletBalanceCard';
 import { WalletTransactionItemCard } from '../components/WalletTransactionItemCard';
@@ -23,6 +23,8 @@ export function WalletOverviewScreen({
   onOpenBetHistory,
   onOpenTransaction,
 }: WalletOverviewScreenProps) {
+  const walletReady = snapshot.balance.availability === 'ready';
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -53,15 +55,17 @@ export function WalletOverviewScreen({
           </View>
 
           {snapshot.transactions.length === 0 ? (
-            <Card style={styles.emptyCard}>
-              <View style={styles.emptyMark} />
-              <View style={styles.emptyCopy}>
-                <Text style={styles.emptyTitle}>Nenhum movimento disponível</Text>
-                <Text style={styles.emptyDescription}>
-                  {snapshot.message ?? 'As transações aparecerão quando forem recebidas da API autenticada.'}
-                </Text>
-              </View>
-            </Card>
+            <SystemState
+              kind={walletReady ? 'empty' : 'error'}
+              compact
+              title={walletReady ? 'Nenhum movimento disponível' : 'Movimentos indisponíveis'}
+              description={
+                snapshot.message ??
+                (walletReady
+                  ? 'As transações aparecerão quando existirem movimentos registados no ledger.'
+                  : 'O cliente não apresenta transações ou saldos locais como substituto da API financeira autenticada.')
+              }
+            />
           ) : (
             <View style={styles.list}>
               {snapshot.transactions.map((transaction) => (
@@ -139,31 +143,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...darkTheme.typography.heading3,
     color: darkTheme.colors.text.primary,
-  },
-  emptyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: darkTheme.spacing.lg,
-  },
-  emptyMark: {
-    width: 42,
-    height: 42,
-    borderRadius: darkTheme.radius.full,
-    borderWidth: 1,
-    borderColor: darkTheme.colors.border.strong,
-    backgroundColor: darkTheme.colors.surface.raised,
-  },
-  emptyCopy: {
-    flex: 1,
-    gap: darkTheme.spacing.xs,
-  },
-  emptyTitle: {
-    ...darkTheme.typography.bodyStrong,
-    color: darkTheme.colors.text.primary,
-  },
-  emptyDescription: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.text.secondary,
   },
   list: {
     gap: darkTheme.spacing.sm,
