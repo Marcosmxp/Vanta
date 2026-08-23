@@ -16,11 +16,11 @@ The Profile feature presents a privacy-minimized, read-only projection of the au
 
 ## Navigation
 
-Profile exposes entry points to:
+Profile exposes implemented entry points to:
 
-- Security Center — Phase 13
-- Responsible Gaming — Phase 14
-- Support — Phase 15
-- Legal and Privacy — Phase 15
+- Security Center
+- Responsible Gaming
+- Support
+- Legal and Privacy
 
-These routes are navigation boundaries only in Phase 12. Their security/compliance functionality is not implemented early through client-side shortcuts.
+Each destination owns its own server-authoritative or versioned contracts. Route availability does not grant security, financial, compliance, support-record or licensing authority to the client.
