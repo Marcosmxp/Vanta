@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../design-system';
 import type { LegalDocumentDetail } from '../types';
 
 export interface LegalDocumentScreenProps {
@@ -15,7 +15,7 @@ export function LegalDocumentScreen({ documentId, document }: LegalDocumentScree
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.eyebrow}>DOCUMENTO VERSIONADO</Text>
-          <Text style={styles.title}>{document?.title ?? 'Documento indisponível'}</Text>
+          <Text style={styles.title}>{document?.title ?? 'A carregar documento'}</Text>
           <Text style={styles.subtitle}>
             O conteúdo é recarregado da API pelo `documentId`; o corpo completo nunca é transportado em navigation state.
           </Text>
@@ -37,10 +37,11 @@ export function LegalDocumentScreen({ documentId, document }: LegalDocumentScree
             </Card>
           </>
         ) : (
-          <Card style={styles.metaCard}>
-            <Text style={styles.meta}>ID solicitado: {documentId}</Text>
-            <Text style={styles.empty}>O documento será apresentado quando a API legal confirmar a versão e integridade do conteúdo.</Text>
-          </Card>
+          <SystemState
+            kind="loading"
+            title="A carregar documento legal"
+            description={`O documento ${documentId} só será apresentado quando a API legal confirmar a versão e integridade do conteúdo.`}
+          />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -61,5 +62,4 @@ const styles = StyleSheet.create({
   digest: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
   bodyCard: { gap: darkTheme.spacing.md },
   body: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.primary, lineHeight: 24 },
-  empty: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
 });
