@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../../design-system';
 import type { BetDetails, BetStatus } from '../types';
 import { formatBetDate, formatEuroMinor, formatMultiplierBps } from '../utils/formatting';
 
@@ -42,12 +42,11 @@ export function BetDetailsScreen({ betId, details = null }: BetDetailsScreenProp
         </View>
 
         {details === null ? (
-          <Card style={styles.unavailableCard}>
-            <Text style={styles.unavailableTitle}>Dados ainda não carregados</Text>
-            <Text style={styles.unavailableDescription}>
-              O detalhe será obtido pela API autenticada. O cliente não reconstrói nem inventa liquidação localmente.
-            </Text>
-          </Card>
+          <SystemState
+            kind="loading"
+            title="A carregar detalhe da aposta"
+            description="O detalhe será obtido pela API autenticada. O cliente não reconstrói nem inventa liquidação localmente."
+          />
         ) : (
           <>
             <Card elevated style={styles.summaryCard}>
@@ -122,17 +121,6 @@ const styles = StyleSheet.create({
   betId: {
     ...darkTheme.typography.caption,
     color: darkTheme.colors.text.disabled,
-  },
-  unavailableCard: {
-    gap: darkTheme.spacing.sm,
-  },
-  unavailableTitle: {
-    ...darkTheme.typography.bodyStrong,
-    color: darkTheme.colors.text.primary,
-  },
-  unavailableDescription: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.text.secondary,
   },
   summaryCard: {
     gap: darkTheme.spacing.xl,
