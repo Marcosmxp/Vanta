@@ -1,12 +1,14 @@
-import { ScreenScaffold } from './ScreenScaffold';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export function SecurityCenterRouteScreen() {
+import { SecurityCenterScreen } from '../../../features/security/screens/SecurityCenterScreen';
+import type { MainStackParamList } from '../types';
+
+type Props = NativeStackScreenProps<MainStackParamList, 'SecurityCenter'>;
+
+export function SecurityCenterRouteScreen({ navigation }: Props) {
   return (
-    <ScreenScaffold
-      eyebrow="Segurança"
-      title="Security Center"
-      description="Entrada reservada para sessões, dispositivos, autenticação forte e controlos de segurança da Fase 13."
-      statusLabel="Phase 13 boundary ready"
+    <SecurityCenterScreen
+      onOpenSession={(sessionId) => navigation.navigate('SecuritySessionDetails', { sessionId })}
     />
   );
 }

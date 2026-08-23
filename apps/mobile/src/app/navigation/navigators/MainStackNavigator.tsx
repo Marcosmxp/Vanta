@@ -7,6 +7,7 @@ import { DepositRouteScreen } from '../screens/DepositRouteScreen';
 import { LegalRouteScreen } from '../screens/LegalRouteScreen';
 import { ResponsibleGamingRouteScreen } from '../screens/ResponsibleGamingRouteScreen';
 import { SecurityCenterRouteScreen } from '../screens/SecurityCenterRouteScreen';
+import { SecuritySessionDetailsRouteScreen } from '../screens/SecuritySessionDetailsRouteScreen';
 import { SupportRouteScreen } from '../screens/SupportRouteScreen';
 import { WalletTransactionDetailsRouteScreen } from '../screens/WalletTransactionDetailsRouteScreen';
 import { WithdrawalRouteScreen } from '../screens/WithdrawalRouteScreen';
@@ -37,6 +38,11 @@ export function MainStackNavigator() {
       <Stack.Screen name="Deposit" component={DepositRouteScreen} options={{ title: 'Depositar' }} />
       <Stack.Screen name="Withdrawal" component={WithdrawalRouteScreen} options={{ title: 'Levantar' }} />
       <Stack.Screen name="SecurityCenter" component={SecurityCenterRouteScreen} options={{ title: 'Segurança' }} />
+      <Stack.Screen
+        name="SecuritySessionDetails"
+        component={SecuritySessionDetailsRouteScreen}
+        options={{ title: 'Detalhe da sessão' }}
+      />
       <Stack.Screen
         name="ResponsibleGaming"
         component={ResponsibleGamingRouteScreen}
