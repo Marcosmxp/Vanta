@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../../design-system';
 import { BetControls } from '../components/BetControls';
 import { MultiplierRow } from '../components/MultiplierRow';
 import { PlinkoBoard } from '../components/PlinkoBoard';
@@ -122,6 +122,15 @@ export function PlinkoGameScreen({
           </Text>
         </View>
 
+        {snapshot.availability !== 'ready' ? (
+          <SystemState
+            kind="offline"
+            compact
+            title="Apostas temporariamente indisponíveis"
+            description={snapshot.message ?? 'O tabuleiro permanece disponível para visualização, mas nenhuma aposta é aceite sem ligação ao serviço autoritativo.'}
+          />
+        ) : null}
+
         <PlinkoBoard
           rows={rows}
           width={boardWidth}
@@ -136,9 +145,12 @@ export function PlinkoGameScreen({
         />
 
         {errorMessage ? (
-          <Card style={styles.errorCard}>
-            <Text accessibilityLiveRegion="polite" style={styles.errorText}>{errorMessage}</Text>
-          </Card>
+          <SystemState
+            kind="error"
+            compact
+            title="Aposta não confirmada"
+            description={errorMessage}
+          />
         ) : null}
 
         {lastResult ? <ResultCard result={lastResult} /> : null}
@@ -200,13 +212,6 @@ const styles = StyleSheet.create({
   description: {
     ...darkTheme.typography.bodyMedium,
     color: darkTheme.colors.text.secondary,
-  },
-  errorCard: {
-    borderColor: darkTheme.colors.status.danger,
-  },
-  errorText: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.status.danger,
   },
   resultCard: {
     gap: darkTheme.spacing.lg,
