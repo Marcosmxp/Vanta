@@ -33,15 +33,15 @@ const items: readonly {
     destination: 'support',
     title: 'Suporte',
     description: 'Ajuda, contacto e acompanhamento de pedidos.',
-    status: 'Fase 15',
-    active: false,
+    status: 'Ativo',
+    active: true,
   },
   {
     destination: 'legal',
     title: 'Legal e privacidade',
     description: 'Termos, privacidade, regras e informação regulatória.',
-    status: 'Fase 15',
-    active: false,
+    status: 'Ativo',
+    active: true,
   },
 ];
 
