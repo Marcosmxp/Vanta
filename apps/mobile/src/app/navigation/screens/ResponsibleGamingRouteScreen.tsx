@@ -1,12 +1,27 @@
-import { ScreenScaffold } from './ScreenScaffold';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export function ResponsibleGamingRouteScreen() {
-  return (
-    <ScreenScaffold
-      eyebrow="Proteção"
-      title="Jogo responsável"
-      description="Entrada reservada para limites, pausas, autoexclusão e proteções da Fase 14."
-      statusLabel="Phase 14 boundary ready"
-    />
-  );
+import {
+  type ResponsibleGamingDestination,
+} from '../../../features/responsible-gaming/components/ResponsibleGamingActionCard';
+import { ResponsibleGamingOverviewScreen } from '../../../features/responsible-gaming/screens/ResponsibleGamingOverviewScreen';
+import type { MainStackParamList } from '../types';
+
+type Props = NativeStackScreenProps<MainStackParamList, 'ResponsibleGaming'>;
+
+export function ResponsibleGamingRouteScreen({ navigation }: Props) {
+  const openDestination = (destination: ResponsibleGamingDestination) => {
+    switch (destination) {
+      case 'limits':
+        navigation.navigate('ResponsibleGamingLimits');
+        return;
+      case 'time-out':
+        navigation.navigate('ResponsibleGamingTimeOut');
+        return;
+      case 'self-exclusion':
+        navigation.navigate('ResponsibleGamingSelfExclusion');
+        return;
+    }
+  };
+
+  return <ResponsibleGamingOverviewScreen onOpenDestination={openDestination} />;
 }
