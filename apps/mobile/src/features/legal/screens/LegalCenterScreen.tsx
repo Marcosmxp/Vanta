@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../design-system';
+import { Badge, Card, SystemState, darkTheme } from '../../../design-system';
 import { disconnectedLegalSnapshot } from '../provider/LegalProvider';
 import type { LegalSnapshot } from '../types';
 
@@ -62,7 +62,16 @@ export function LegalCenterScreen({
             <Text style={styles.count}>{snapshot.documents.length}</Text>
           </View>
           {snapshot.documents.length === 0 ? (
-            <Card><Text style={styles.emptyText}>Nenhum documento legal foi carregado.</Text></Card>
+            <SystemState
+              kind={ready ? 'empty' : 'error'}
+              compact
+              title={ready ? 'Nenhum documento publicado' : 'Documentos indisponíveis'}
+              description={
+                ready
+                  ? 'Não existem documentos legais publicados para este contexto.'
+                  : snapshot.message ?? 'O Vanta não apresenta textos legais locais como substituto da API compliance versionada.'
+              }
+            />
           ) : (
             snapshot.documents.map((document) => (
               <Pressable
@@ -120,6 +129,5 @@ const styles = StyleSheet.create({
   documentTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
   documentMeta: { ...darkTheme.typography.caption, color: darkTheme.colors.text.secondary },
   digest: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
-  emptyText: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   footer: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled, textAlign: 'center' },
 });
