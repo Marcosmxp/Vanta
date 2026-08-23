@@ -35,6 +35,10 @@ export type KycStackParamList = {
   Retry: undefined;
 };
 
+export type ResponsibleGamingLimitChangeParams =
+  | { target: 'money'; limitId: string }
+  | { target: 'session' };
+
 export type MainStackParamList = {
   Tabs: undefined;
   BetHistory: undefined;
@@ -45,6 +49,10 @@ export type MainStackParamList = {
   SecurityCenter: undefined;
   SecuritySessionDetails: { sessionId: string };
   ResponsibleGaming: undefined;
+  ResponsibleGamingLimits: undefined;
+  ResponsibleGamingLimitChange: ResponsibleGamingLimitChangeParams;
+  ResponsibleGamingTimeOut: undefined;
+  ResponsibleGamingSelfExclusion: undefined;
   Support: undefined;
   Legal: undefined;
 };
