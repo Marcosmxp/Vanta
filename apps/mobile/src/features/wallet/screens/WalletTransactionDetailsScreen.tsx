@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SystemStateScreen } from '../../../core/system-state/screens/SystemStateScreen';
 import { Badge, Card, darkTheme } from '../../../design-system';
 import type { WalletTransactionDetailReadModel } from '../types';
 import {
@@ -29,15 +30,11 @@ export function WalletTransactionDetailsScreen({
 }: WalletTransactionDetailsScreenProps) {
   if (!transaction) {
     return (
-      <SafeAreaView edges={['bottom']} style={styles.safeArea}>
-        <View style={styles.unavailableContent}>
-          <Badge label="Read-only" tone="neutral" />
-          <Text style={styles.title}>Movimento indisponível</Text>
-          <Text style={styles.subtitle}>
-            O detalhe de {transactionId} será carregado apenas pela API financeira autenticada e com verificação de ownership.
-          </Text>
-        </View>
-      </SafeAreaView>
+      <SystemStateScreen
+        kind="loading"
+        title="A carregar movimento"
+        description={`O detalhe de ${transactionId} será carregado apenas pela API financeira autenticada e com verificação de ownership.`}
+      />
     );
   }
 
@@ -88,12 +85,6 @@ const styles = StyleSheet.create({
     paddingBottom: darkTheme.spacing['4xl'],
     gap: darkTheme.spacing.xl,
   },
-  unavailableContent: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: darkTheme.spacing.xl,
-    gap: darkTheme.spacing.md,
-  },
   hero: {
     gap: darkTheme.spacing.sm,
   },
@@ -105,10 +96,6 @@ const styles = StyleSheet.create({
   title: {
     ...darkTheme.typography.heading2,
     color: darkTheme.colors.text.primary,
-  },
-  subtitle: {
-    ...darkTheme.typography.bodyLarge,
-    color: darkTheme.colors.text.secondary,
   },
   amount: {
     ...darkTheme.typography.display,
