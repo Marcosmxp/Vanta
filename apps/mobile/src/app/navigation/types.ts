@@ -43,6 +43,7 @@ export type MainStackParamList = {
   Deposit: undefined;
   Withdrawal: undefined;
   SecurityCenter: undefined;
+  SecuritySessionDetails: { sessionId: string };
   ResponsibleGaming: undefined;
   Support: undefined;
   Legal: undefined;
