@@ -4,7 +4,10 @@ import { darkTheme } from '../../../design-system';
 import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
 import { DepositRouteScreen } from '../screens/DepositRouteScreen';
+import { LegalDocumentRouteScreen } from '../screens/LegalDocumentRouteScreen';
 import { LegalRouteScreen } from '../screens/LegalRouteScreen';
+import { PrivacyInformationRouteScreen } from '../screens/PrivacyInformationRouteScreen';
+import { RegulatoryInformationRouteScreen } from '../screens/RegulatoryInformationRouteScreen';
 import { ResponsibleGamingLimitChangeRouteScreen } from '../screens/ResponsibleGamingLimitChangeRouteScreen';
 import { ResponsibleGamingLimitsRouteScreen } from '../screens/ResponsibleGamingLimitsRouteScreen';
 import { ResponsibleGamingRouteScreen } from '../screens/ResponsibleGamingRouteScreen';
@@ -12,6 +15,8 @@ import { ResponsibleGamingSelfExclusionRouteScreen } from '../screens/Responsibl
 import { ResponsibleGamingTimeOutRouteScreen } from '../screens/ResponsibleGamingTimeOutRouteScreen';
 import { SecurityCenterRouteScreen } from '../screens/SecurityCenterRouteScreen';
 import { SecuritySessionDetailsRouteScreen } from '../screens/SecuritySessionDetailsRouteScreen';
+import { SupportRequestCreateRouteScreen } from '../screens/SupportRequestCreateRouteScreen';
+import { SupportRequestDetailsRouteScreen } from '../screens/SupportRequestDetailsRouteScreen';
 import { SupportRouteScreen } from '../screens/SupportRouteScreen';
 import { WalletTransactionDetailsRouteScreen } from '../screens/WalletTransactionDetailsRouteScreen';
 import { WithdrawalRouteScreen } from '../screens/WithdrawalRouteScreen';
@@ -73,7 +78,28 @@ export function MainStackNavigator() {
         options={{ title: 'Autoexclusão' }}
       />
       <Stack.Screen name="Support" component={SupportRouteScreen} options={{ title: 'Suporte' }} />
+      <Stack.Screen
+        name="SupportRequestCreate"
+        component={SupportRequestCreateRouteScreen}
+        options={{ title: 'Novo pedido' }}
+      />
+      <Stack.Screen
+        name="SupportRequestDetails"
+        component={SupportRequestDetailsRouteScreen}
+        options={{ title: 'Detalhe do pedido' }}
+      />
       <Stack.Screen name="Legal" component={LegalRouteScreen} options={{ title: 'Legal e privacidade' }} />
+      <Stack.Screen name="LegalDocument" component={LegalDocumentRouteScreen} options={{ title: 'Documento legal' }} />
+      <Stack.Screen
+        name="PrivacyInformation"
+        component={PrivacyInformationRouteScreen}
+        options={{ title: 'Privacidade' }}
+      />
+      <Stack.Screen
+        name="RegulatoryInformation"
+        component={RegulatoryInformationRouteScreen}
+        options={{ title: 'Informação regulatória' }}
+      />
     </Stack.Navigator>
   );
 }

@@ -54,7 +54,12 @@ export type MainStackParamList = {
   ResponsibleGamingTimeOut: undefined;
   ResponsibleGamingSelfExclusion: undefined;
   Support: undefined;
+  SupportRequestCreate: undefined;
+  SupportRequestDetails: { requestId: string };
   Legal: undefined;
+  LegalDocument: { documentId: string };
+  PrivacyInformation: undefined;
+  RegulatoryInformation: undefined;
 };
 
 export type MainTabParamList = {

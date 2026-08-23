@@ -54,10 +54,15 @@ Only the document category may be passed through navigation. Raw document images
 - `ResponsibleGamingLimitChange` — guarded limit-change request carrying only the target type and opaque `limitId` when applicable.
 - `ResponsibleGamingTimeOut` — server-provided temporary-pause options.
 - `ResponsibleGamingSelfExclusion` — server-provided self-exclusion options and explicit acknowledgement UX.
-- `Support` — Phase 15 navigation boundary.
-- `Legal` — Phase 15 legal/privacy navigation boundary.
+- `Support` — authenticated help, contact channels and recent-request overview.
+- `SupportRequestCreate` — guarded support-request form; submit stays disabled until backend capability is available.
+- `SupportRequestDetails` — read-only request detail receiving only opaque `requestId`.
+- `Legal` — versioned legal/privacy/regulatory overview.
+- `LegalDocument` — document detail receiving only opaque `documentId`.
+- `PrivacyInformation` — privacy-controller and supervisory-authority disclosure.
+- `RegulatoryInformation` — operator, regulator and licensing disclosure.
 
-Betting history, wallet details, payment flows, security screens, responsible-gaming screens and profile destinations sit above the tab navigator so they can be opened from authenticated surfaces without becoming permanent tabs.
+Betting history, wallet details, payment flows, security screens, responsible-gaming screens, support/compliance screens and profile destinations sit above the tab navigator so they can be opened from authenticated surfaces without becoming permanent tabs.
 
 ### Main tabs
 
@@ -70,15 +75,15 @@ The custom tab bar is backed by the Vanta `BottomNavigation` design-system compo
 
 ## Security boundaries
 
-Navigation never decides whether a player is authenticated, eligible, funded, KYC-approved, allowed to wager, allowed to deposit, allowed to withdraw, authorized to mutate account security, or allowed to bypass a responsible-gaming restriction. Those decisions come from trusted application/backend state and server-authoritative APIs.
+Navigation never decides whether a player is authenticated, eligible, funded, KYC-approved, allowed to wager, allowed to deposit, allowed to withdraw, authorized to mutate account security, allowed to bypass a responsible-gaming restriction, allowed to access another player's support request, or entitled to a legal/licensing claim. Those decisions come from trusted application/backend state and server-authoritative APIs.
 
-Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, KYC/AML, jurisdiction, responsible-gaming limits/restrictions, idempotency, payment state, session ownership, step-up authentication and financial invariants server-side.
+Route visibility is not authorization. Sensitive backend operations must continue to validate authentication, authorization, account state, KYC/AML, jurisdiction, responsible-gaming limits/restrictions, idempotency, payment state, session ownership, support-request ownership, step-up authentication and financial invariants server-side.
 
-Credentials, passwords, OTP values, raw KYC media, full legal identity data, tokens, cookies, session secrets, TOTP secrets, recovery codes, canonical balances, payment secrets, RNG state, payout rules, and settlement authority must never be stored in route parameters or navigation state.
+Credentials, passwords, OTP values, raw KYC media, full legal identity data, tokens, cookies, session secrets, TOTP secrets, recovery codes, support-message bodies, canonical balances, payment secrets, RNG state, payout rules, legal-document bodies and settlement authority must never be stored in route parameters or navigation state.
 
-Bet details carry only `betId`; wallet transaction details carry only `transactionId`; security-session details carry only `sessionId`; responsible-gaming limit changes carry only the limit target and an opaque `limitId` when required. Deposit and withdrawal routes carry no financial record or authorization state. Profile destination routes carry no identity record or privilege state. Future handlers must perform authenticated ownership checks for every opaque identifier to prevent IDOR.
+Bet details carry only `betId`; wallet transaction details carry only `transactionId`; security-session details carry only `sessionId`; responsible-gaming limit changes carry only the limit target and opaque `limitId` when required; support-request details carry only `requestId`; legal-document details carry only `documentId`. Deposit and withdrawal routes carry no financial record or authorization state. Profile destination routes carry no identity record or privilege state. Handlers must perform authenticated ownership checks for every player-owned opaque identifier to prevent IDOR.
 
-The authentication, KYC, payment, profile, security and responsible-gaming presentation layers validate or present UX state only. They do not mint sessions, approve KYC, alter account privileges, revoke sessions locally, mark MFA active locally, credit balances, authorize withdrawals, confirm provider settlement, apply limits locally, end a time-out, revoke self-exclusion or grant access to protected backend operations.
+The authentication, KYC, payment, profile, security, responsible-gaming, support and legal presentation layers validate or present UX state only. They do not mint sessions, approve KYC, alter account privileges, revoke sessions locally, mark MFA active locally, credit balances, authorize withdrawals, confirm provider settlement, apply limits locally, end a time-out, revoke self-exclusion, create support records locally, declare a licence locally or grant access to protected backend operations.
 
 ## Entry and future coordination
 
