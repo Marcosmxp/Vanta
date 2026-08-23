@@ -6,8 +6,6 @@ import (
 )
 
 func TestSnapshotValidateReadyLimitsConfigured(t *testing.T) {
-	now := time.Date(2026, time.August, 23, 6, 0, 0, 0, time.UTC)
-
 	snapshot := Snapshot{
 		PlayerID:     "player_123",
 		Availability: AvailabilityReady,
@@ -23,8 +21,8 @@ func TestSnapshotValidateReadyLimitsConfigured(t *testing.T) {
 		},
 		SessionLimit: &SessionLimitReadModel{Minutes: 120},
 		Policy: PolicyReadModel{
-			TimeOutOptions: []PolicyOptionReadModel{{OptionID: "timeout_short", Label: "Pausa curta"}},
-			SelfExclusionOptions: []PolicyOptionReadModel{{OptionID: "exclude_long", Label: "Autoexclusão"}},
+			TimeOutOptions:        []PolicyOptionReadModel{{OptionID: "timeout_short", Label: "Pausa curta"}},
+			SelfExclusionOptions:  []PolicyOptionReadModel{{OptionID: "exclude_long", Label: "Autoexclusão"}},
 			CanRequestLimitChange: true,
 			CanStartTimeOut:       true,
 			CanSelfExclude:        true,
@@ -34,8 +32,6 @@ func TestSnapshotValidateReadyLimitsConfigured(t *testing.T) {
 	if err := snapshot.Validate(); err != nil {
 		t.Fatalf("expected valid snapshot, got %v", err)
 	}
-
-	_ = now
 }
 
 func TestSnapshotValidateRejectsSelfExclusionWithMutableCapabilities(t *testing.T) {
