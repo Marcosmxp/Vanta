@@ -5,7 +5,11 @@ import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
 import { DepositRouteScreen } from '../screens/DepositRouteScreen';
 import { LegalRouteScreen } from '../screens/LegalRouteScreen';
+import { ResponsibleGamingLimitChangeRouteScreen } from '../screens/ResponsibleGamingLimitChangeRouteScreen';
+import { ResponsibleGamingLimitsRouteScreen } from '../screens/ResponsibleGamingLimitsRouteScreen';
 import { ResponsibleGamingRouteScreen } from '../screens/ResponsibleGamingRouteScreen';
+import { ResponsibleGamingSelfExclusionRouteScreen } from '../screens/ResponsibleGamingSelfExclusionRouteScreen';
+import { ResponsibleGamingTimeOutRouteScreen } from '../screens/ResponsibleGamingTimeOutRouteScreen';
 import { SecurityCenterRouteScreen } from '../screens/SecurityCenterRouteScreen';
 import { SecuritySessionDetailsRouteScreen } from '../screens/SecuritySessionDetailsRouteScreen';
 import { SupportRouteScreen } from '../screens/SupportRouteScreen';
@@ -47,6 +51,26 @@ export function MainStackNavigator() {
         name="ResponsibleGaming"
         component={ResponsibleGamingRouteScreen}
         options={{ title: 'Jogo responsável' }}
+      />
+      <Stack.Screen
+        name="ResponsibleGamingLimits"
+        component={ResponsibleGamingLimitsRouteScreen}
+        options={{ title: 'Limites pessoais' }}
+      />
+      <Stack.Screen
+        name="ResponsibleGamingLimitChange"
+        component={ResponsibleGamingLimitChangeRouteScreen}
+        options={{ title: 'Alterar limite' }}
+      />
+      <Stack.Screen
+        name="ResponsibleGamingTimeOut"
+        component={ResponsibleGamingTimeOutRouteScreen}
+        options={{ title: 'Time-out' }}
+      />
+      <Stack.Screen
+        name="ResponsibleGamingSelfExclusion"
+        component={ResponsibleGamingSelfExclusionRouteScreen}
+        options={{ title: 'Autoexclusão' }}
       />
       <Stack.Screen name="Support" component={SupportRouteScreen} options={{ title: 'Suporte' }} />
       <Stack.Screen name="Legal" component={LegalRouteScreen} options={{ title: 'Legal e privacidade' }} />
