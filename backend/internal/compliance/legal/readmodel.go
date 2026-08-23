@@ -57,14 +57,14 @@ type LicenseReferenceReadModel struct {
 }
 
 type RegulatoryDisclosureReadModel struct {
-	JurisdictionCode    string
-	OperatorLegalName   string
-	OperatorContact     string
-	OperatorAddress     string
-	LicensingStatus     LicensingStatus
-	Regulator           AuthorityLinkReadModel
-	LicenseReferences   []LicenseReferenceReadModel
-	LicenseNotice       string
+	JurisdictionCode     string
+	OperatorLegalName    string
+	OperatorContact      string
+	OperatorAddress      string
+	LicensingStatus      LicensingStatus
+	Regulator            AuthorityLinkReadModel
+	LicenseReferences    []LicenseReferenceReadModel
+	LicenseNotice        string
 	ComplaintsDocumentID string
 }
 
