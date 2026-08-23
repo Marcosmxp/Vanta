@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Badge, Card, darkTheme } from '../../../../design-system';
+import { Badge, SystemState, darkTheme } from '../../../../design-system';
 import { BetHistoryItemCard } from '../components/BetHistoryItemCard';
 import { disconnectedBetHistorySnapshot } from '../provider/BetHistoryProvider';
 import type { BetHistorySnapshot } from '../types';
@@ -15,6 +15,14 @@ export function BetHistoryScreen({
   snapshot = disconnectedBetHistorySnapshot,
   onOpenBet,
 }: BetHistoryScreenProps) {
+  const emptyKind = snapshot.availability === 'ready' ? 'empty' : 'error';
+  const emptyTitle =
+    snapshot.availability === 'ready'
+      ? 'Nenhuma aposta disponível'
+      : snapshot.availability === 'restricted'
+        ? 'Histórico indisponível'
+        : 'Não foi possível carregar o histórico';
+
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -27,20 +35,16 @@ export function BetHistoryScreen({
         </View>
 
         {snapshot.items.length === 0 ? (
-          <Card style={styles.emptyCard}>
-            <View style={styles.emptyMark} />
-            <View style={styles.emptyCopy}>
-              <Text style={styles.emptyTitle}>
-                {snapshot.availability === 'restricted'
-                  ? 'Histórico indisponível'
-                  : 'Nenhuma aposta disponível'}
-              </Text>
-              <Text style={styles.emptyDescription}>
-                {snapshot.message ??
-                  'As apostas aparecerão aqui apenas depois de serem recebidas da API autenticada.'}
-              </Text>
-            </View>
-          </Card>
+          <SystemState
+            kind={emptyKind}
+            title={emptyTitle}
+            description={
+              snapshot.message ??
+              (snapshot.availability === 'ready'
+                ? 'As apostas aparecerão aqui depois de serem registadas pelo backend autoritativo.'
+                : 'O Vanta não apresenta apostas locais como substituto do histórico autenticado.')
+            }
+          />
         ) : (
           <View style={styles.list}>
             {snapshot.items.map((bet) => (
@@ -85,31 +89,6 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: darkTheme.spacing.md,
-  },
-  emptyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: darkTheme.spacing.lg,
-  },
-  emptyMark: {
-    width: 44,
-    height: 44,
-    borderRadius: darkTheme.radius.full,
-    borderWidth: 1,
-    borderColor: darkTheme.colors.border.strong,
-    backgroundColor: darkTheme.colors.surface.raised,
-  },
-  emptyCopy: {
-    flex: 1,
-    gap: darkTheme.spacing.xs,
-  },
-  emptyTitle: {
-    ...darkTheme.typography.bodyStrong,
-    color: darkTheme.colors.text.primary,
-  },
-  emptyDescription: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.text.secondary,
   },
   footer: {
     ...darkTheme.typography.caption,
