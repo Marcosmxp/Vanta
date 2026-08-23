@@ -1,12 +1,18 @@
-import { ScreenScaffold } from './ScreenScaffold';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export function LegalRouteScreen() {
+import { disconnectedLegalSnapshot } from '../../../features/legal/provider/LegalProvider';
+import { LegalCenterScreen } from '../../../features/legal/screens/LegalCenterScreen';
+import type { MainStackParamList } from '../types';
+
+type Props = NativeStackScreenProps<MainStackParamList, 'Legal'>;
+
+export function LegalRouteScreen({ navigation }: Props) {
   return (
-    <ScreenScaffold
-      eyebrow="Informação"
-      title="Legal e privacidade"
-      description="Entrada reservada para termos, privacidade, regras e informação regulatória da Fase 15."
-      statusLabel="Phase 15 legal boundary ready"
+    <LegalCenterScreen
+      snapshot={disconnectedLegalSnapshot}
+      onOpenDocument={(documentId) => navigation.navigate('LegalDocument', { documentId })}
+      onOpenPrivacy={() => navigation.navigate('PrivacyInformation')}
+      onOpenRegulatory={() => navigation.navigate('RegulatoryInformation')}
     />
   );
 }
