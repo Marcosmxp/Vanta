@@ -29,21 +29,21 @@ type Credential struct {
 }
 
 type Session struct {
-	SessionID          string
-	PlayerID           string
-	AccessTokenHash    string
-	AccessExpiresAt    time.Time
-	RefreshTokenHash   string
-	RefreshExpiresAt   time.Time
-	RefreshGeneration  int64
-	DeviceLabel        string
-	Platform           string
-	IPMasked           string
-	MFAUsed            bool
-	Trust              string
-	CreatedAt          time.Time
-	LastSeenAt         time.Time
-	RevokedAt          *time.Time
+	SessionID         string
+	PlayerID          string
+	AccessTokenHash   string
+	AccessExpiresAt   time.Time
+	RefreshTokenHash  string
+	RefreshExpiresAt  time.Time
+	RefreshGeneration int64
+	DeviceLabel       string
+	Platform          string
+	IPMasked          string
+	MFAUsed           bool
+	Trust             string
+	CreatedAt         time.Time
+	LastSeenAt        time.Time
+	RevokedAt         *time.Time
 }
 
 type NewAccount struct {
@@ -61,15 +61,15 @@ type NewAccount struct {
 }
 
 type NewSession struct {
-	SessionID         string
-	PlayerID          string
-	AccessTokenHash   string
-	AccessExpiresAt   time.Time
-	RefreshTokenHash  string
-	RefreshExpiresAt  time.Time
-	DeviceLabel       string
-	Platform          string
-	IPMasked          string
+	SessionID        string
+	PlayerID         string
+	AccessTokenHash  string
+	AccessExpiresAt  time.Time
+	RefreshTokenHash string
+	RefreshExpiresAt time.Time
+	DeviceLabel      string
+	Platform         string
+	IPMasked         string
 }
 
 type Store interface {
