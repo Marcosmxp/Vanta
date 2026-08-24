@@ -23,10 +23,10 @@ func NewHTTPHandler(repository *PostgresRepository) *HTTPHandler {
 }
 
 type profileResponse struct {
-	Availability string                       `json:"availability"`
-	Identity     profileIdentityResponse      `json:"identity"`
-	Verification profileVerificationResponse  `json:"verification"`
-	Preferences  profilePreferencesResponse   `json:"preferences"`
+	Availability string                      `json:"availability"`
+	Identity     profileIdentityResponse     `json:"identity"`
+	Verification profileVerificationResponse `json:"verification"`
+	Preferences  profilePreferencesResponse  `json:"preferences"`
 }
 
 type profileIdentityResponse struct {
@@ -71,13 +71,13 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 			CountryCode: snapshot.Identity.CountryCode, MemberSince: snapshot.Identity.MemberSince,
 		},
 		Verification: profileVerificationResponse{
-			AgeVerified: snapshot.Verification.AgeVerified,
-			KYCStatus: string(snapshot.Verification.KYCStatus),
+			AgeVerified:   snapshot.Verification.AgeVerified,
+			KYCStatus:     string(snapshot.Verification.KYCStatus),
 			AccountStatus: string(snapshot.Verification.AccountStatus),
 		},
 		Preferences: profilePreferencesResponse{
-			Language: string(snapshot.Preferences.Language),
-			MarketingOptIn: snapshot.Preferences.MarketingOptIn,
+			Language:         string(snapshot.Preferences.Language),
+			MarketingOptIn:   snapshot.Preferences.MarketingOptIn,
 			ProtectionStatus: string(snapshot.Preferences.ProtectionStatus),
 		},
 	})
