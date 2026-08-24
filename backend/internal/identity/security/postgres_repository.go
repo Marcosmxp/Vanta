@@ -18,8 +18,8 @@ func NewPostgresRepository(pool *pgxpool.Pool) *PostgresRepository {
 func (r *PostgresRepository) GetSnapshot(ctx context.Context, playerID, currentSessionID string) (Snapshot, error) {
 	snapshot := Snapshot{
 		Availability: AvailabilityReady,
-		PlayerID: playerID,
-		MFAStatus: MFAStatusDisabled,
+		PlayerID:     playerID,
+		MFAStatus:    MFAStatusDisabled,
 	}
 
 	var hasActiveMFA bool
