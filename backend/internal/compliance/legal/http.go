@@ -84,13 +84,13 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 	if snapshot.Regulatory != nil {
 		regulatory := regulatoryResponse{
-			JurisdictionCode: snapshot.Regulatory.JurisdictionCode,
-			OperatorLegalName: snapshot.Regulatory.OperatorLegalName,
-			OperatorContact: snapshot.Regulatory.OperatorContact,
-			OperatorAddress: snapshot.Regulatory.OperatorAddress,
-			LicensingStatus: string(snapshot.Regulatory.LicensingStatus),
-			Regulator: authorityResponse{Name: snapshot.Regulatory.Regulator.Name, URL: snapshot.Regulatory.Regulator.URL},
-			LicenseNotice: snapshot.Regulatory.LicenseNotice,
+			JurisdictionCode:     snapshot.Regulatory.JurisdictionCode,
+			OperatorLegalName:    snapshot.Regulatory.OperatorLegalName,
+			OperatorContact:      snapshot.Regulatory.OperatorContact,
+			OperatorAddress:      snapshot.Regulatory.OperatorAddress,
+			LicensingStatus:      string(snapshot.Regulatory.LicensingStatus),
+			Regulator:            authorityResponse{Name: snapshot.Regulatory.Regulator.Name, URL: snapshot.Regulatory.Regulator.URL},
+			LicenseNotice:        snapshot.Regulatory.LicenseNotice,
 			ComplaintsDocumentID: snapshot.Regulatory.ComplaintsDocumentID,
 		}
 		for _, reference := range snapshot.Regulatory.LicenseReferences {
@@ -100,11 +100,11 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 	if snapshot.Privacy != nil {
 		response.Privacy = &privacyResponse{
-			ControllerName: snapshot.Privacy.ControllerName,
-			PrivacyContact: snapshot.Privacy.PrivacyContact,
-			DPOContact: snapshot.Privacy.DPOContact,
+			ControllerName:       snapshot.Privacy.ControllerName,
+			PrivacyContact:       snapshot.Privacy.PrivacyContact,
+			DPOContact:           snapshot.Privacy.DPOContact,
 			SupervisoryAuthority: authorityResponse{Name: snapshot.Privacy.SupervisoryAuthority.Name, URL: snapshot.Privacy.SupervisoryAuthority.URL},
-			PrivacyDocumentID: snapshot.Privacy.PrivacyDocumentID,
+			PrivacyDocumentID:    snapshot.Privacy.PrivacyDocumentID,
 		}
 	}
 
@@ -131,12 +131,12 @@ func (h *HTTPHandler) GetDocument(w http.ResponseWriter, r *http.Request) {
 
 func mapDocumentSummary(document DocumentSummaryReadModel) documentSummaryResponse {
 	return documentSummaryResponse{
-		DocumentID: document.DocumentID,
-		Kind: string(document.Kind),
-		Title: document.Title,
-		Version: document.Version,
-		EffectiveAt: document.EffectiveAt,
-		UpdatedAt: document.UpdatedAt,
+		DocumentID:    document.DocumentID,
+		Kind:          string(document.Kind),
+		Title:         document.Title,
+		Version:       document.Version,
+		EffectiveAt:   document.EffectiveAt,
+		UpdatedAt:     document.UpdatedAt,
 		ContentSHA256: document.ContentSHA256,
 	}
 }
