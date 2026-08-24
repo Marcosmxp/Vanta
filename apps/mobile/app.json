@@ -6,9 +6,21 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "platforms": ["ios", "android"],
+    "plugins": [
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Permitir que o Vanta utilize o Face ID para proteger o acesso à conta."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.marcosmxp.vanta"
+      "bundleIdentifier": "com.marcosmxp.vanta",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.marcosmxp.vanta",
