@@ -145,29 +145,27 @@ func (s *PostgresStore) GetSession(ctx context.Context, sessionID string) (Sessi
 	return session, nil
 }
 
-func (s *PostgresStore) RotateSession(
-	ctx context.Context,
-	sessionID, accessHash string,
-	accessExpiresAt time.Time,
-	refreshHash string,
-	refreshExpiresAt time.Time,
-	generation int64,
-) error {
+func (s *PostgresStore) RotateSession(ctx context.Context, rotation SessionRotation) error {
 	result, err := s.pool.Exec(ctx, `
 		UPDATE sessions
-		SET access_token_hash = $2,
-		    access_expires_at = $3,
-		    refresh_token_hash = $4,
-		    refresh_expires_at = $5,
-		    refresh_generation = $6,
+		SET access_token_hash = $4,
+		    access_expires_at = $5,
+		    refresh_token_hash = $6,
+		    refresh_expires_at = $7,
+		    refresh_generation = $8,
 		    last_seen_at = NOW()
-		WHERE session_id = $1 AND revoked_at IS NULL`,
-		sessionID,
-		accessHash,
-		accessExpiresAt,
-		refreshHash,
-		refreshExpiresAt,
-		generation,
+		WHERE session_id = $1
+		  AND revoked_at IS NULL
+		  AND refresh_token_hash = $2
+		  AND refresh_generation = $3`,
+		rotation.SessionID,
+		rotation.ExpectedRefreshTokenHash,
+		rotation.ExpectedGeneration,
+		rotation.AccessTokenHash,
+		rotation.AccessExpiresAt,
+		rotation.RefreshTokenHash,
+		rotation.RefreshExpiresAt,
+		rotation.Generation,
 	)
 	if err != nil {
 		return fmt.Errorf("rotate session: %w", err)
