@@ -33,10 +33,4 @@ export interface SecurityCapabilities {
 
 export interface RevokeSessionInput {
   sessionId: string;
-  idempotencyKey: string;
-}
-
-export interface SecurityCommandReceipt {
-  commandId: string;
-  acceptedAt: string;
 }
