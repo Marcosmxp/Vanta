@@ -92,21 +92,13 @@ jobs:
           go mod tidy
           git diff --exit-code -- go.mod go.sum
 
-      - name: Generate canonical gofmt output
-        run: |
-          gofmt -w .
-          tar -czf /tmp/backend-gofmt.tar.gz cmd internal
-
-      - name: Upload canonical gofmt output
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-gofmt
-          path: /tmp/backend-gofmt.tar.gz
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Format verification
-        run: git diff --exit-code -- '*.go'
+        run: |
+          files="$(gofmt -l .)"
+          if [ -n "$files" ]; then
+            printf 'gofmt required for:\n%s\n' "$files"
+            exit 1
+          fi
 
       - name: Run tests with race detector
         run: go test -race ./...
