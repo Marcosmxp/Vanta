@@ -7,6 +7,12 @@ ALTER TABLE responsible_gaming_profiles
 ALTER TABLE responsible_gaming_limits
     ADD COLUMN pending_requested_at TIMESTAMPTZ;
 
+CREATE TABLE responsible_gaming_jurisdiction_policy (
+    jurisdiction CHAR(2) PRIMARY KEY,
+    limit_increase_cooling_off_minutes BIGINT NOT NULL CHECK (limit_increase_cooling_off_minutes > 0),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE responsible_gaming_policy_options (
     option_id TEXT PRIMARY KEY,
     jurisdiction CHAR(2) NOT NULL,
