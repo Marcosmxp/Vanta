@@ -52,17 +52,17 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 	response := securityResponse{Availability: string(snapshot.Availability), MFAStatus: string(snapshot.MFAStatus)}
 	for _, session := range snapshot.Sessions {
 		response.Sessions = append(response.Sessions, sessionResponse{
-			SessionID: session.SessionID,
+			SessionID:   session.SessionID,
 			DeviceLabel: session.DeviceLabel,
-			Platform: session.Platform,
-			IPMasked: session.IPMasked,
+			Platform:    session.Platform,
+			IPMasked:    session.IPMasked,
 			CountryCode: session.CountryCode,
-			Current: session.Current,
-			Status: string(session.Status),
-			MFAUsed: session.MFAUsed,
-			Trust: string(session.Trust),
-			CreatedAt: session.CreatedAt,
-			LastSeenAt: session.LastSeenAt,
+			Current:     session.Current,
+			Status:      string(session.Status),
+			MFAUsed:     session.MFAUsed,
+			Trust:       string(session.Trust),
+			CreatedAt:   session.CreatedAt,
+			LastSeenAt:  session.LastSeenAt,
 		})
 	}
 	httpapi.WriteJSON(w, http.StatusOK, response)
