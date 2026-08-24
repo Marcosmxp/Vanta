@@ -109,7 +109,7 @@ func recoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recovered := recover(); recovered != nil {
-				slog.Error("recovered HTTP panic", "request_id", RequestID(r.Context()), "method", r.Method, "path", r.URL.Path, "panic", recovered, "stack", string(debug.Stack()))
+				slog.Error("recovered HTTP panic", "request_id", RequestID(r.Context()), "method", r.Method, "path", r.URL.Path, "stack", string(debug.Stack()))
 				httpapi.WriteError(w, http.StatusInternalServerError, "internal_error", "An internal error occurred.", RequestID(r.Context()))
 			}
 		}()
