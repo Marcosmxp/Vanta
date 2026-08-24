@@ -72,12 +72,23 @@ type NewSession struct {
 	IPMasked         string
 }
 
+type SessionRotation struct {
+	SessionID                string
+	ExpectedRefreshTokenHash string
+	ExpectedGeneration       int64
+	AccessTokenHash          string
+	AccessExpiresAt          time.Time
+	RefreshTokenHash         string
+	RefreshExpiresAt         time.Time
+	Generation               int64
+}
+
 type Store interface {
 	CreateAccount(context.Context, NewAccount) error
 	FindCredentialByEmailHash(context.Context, string) (Credential, error)
 	CreateSession(context.Context, NewSession) error
 	GetSession(context.Context, string) (Session, error)
-	RotateSession(context.Context, string, string, time.Time, string, time.Time, int64) error
+	RotateSession(context.Context, SessionRotation) error
 	RevokeSession(context.Context, string, string) error
 	TouchSession(context.Context, string, time.Time) error
 }
@@ -230,7 +241,8 @@ func (s *Service) Refresh(ctx context.Context, refreshToken string) (TokenPair, 
 	}
 
 	now := s.now()
-	if !hashesEqual(session.RefreshTokenHash, tokenHash(refreshToken)) {
+	presentedHash := tokenHash(refreshToken)
+	if !hashesEqual(session.RefreshTokenHash, presentedHash) {
 		_ = s.store.RevokeSession(ctx, sessionID, "refresh-token-reuse-or-mismatch")
 		return TokenPair{}, ErrInvalidToken
 	}
@@ -251,7 +263,21 @@ func (s *Service) Refresh(ctx context.Context, refreshToken string) (TokenPair, 
 	refreshExpiresAt := now.Add(s.refreshTTL)
 	generation := session.RefreshGeneration + 1
 
-	if err := s.store.RotateSession(ctx, sessionID, accessHash, accessExpiresAt, refreshHash, refreshExpiresAt, generation); err != nil {
+	err = s.store.RotateSession(ctx, SessionRotation{
+		SessionID:                sessionID,
+		ExpectedRefreshTokenHash: presentedHash,
+		ExpectedGeneration:       session.RefreshGeneration,
+		AccessTokenHash:          accessHash,
+		AccessExpiresAt:          accessExpiresAt,
+		RefreshTokenHash:         refreshHash,
+		RefreshExpiresAt:         refreshExpiresAt,
+		Generation:               generation,
+	})
+	if err != nil {
+		// A failed compare-and-swap after a valid pre-check means the refresh
+		// generation changed concurrently or the session was otherwise altered.
+		// Treat this as token replay/race and revoke fail-closed.
+		_ = s.store.RevokeSession(ctx, sessionID, "refresh-token-reuse-or-race")
 		return TokenPair{}, ErrInvalidToken
 	}
 

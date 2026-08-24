@@ -35,8 +35,14 @@ jobs:
       - name: Install workspace dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Audit JavaScript dependencies
+        run: pnpm audit --audit-level=high
+
       - name: Typecheck mobile application
         run: pnpm mobile:typecheck
+
+      - name: Run mobile API boundary tests
+        run: pnpm mobile:test
 
       - name: Validate application Android bundle
         run: pnpm --filter @vanta/mobile app:validate
@@ -105,6 +111,9 @@ jobs:
 
       - name: Run vet
         run: go vet ./...
+
+      - name: Check Go vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...
 
       - name: Build API binary
         run: go build ./cmd/api

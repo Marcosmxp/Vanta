@@ -9,6 +9,7 @@
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "app:validate": "expo export --platform android --output-dir .app-build",
     "storybook": "cross-env STORYBOOK_ENABLED=true expo start --dev-client",
     "storybook:android": "cross-env STORYBOOK_ENABLED=true expo run:android",
@@ -44,6 +45,7 @@
     "@storybook/react-native": "10.5.4",
     "@types/react": "^19.2.0",
     "cross-env": "^10.0.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.4"
   }
 }

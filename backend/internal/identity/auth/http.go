@@ -157,7 +157,13 @@ func (h *HTTPHandler) RequireAuthentication(next http.Handler) http.Handler {
 }
 
 func (h *HTTPHandler) allowAuthAttempt(w http.ResponseWriter, r *http.Request, scope string, maximum int64, window time.Duration) bool {
-	allowed, err := h.limiter.Allow(r.Context(), scope, r.RemoteAddr, maximum, window)
+	subject := httpapi.RemoteIP(r.RemoteAddr)
+	if subject == "" {
+		// RemoteAddr is server-supplied. If it cannot be normalized, collapse it
+		// into one fail-safe bucket rather than using attacker-controlled text.
+		subject = "unknown-client"
+	}
+	allowed, err := h.limiter.Allow(r.Context(), scope, subject, maximum, window)
 	if err != nil {
 		httpapi.WriteError(w, http.StatusServiceUnavailable, "security_dependency_unavailable", "Authentication is temporarily unavailable.", "")
 		return false
