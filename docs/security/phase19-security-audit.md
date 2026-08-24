@@ -122,4 +122,12 @@ The following are intentionally **not** considered solved by Phase 19:
 
 ## Phase 19 release decision
 
-Phase 19 may be considered complete when all new regression and vulnerability gates pass on the merge candidate. Passing this phase means the current closed-MVP boundaries have been hardened and regression-tested. It does **not** authorize real-money operation or remove the blockers above.
+**Phase 19 is COMPLETE / MERGED.** All required regression, dependency, vulnerability, mobile, backend, Docker and CodeQL gates passed on the final merge candidate before PR #22 was integrated into `main`.
+
+Canonical Phase 19 main commit:
+
+```text
+b12c56928eba8e79f1c48a2361683e1e1746e224
+```
+
+This result means the current **closed-MVP boundaries** were hardened and regression-tested. It does **not** authorize real-money operation and does not remove any residual blocker listed above. Phase 20 may proceed with native builds/device validation while those regulated-production capabilities remain closed.
