@@ -58,27 +58,27 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	response := walletResponse{
 		Balance: balanceResponse{
-			WalletID: snapshot.Balance.WalletID,
-			Currency: snapshot.Balance.Currency,
-			Availability: string(snapshot.Balance.Availability),
+			WalletID:              snapshot.Balance.WalletID,
+			Currency:              snapshot.Balance.Currency,
+			Availability:          string(snapshot.Balance.Availability),
 			AvailableBalanceMinor: snapshot.Balance.AvailableBalanceMinor,
-			ReservedBalanceMinor: snapshot.Balance.ReservedBalanceMinor,
-			TotalBalanceMinor: snapshot.Balance.TotalBalanceMinor,
-			AsOf: snapshot.Balance.AsOf,
+			ReservedBalanceMinor:  snapshot.Balance.ReservedBalanceMinor,
+			TotalBalanceMinor:     snapshot.Balance.TotalBalanceMinor,
+			AsOf:                  snapshot.Balance.AsOf,
 		},
 		NextCursor: snapshot.NextCursor,
 	}
 	for _, transaction := range snapshot.Transactions {
 		response.Transactions = append(response.Transactions, transactionResponse{
 			TransactionID: transaction.TransactionID,
-			Kind: string(transaction.Kind),
-			Direction: string(transaction.Direction),
-			Status: string(transaction.Status),
-			AmountMinor: transaction.AmountMinor,
-			Currency: transaction.Currency,
-			OccurredAt: transaction.OccurredAt,
-			ReferenceID: transaction.ReferenceID,
-			Description: transaction.Description,
+			Kind:          string(transaction.Kind),
+			Direction:     string(transaction.Direction),
+			Status:        string(transaction.Status),
+			AmountMinor:   transaction.AmountMinor,
+			Currency:      transaction.Currency,
+			OccurredAt:    transaction.OccurredAt,
+			ReferenceID:   transaction.ReferenceID,
+			Description:   transaction.Description,
 		})
 	}
 
