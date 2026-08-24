@@ -39,13 +39,13 @@ func (r *PostgresRepository) GetSnapshot(ctx context.Context, playerID string) (
 	total := available + reserved
 	snapshot := Snapshot{
 		Balance: BalanceReadModel{
-			WalletID: walletID,
-			Currency: currency,
-			Availability: AvailabilityReady,
+			WalletID:              walletID,
+			Currency:              currency,
+			Availability:          AvailabilityReady,
 			AvailableBalanceMinor: &available,
-			ReservedBalanceMinor: &reserved,
-			TotalBalanceMinor: &total,
-			AsOf: &now,
+			ReservedBalanceMinor:  &reserved,
+			TotalBalanceMinor:     &total,
+			AsOf:                  &now,
 		},
 	}
 
