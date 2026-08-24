@@ -1,7 +1,17 @@
 import { ApiError } from '../../../core/api/ApiClient';
 import type { SessionContextValue } from '../../../core/session/types';
 import type { SupportProvider } from './SupportProvider';
-import type { SupportRequestSummary, SupportSnapshot } from '../types';
+import type {
+  SupportCapabilities,
+  SupportRequestSummary,
+  SupportSnapshot,
+} from '../types';
+
+export const apiSupportCapabilities: SupportCapabilities = {
+  canCreateRequest: true,
+  maxMessageLength: 4000,
+  message: 'Os pedidos são persistidos, cifrados e associados à conta autenticada pelo backend.',
+};
 
 export function createApiSupportProvider(request: SessionContextValue['request']): SupportProvider {
   return {
