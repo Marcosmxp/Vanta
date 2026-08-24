@@ -2,20 +2,38 @@ package config
 
 import "testing"
 
-func TestProductionRequiresInfrastructureURLs(t *testing.T) {
-	t.Setenv("VANTA_ENV", "production")
-	t.Setenv("VANTA_DATABASE_URL", "")
-	t.Setenv("VANTA_REDIS_URL", "")
+func clearRuntimeEnv(t *testing.T) {
+	t.Helper()
+	for _, key := range []string{
+		"VANTA_ENV",
+		"VANTA_API_PORT",
+		"VANTA_DATABASE_URL",
+		"VANTA_DATABASE_MAX_CONNS",
+		"VANTA_REDIS_URL",
+		"VANTA_AUTH_ACCESS_TTL",
+		"VANTA_AUTH_REFRESH_TTL",
+		"VANTA_PII_ENCRYPTION_KEY_B64",
+		"VANTA_PII_LOOKUP_KEY_B64",
+		"VANTA_MAINTENANCE_ENABLED",
+		"VANTA_MAINTENANCE_INCIDENT_ID",
+		"VANTA_MAINTENANCE_MESSAGE",
+		"VANTA_MAINTENANCE_RETRY_AFTER",
+	} {
+		t.Setenv(key, "")
+	}
+}
 
-	_, err := Load()
-	if err == nil {
+func TestProductionRequiresInfrastructureAndCryptographicKeys(t *testing.T) {
+	clearRuntimeEnv(t)
+	t.Setenv("VANTA_ENV", "production")
+
+	if _, err := Load(); err == nil {
 		t.Fatal("expected production configuration validation to fail")
 	}
 }
 
-func TestDevelopmentUsesSafeDefaults(t *testing.T) {
-	t.Setenv("VANTA_ENV", "")
-	t.Setenv("VANTA_API_PORT", "")
+func TestDevelopmentUsesSafeLocalDefaults(t *testing.T) {
+	clearRuntimeEnv(t)
 
 	cfg, err := Load()
 	if err != nil {
@@ -27,5 +45,29 @@ func TestDevelopmentUsesSafeDefaults(t *testing.T) {
 	}
 	if cfg.APIPort != "8080" {
 		t.Fatalf("expected port 8080, got %q", cfg.APIPort)
+	}
+	if cfg.DatabaseURL == "" || cfg.RedisURL == "" {
+		t.Fatal("development runtime must have local infrastructure defaults")
+	}
+	if len(cfg.PIIEncryptionKey) != 32 || len(cfg.PIILookupKey) < 32 {
+		t.Fatal("development runtime must initialize valid local-only cryptographic placeholders")
+	}
+}
+
+func TestMaintenanceRequiresIncidentID(t *testing.T) {
+	clearRuntimeEnv(t)
+	t.Setenv("VANTA_MAINTENANCE_ENABLED", "true")
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected enabled maintenance without incident id to fail")
+	}
+}
+
+func TestRejectsUnsafeSessionTTLs(t *testing.T) {
+	clearRuntimeEnv(t)
+	t.Setenv("VANTA_AUTH_ACCESS_TTL", "2h")
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected access token TTL above policy maximum to fail")
 	}
 }
