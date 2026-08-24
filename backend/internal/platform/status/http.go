@@ -20,11 +20,11 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 		httpapi.WriteError(w, http.StatusServiceUnavailable, "status_unavailable", "Service status is temporarily unavailable.", "")
 		return
 	}
-	statusCode := http.StatusOK
-	if model.Availability == AvailabilityMaintenance {
-		statusCode = http.StatusServiceUnavailable
-	}
-	httpapi.WriteJSON(w, statusCode, struct {
+
+	// Platform status is a presentation/bootstrap contract. A valid maintenance
+	// snapshot is still a successful response; infrastructure health remains on
+	// /health/ready where non-ready dependencies use failure status codes.
+	httpapi.WriteJSON(w, http.StatusOK, struct {
 		Availability string `json:"availability"`
 		IncidentID   string `json:"incidentId,omitempty"`
 		Message      string `json:"message"`

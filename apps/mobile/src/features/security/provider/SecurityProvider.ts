@@ -1,7 +1,6 @@
 import type {
   RevokeSessionInput,
   SecurityCapabilities,
-  SecurityCommandReceipt,
   SecuritySession,
   SecuritySnapshot,
 } from '../types';
@@ -10,9 +9,9 @@ export interface SecurityProvider {
   getSnapshot(): Promise<SecuritySnapshot>;
   getSession(sessionId: string): Promise<SecuritySession | null>;
   getCapabilities(): Promise<SecurityCapabilities>;
-  revokeSession(input: RevokeSessionInput): Promise<SecurityCommandReceipt>;
-  revokeOtherSessions(idempotencyKey: string): Promise<SecurityCommandReceipt>;
-  beginMfaEnrollment(idempotencyKey: string): Promise<SecurityCommandReceipt>;
+  revokeSession(input: RevokeSessionInput): Promise<void>;
+  revokeOtherSessions(): Promise<void>;
+  beginMfaEnrollment(): Promise<void>;
 }
 
 export const disconnectedSecuritySnapshot: SecuritySnapshot = {

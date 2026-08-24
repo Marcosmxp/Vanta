@@ -84,4 +84,5 @@ export interface RequestSessionLimitChangeInput {
 export interface StartProtectionInput {
   optionId: string;
   idempotencyKey: string;
+  acknowledged?: boolean;
 }

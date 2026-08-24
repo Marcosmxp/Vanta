@@ -1,9 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { AuthStackParamList } from '../../../app/navigation/types';
+import { ApiError } from '../../../core/api/ApiClient';
+import { useSession } from '../../../core/session/SessionProvider';
 import { Button, Card, Input, darkTheme } from '../../../design-system';
 import { AuthScreenLayout } from '../components/AuthScreenLayout';
 import {
@@ -33,7 +36,28 @@ function IntegrationNotice({ children }: { children: string }) {
   );
 }
 
+function readableAuthError(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.code === 'invalid_credentials') {
+      return 'Email ou palavra-passe inválidos.';
+    }
+    if (error.code === 'rate_limited') {
+      return 'Foram efetuadas demasiadas tentativas. Aguarde antes de tentar novamente.';
+    }
+    if (error.code === 'account_conflict') {
+      return 'Já existe uma conta associada a estas credenciais.';
+    }
+    if (error.code === 'api_not_configured') {
+      return 'A API Vanta não está configurada neste build.';
+    }
+    return error.message;
+  }
+  return 'Não foi possível concluir a operação de autenticação.';
+}
+
 export function LoginScreen({ navigation }: LoginProps) {
+  const { signIn } = useSession();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
@@ -43,15 +67,20 @@ export function LoginScreen({ navigation }: LoginProps) {
     defaultValues: { email: '', password: '' },
   });
 
-  const submit = handleSubmit(async () => {
-    // Phase 05 validates presentation/input only. No credential is logged or persisted.
+  const submit = handleSubmit(async (values) => {
+    setSubmitError(null);
+    try {
+      await signIn({ email: values.email.trim(), password: values.password });
+    } catch (error) {
+      setSubmitError(readableAuthError(error));
+    }
   });
 
   return (
     <AuthScreenLayout
       eyebrow="Acesso"
       title="Entrar"
-      description="Utilize as credenciais da sua conta. A validação final da sessão pertence ao serviço de identidade do servidor."
+      description="A sessão é validada pelo serviço de identidade Vanta e os tokens são guardados apenas no armazenamento seguro do dispositivo."
     >
       <Controller
         control={control}
@@ -95,33 +124,84 @@ export function LoginScreen({ navigation }: LoginProps) {
         onPress={() => navigation.navigate('ForgotPassword')}
       />
 
-      <IntegrationNotice>
-        O serviço remoto de autenticação ainda não está ligado neste build. Nenhuma credencial introduzida é guardada localmente.
-      </IntegrationNotice>
+      {submitError ? <IntegrationNotice>{submitError}</IntegrationNotice> : null}
     </AuthScreenLayout>
   );
 }
 
-export function CreateAccountScreen({ navigation }: CreateAccountProps) {
+export function CreateAccountScreen(_props: CreateAccountProps) {
+  const { register } = useSession();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateAccountFormValues>({
     resolver: zodResolver(createAccountSchema),
-    defaultValues: { email: '', password: '', confirmPassword: '' },
+    defaultValues: {
+      displayName: '',
+      countryCode: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      termsAccepted: false,
+    },
   });
 
-  const submit = handleSubmit(async () => {
-    navigation.navigate('Verification', { purpose: 'registration' });
+  const submit = handleSubmit(async (values) => {
+    setSubmitError(null);
+    try {
+      await register({
+        email: values.email.trim(),
+        password: values.password,
+        displayName: values.displayName.trim(),
+        countryCode: values.countryCode.trim().toUpperCase(),
+        termsAccepted: values.termsAccepted,
+      });
+    } catch (error) {
+      setSubmitError(readableAuthError(error));
+    }
   });
 
   return (
     <AuthScreenLayout
       eyebrow="Nova conta"
       title="Criar conta"
-      description="Comece com email e palavra-passe. Identidade, idade e elegibilidade serão verificadas separadamente antes de dinheiro real."
+      description="Crie a identidade base da conta. KYC, idade e elegibilidade continuam separados e obrigatórios antes de operações reguladas."
     >
+      <Controller
+        control={control}
+        name="displayName"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <Input
+            label="Nome de apresentação"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            autoCorrect={false}
+            errorMessage={errors.displayName?.message}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="countryCode"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <Input
+            label="País (ISO)"
+            value={value}
+            onChangeText={(text) => onChange(text.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase())}
+            onBlur={onBlur}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={2}
+            helperText="Exemplo de formato: PT"
+            errorMessage={errors.countryCode?.message}
+          />
+        )}
+      />
+
       <Controller
         control={control}
         name="email"
@@ -173,16 +253,37 @@ export function CreateAccountScreen({ navigation }: CreateAccountProps) {
         )}
       />
 
-      <Button label="Continuar" fullWidth loading={isSubmitting} onPress={submit} />
+      <Controller
+        control={control}
+        name="termsAccepted"
+        render={({ field: { value, onChange } }) => (
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: value }}
+            onPress={() => onChange(!value)}
+            style={styles.checkboxRow}
+          >
+            <View style={[styles.checkbox, value && styles.checkboxChecked]}>
+              {value ? <Text style={styles.checkmark}>✓</Text> : null}
+            </View>
+            <Text style={styles.checkboxLabel}>Li e aceito os termos aplicáveis à criação da conta.</Text>
+          </Pressable>
+        )}
+      />
+      {errors.termsAccepted?.message ? <Text style={styles.errorText}>{errors.termsAccepted.message}</Text> : null}
+
+      <Button label="Criar conta" fullWidth loading={isSubmitting} onPress={submit} />
+      {submitError ? <IntegrationNotice>{submitError}</IntegrationNotice> : null}
       <Text style={styles.legal}>
-        A criação visual desta etapa não cria conta no servidor. O endpoint de identidade será a única fonte de verdade.
+        A criação da conta não autoriza apostas, depósitos ou levantamentos. Essas operações continuam dependentes das verificações server-side aplicáveis.
       </Text>
     </AuthScreenLayout>
   );
 }
 
-export function VerificationScreen({ route, navigation }: VerificationProps) {
+export function VerificationScreen({ route }: VerificationProps) {
   const { purpose } = route.params;
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
@@ -193,19 +294,18 @@ export function VerificationScreen({ route, navigation }: VerificationProps) {
   });
 
   const submit = handleSubmit(async () => {
-    if (purpose === 'password-reset') {
-      navigation.replace('ResetPassword');
-      return;
-    }
-
-    navigation.replace('Login');
+    setSubmitError(
+      purpose === 'password-reset'
+        ? 'A API de recuperação de palavra-passe ainda não está disponível.'
+        : 'A API de verificação por código ainda não está disponível.',
+    );
   });
 
   return (
     <AuthScreenLayout
       eyebrow="Verificação"
       title="Código de 6 dígitos"
-      description="Introduza o código associado à operação. Códigos reais serão emitidos e validados exclusivamente pelo backend."
+      description="Códigos só podem ser emitidos e validados pelo backend. Este build não possui OTP local nem código mestre."
     >
       <Controller
         control={control}
@@ -223,16 +323,14 @@ export function VerificationScreen({ route, navigation }: VerificationProps) {
           />
         )}
       />
-
       <Button label="Verificar" fullWidth loading={isSubmitting} onPress={submit} />
-      <IntegrationNotice>
-        Este build valida apenas o formato do código para revisão do fluxo; não existe OTP local nem código mestre no cliente.
-      </IntegrationNotice>
+      {submitError ? <IntegrationNotice>{submitError}</IntegrationNotice> : null}
     </AuthScreenLayout>
   );
 }
 
-export function ForgotPasswordScreen({ navigation }: ForgotPasswordProps) {
+export function ForgotPasswordScreen(_props: ForgotPasswordProps) {
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
@@ -243,14 +341,14 @@ export function ForgotPasswordScreen({ navigation }: ForgotPasswordProps) {
   });
 
   const submit = handleSubmit(async () => {
-    navigation.navigate('Verification', { purpose: 'password-reset' });
+    setSubmitError('A recuperação remota ainda não foi exposta pela API Vanta; nenhum pedido foi enviado.');
   });
 
   return (
     <AuthScreenLayout
       eyebrow="Recuperação"
       title="Recuperar acesso"
-      description="Indique o email da conta. A resposta do serviço deverá ser neutra para não revelar se uma conta existe."
+      description="A recuperação será ativada quando existir um endpoint neutro que não revele se uma conta existe."
     >
       <Controller
         control={control}
@@ -269,13 +367,14 @@ export function ForgotPasswordScreen({ navigation }: ForgotPasswordProps) {
           />
         )}
       />
-
       <Button label="Continuar" fullWidth loading={isSubmitting} onPress={submit} />
+      {submitError ? <IntegrationNotice>{submitError}</IntegrationNotice> : null}
     </AuthScreenLayout>
   );
 }
 
-export function ResetPasswordScreen({ navigation }: ResetPasswordProps) {
+export function ResetPasswordScreen(_props: ResetPasswordProps) {
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
@@ -286,15 +385,14 @@ export function ResetPasswordScreen({ navigation }: ResetPasswordProps) {
   });
 
   const submit = handleSubmit(async () => {
-    navigation.popToTop();
-    navigation.navigate('Login');
+    setSubmitError('A alteração de palavra-passe permanece bloqueada até existir confirmação server-side do fluxo de recuperação.');
   });
 
   return (
     <AuthScreenLayout
       eyebrow="Segurança"
       title="Definir nova palavra-passe"
-      description="A alteração real será confirmada no servidor e deverá invalidar sessões anteriores conforme a política de segurança."
+      description="A alteração real deverá ser confirmada no servidor e invalidar sessões anteriores segundo a política de segurança."
     >
       <Controller
         control={control}
@@ -311,7 +409,6 @@ export function ResetPasswordScreen({ navigation }: ResetPasswordProps) {
           />
         )}
       />
-
       <Controller
         control={control}
         name="confirmPassword"
@@ -327,11 +424,11 @@ export function ResetPasswordScreen({ navigation }: ResetPasswordProps) {
           />
         )}
       />
-
       <Button label="Guardar nova palavra-passe" fullWidth loading={isSubmitting} onPress={submit} />
+      {submitError ? <IntegrationNotice>{submitError}</IntegrationNotice> : null}
       <View style={styles.securityRow}>
         <View style={styles.securityDot} />
-        <Text style={styles.securityText}>Nenhuma palavra-passe é gravada em estado persistente nesta fase.</Text>
+        <Text style={styles.securityText}>A palavra-passe nunca é persistida pelo cliente Vanta.</Text>
       </View>
     </AuthScreenLayout>
   );
@@ -345,6 +442,38 @@ const styles = StyleSheet.create({
   legal: {
     ...darkTheme.typography.caption,
     color: darkTheme.colors.text.secondary,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: darkTheme.spacing.md,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: darkTheme.radius.sm,
+    borderWidth: 1,
+    borderColor: darkTheme.colors.border.strong,
+    backgroundColor: darkTheme.colors.surface.raised,
+  },
+  checkboxChecked: {
+    borderColor: darkTheme.colors.brand.primary,
+    backgroundColor: darkTheme.colors.brand.primary,
+  },
+  checkmark: {
+    ...darkTheme.typography.bodyStrong,
+    color: darkTheme.colors.text.primary,
+  },
+  checkboxLabel: {
+    flex: 1,
+    ...darkTheme.typography.bodyMedium,
+    color: darkTheme.colors.text.secondary,
+  },
+  errorText: {
+    ...darkTheme.typography.caption,
+    color: darkTheme.colors.status.danger,
   },
   securityRow: {
     flexDirection: 'row',

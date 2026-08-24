@@ -14,9 +14,12 @@ export const loginSchema = z.object({
 
 export const createAccountSchema = z
   .object({
+    displayName: z.string().trim().min(2, 'Introduza pelo menos 2 caracteres.').max(50, 'Use no máximo 50 caracteres.'),
+    countryCode: z.string().trim().regex(/^[A-Za-z]{2}$/, 'Use um código de país ISO com 2 letras.'),
     email: z.string().trim().email('Introduza um email válido.'),
     password: passwordRule,
     confirmPassword: z.string(),
+    termsAccepted: z.boolean().refine((value) => value, 'Tem de aceitar os termos para criar a conta.'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],

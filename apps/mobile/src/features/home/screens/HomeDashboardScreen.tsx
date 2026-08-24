@@ -7,8 +7,10 @@ import { FeaturedGameCard } from '../components/FeaturedGameCard';
 import { ResponsibleGamingBanner } from '../components/ResponsibleGamingBanner';
 import { WalletSummaryCard } from '../components/WalletSummaryCard';
 import { disconnectedHomeSnapshot } from '../provider/HomeProvider';
+import type { HomeSnapshot } from '../types';
 
 export interface HomeDashboardScreenProps {
+  snapshot?: HomeSnapshot;
   onOpenWallet: () => void;
   onOpenPlay: () => void;
   onOpenProfile: () => void;
@@ -16,19 +18,15 @@ export interface HomeDashboardScreenProps {
 }
 
 export function HomeDashboardScreen({
+  snapshot = disconnectedHomeSnapshot,
   onOpenWallet,
   onOpenPlay,
   onOpenProfile,
   onOpenBetHistory,
 }: HomeDashboardScreenProps) {
-  const snapshot = disconnectedHomeSnapshot;
-
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.brandGroup}>
             <Text style={styles.brand}>VANTA</Text>
@@ -65,10 +63,7 @@ export function HomeDashboardScreen({
 
         <FeaturedGameCard game={snapshot.featuredGame} onPlay={onOpenPlay} />
 
-        <ActivityPreview
-          items={snapshot.recentActivity}
-          onOpenBetHistory={onOpenBetHistory}
-        />
+        <ActivityPreview items={snapshot.recentActivity} onOpenBetHistory={onOpenBetHistory} />
 
         <ResponsibleGamingBanner />
 
