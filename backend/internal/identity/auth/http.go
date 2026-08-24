@@ -5,8 +5,10 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/Marcosmxp/Vanta/backend/internal/platform/httpapi"
+	"github.com/Marcosmxp/Vanta/backend/internal/platform/ratelimit"
 )
 
 type contextKey string
@@ -17,10 +19,11 @@ const authBodyLimit = 16 << 10
 
 type HTTPHandler struct {
 	service *Service
+	limiter *ratelimit.Limiter
 }
 
-func NewHTTPHandler(service *Service) *HTTPHandler {
-	return &HTTPHandler{service: service}
+func NewHTTPHandler(service *Service, limiter *ratelimit.Limiter) *HTTPHandler {
+	return &HTTPHandler{service: service, limiter: limiter}
 }
 
 type registerRequest struct {
@@ -45,6 +48,9 @@ type refreshRequest struct {
 }
 
 func (h *HTTPHandler) Register(w http.ResponseWriter, r *http.Request) {
+	if !h.allowAuthAttempt(w, r, "register", 5, 10*time.Minute) {
+		return
+	}
 	var request registerRequest
 	if err := httpapi.DecodeJSON(w, r, &request, authBodyLimit); err != nil {
 		httpapi.WriteError(w, http.StatusBadRequest, "invalid_request", "Invalid registration request.", "")
@@ -74,6 +80,9 @@ func (h *HTTPHandler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPHandler) Login(w http.ResponseWriter, r *http.Request) {
+	if !h.allowAuthAttempt(w, r, "login", 10, 10*time.Minute) {
+		return
+	}
 	var request loginRequest
 	if err := httpapi.DecodeJSON(w, r, &request, authBodyLimit); err != nil {
 		httpapi.WriteError(w, http.StatusBadRequest, "invalid_request", "Invalid login request.", "")
@@ -96,6 +105,9 @@ func (h *HTTPHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HTTPHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+	if !h.allowAuthAttempt(w, r, "refresh", 30, 10*time.Minute) {
+		return
+	}
 	var request refreshRequest
 	if err := httpapi.DecodeJSON(w, r, &request, authBodyLimit); err != nil {
 		httpapi.WriteError(w, http.StatusBadRequest, "invalid_request", "Invalid refresh request.", "")
@@ -142,6 +154,20 @@ func (h *HTTPHandler) RequireAuthentication(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), principalContextKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (h *HTTPHandler) allowAuthAttempt(w http.ResponseWriter, r *http.Request, scope string, maximum int64, window time.Duration) bool {
+	allowed, err := h.limiter.Allow(r.Context(), scope, r.RemoteAddr, maximum, window)
+	if err != nil {
+		httpapi.WriteError(w, http.StatusServiceUnavailable, "security_dependency_unavailable", "Authentication is temporarily unavailable.", "")
+		return false
+	}
+	if !allowed {
+		w.Header().Set("Retry-After", "600")
+		httpapi.WriteError(w, http.StatusTooManyRequests, "rate_limited", "Too many authentication attempts. Try again later.", "")
+		return false
+	}
+	return true
 }
 
 func PrincipalFromContext(ctx context.Context) (Principal, bool) {
