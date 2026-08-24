@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	ErrPolicyUnavailable    = errors.New("responsible-gaming policy unavailable")
-	ErrProtectionActive     = errors.New("responsible-gaming restriction already active")
-	ErrIdempotencyConflict  = errors.New("idempotency key reused with different request")
-	ErrLimitNotFound        = errors.New("responsible-gaming limit not found")
+	ErrPolicyUnavailable   = errors.New("responsible-gaming policy unavailable")
+	ErrProtectionActive    = errors.New("responsible-gaming restriction already active")
+	ErrIdempotencyConflict = errors.New("idempotency key reused with different request")
+	ErrLimitNotFound       = errors.New("responsible-gaming limit not found")
 )
 
 type PostgresRepository struct {
