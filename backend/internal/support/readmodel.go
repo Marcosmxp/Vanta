@@ -22,6 +22,7 @@ const (
 
 	ChannelInApp ChannelType = "in-app"
 	ChannelEmail ChannelType = "email"
+	ChannelPhone ChannelType = "phone"
 	ChannelWeb   ChannelType = "web"
 )
 
@@ -97,7 +98,7 @@ func (c ChannelReadModel) Validate() error {
 	if strings.TrimSpace(c.ChannelID) == "" || strings.TrimSpace(c.Label) == "" {
 		return errors.New("support channel requires id and label")
 	}
-	if c.Type != ChannelInApp && c.Type != ChannelEmail && c.Type != ChannelWeb {
+	if c.Type != ChannelInApp && c.Type != ChannelEmail && c.Type != ChannelPhone && c.Type != ChannelWeb {
 		return errors.New("invalid support channel type")
 	}
 	if strings.TrimSpace(c.Target) == "" {
