@@ -1,4 +1,4 @@
-# Bootstrap threat model
+# Backend threat model
 
 This document records the security assumptions that must remain true as Vanta grows.
 
@@ -6,39 +6,75 @@ This document records the security assumptions that must remain true as Vanta gr
 
 ### Mobile client
 
-Treat every value from the mobile application as attacker-controlled, including bet amount, selected game configuration, wallet identifiers, timestamps, device metadata, and locally cached state.
+Treat every value from the mobile application as attacker-controlled, including bet amount, selected game configuration, wallet identifiers, timestamps, device metadata, route state and locally cached data. UI visibility never grants authorization.
 
 ### Public API
 
-The API is the first trusted enforcement boundary. It must authenticate requests, validate authorization, enforce rate limits, reject malformed input, and create idempotent commands for state-changing operations.
+The Go API is the first trusted enforcement boundary. It authenticates bearer credentials, validates resource ownership, applies request limits, rejects malformed JSON and owns state-changing application commands.
 
-### Financial persistence
+### PostgreSQL
 
-PostgreSQL is the durable source of truth. Financial mutations must be transactional and represented by auditable ledger records.
+PostgreSQL is the durable source of truth for identity, sessions, KYC status, wallet/ledger, bets, responsible-gaming state, support, legal configuration, idempotency, outbox and audit data.
 
 ### Redis
 
-Redis is non-authoritative. Loss or corruption of Redis must not alter canonical balances, settlements, or transaction history.
+Redis is non-authoritative. Phase 17 uses it for authentication throttling and permits future ephemeral cache/coordination uses only. Loss or corruption of Redis must never change canonical balances, settlements, KYC decisions or responsible-gaming restrictions.
 
-## Initial abuse cases
+## Phase 17 controls implemented
 
-1. Client submits a negative, malformed, replayed, or out-of-policy bet.
-2. Client modifies the displayed balance and attempts to spend the forged value.
-3. A request is replayed to settle or deposit twice.
-4. An attacker attempts high-rate betting or authentication requests.
-5. Sensitive tokens are accidentally logged or committed.
-6. A compromised mobile build attempts to infer or control RNG outcomes.
-7. Concurrent requests attempt to overspend the same wallet funds.
+- opaque access tokens with short TTLs;
+- opaque rotating refresh tokens;
+- only token hashes persisted;
+- refresh-token reuse/mismatch causes defensive revocation;
+- bcrypt password hashing;
+- AES-256-GCM protection for selected PII and support message bodies;
+- HMAC-SHA256 lookup keys for searchable PII;
+- Redis-backed authentication throttling that fails closed;
+- strict/size-limited JSON request decoding;
+- server-generated request IDs;
+- authenticated ownership checks for player-scoped resources;
+- PostgreSQL migrations applied before HTTP traffic is accepted;
+- immutable double-entry ledger records;
+- serializable ledger posting with per-player locking;
+- ledger idempotency and negative-balance rejection;
+- Responsible Gaming policy options loaded from PostgreSQL;
+- cooling-off decisions enforced server-side;
+- time-out/self-exclusion cannot be ended by mobile commands;
+- presentation-safe health/platform-status responses;
+- security headers and no-store responses;
+- logs exclude request bodies, bearer tokens, refresh tokens and support message bodies;
+- non-root/read-only local API container;
+- PostgreSQL/Redis integration tests in CI.
 
-## Required controls before financial features
+## Abuse cases that remain in scope
 
-- authenticated player identity
-- explicit authorization checks
-- idempotency keys
-- transactional wallet reservation
-- immutable ledger entries
-- cryptographically secure server-side RNG
-- rate limiting
-- audit logging with sensitive-field redaction
-- request size and timeout limits
-- tests for concurrent and replay scenarios
+1. Client submits a negative, malformed, replayed or out-of-policy bet.
+2. Client modifies displayed balance and attempts to spend forged state.
+3. Concurrent commands attempt to overspend a wallet.
+4. Attacker steals/replays bearer or refresh credentials.
+5. Attacker enumerates opaque IDs to attempt IDOR.
+6. High-rate authentication or future betting requests attempt resource exhaustion.
+7. Sensitive data is accidentally logged, committed or returned in error payloads.
+8. Compromised mobile builds attempt to infer/control RNG outcomes.
+9. Payment-provider callbacks are forged or replayed.
+10. KYC/provider callbacks attempt unauthorized state transitions.
+
+## Deliberately closed boundaries
+
+Phase 17 does not expose production money mutation for Plinko, deposits or withdrawals. It also does not expose payment-provider or KYC-provider callback endpoints. These surfaces remain closed until provider authentication, reconciliation, idempotency, audit, Responsible Gaming/KYC enforcement and settlement invariants are complete.
+
+## Required controls before real-money Plinko
+
+- authenticated/active player session;
+- KYC and age eligibility;
+- jurisdiction authorization;
+- active Responsible Gaming restrictions and limit checks;
+- transactional wallet reservation through the ledger;
+- approved/versioned Plinko ruleset;
+- cryptographically secure server-side RNG;
+- atomic bet record + ledger settlement;
+- idempotent command handling;
+- replay protection;
+- audit/outbox events;
+- concurrency and failure-injection tests;
+- no client-side payout authority.
