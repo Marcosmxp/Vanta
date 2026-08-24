@@ -1,3 +1,4 @@
+import { ApiError } from '../../../core/api/ApiClient';
 import type { SessionContextValue } from '../../../core/session/types';
 import type { SupportProvider } from './SupportProvider';
 import type { SupportRequestSummary, SupportSnapshot } from '../types';
@@ -11,7 +12,7 @@ export function createApiSupportProvider(request: SessionContextValue['request']
       try {
         return await request<SupportRequestSummary>(`/v1/support/requests/${encodeURIComponent(requestId)}`);
       } catch (error) {
-        if (error instanceof Error && 'status' in error && (error as { status?: number }).status === 404) {
+        if (error instanceof ApiError && error.status === 404) {
           return null;
         }
         throw error;
