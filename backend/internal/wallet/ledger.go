@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	ErrLedgerUnbalanced           = errors.New("ledger transaction is not balanced")
-	ErrLedgerOwnership            = errors.New("ledger account ownership mismatch")
-	ErrInsufficientFunds          = errors.New("wallet balance would become negative")
-	ErrLedgerIdempotencyConflict  = errors.New("ledger idempotency conflict")
+	ErrLedgerUnbalanced          = errors.New("ledger transaction is not balanced")
+	ErrLedgerOwnership           = errors.New("ledger account ownership mismatch")
+	ErrInsufficientFunds         = errors.New("wallet balance would become negative")
+	ErrLedgerIdempotencyConflict = errors.New("ledger idempotency conflict")
 )
 
 type LedgerEntryInput struct {
@@ -28,13 +28,13 @@ type LedgerEntryInput struct {
 }
 
 type PostLedgerTransactionInput struct {
-	TransactionID string
-	PlayerID      string
-	Kind          string
-	ReferenceID   string
+	TransactionID  string
+	PlayerID       string
+	Kind           string
+	ReferenceID    string
 	IdempotencyKey string
-	Description   string
-	Entries       []LedgerEntryInput
+	Description    string
+	Entries        []LedgerEntryInput
 }
 
 type LedgerService struct {
