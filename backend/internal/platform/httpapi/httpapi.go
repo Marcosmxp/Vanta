@@ -50,10 +50,26 @@ func DecodeJSON(w http.ResponseWriter, r *http.Request, destination any, maxByte
 	return nil
 }
 
-func MaskRemoteIP(remoteAddr string) string {
-	host, _, err := net.SplitHostPort(strings.TrimSpace(remoteAddr))
+// RemoteIP extracts and canonicalizes only the IP portion of a server-supplied
+// RemoteAddr. It deliberately ignores forwarding headers because those are not
+// trustworthy unless a known reverse-proxy boundary validates them first.
+func RemoteIP(remoteAddr string) string {
+	value := strings.TrimSpace(remoteAddr)
+	host, _, err := net.SplitHostPort(value)
 	if err != nil {
-		host = strings.TrimSpace(remoteAddr)
+		host = value
+	}
+	ip := net.ParseIP(strings.TrimSpace(host))
+	if ip == nil {
+		return ""
+	}
+	return ip.String()
+}
+
+func MaskRemoteIP(remoteAddr string) string {
+	host := RemoteIP(remoteAddr)
+	if host == "" {
+		return ""
 	}
 	ip := net.ParseIP(host)
 	if ip == nil {
