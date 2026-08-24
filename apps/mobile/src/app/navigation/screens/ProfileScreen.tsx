@@ -50,7 +50,7 @@ export function ProfileScreen({ navigation }: Props) {
     <ProfileOverviewScreen
       snapshot={snapshot}
       onOpenDestination={openDestination}
-      onSignOut={() => void signOut()}
+      onSignOut={() => void signOut().catch(() => undefined)}
     />
   );
 }
