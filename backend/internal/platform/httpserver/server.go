@@ -8,6 +8,7 @@ import (
 	"time"
 
 	bettinghistory "github.com/Marcosmxp/Vanta/backend/internal/betting/history"
+	"github.com/Marcosmxp/Vanta/backend/internal/compliance/legal"
 	"github.com/Marcosmxp/Vanta/backend/internal/health"
 	"github.com/Marcosmxp/Vanta/backend/internal/identity/auth"
 	identitysecurity "github.com/Marcosmxp/Vanta/backend/internal/identity/security"
@@ -18,6 +19,7 @@ import (
 	platformstatus "github.com/Marcosmxp/Vanta/backend/internal/platform/status"
 	"github.com/Marcosmxp/Vanta/backend/internal/player/profile"
 	"github.com/Marcosmxp/Vanta/backend/internal/responsiblegaming"
+	"github.com/Marcosmxp/Vanta/backend/internal/support"
 	"github.com/Marcosmxp/Vanta/backend/internal/wallet"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
@@ -33,6 +35,8 @@ type Dependencies struct {
 	ResponsibleGaming *responsiblegaming.HTTPHandler
 	BetHistory        *bettinghistory.HTTPHandler
 	KYC               *kyc.HTTPHandler
+	Support           *support.HTTPHandler
+	Legal             *legal.HTTPHandler
 	PlatformStatus    *platformstatus.HTTPHandler
 }
 
@@ -45,6 +49,8 @@ func New(cfg config.Config, dependencies Dependencies) *http.Server {
 	mux.Handle("GET /health", health.Handler())
 	mux.Handle("GET /health/ready", health.ReadinessHandler(dependencies.Postgres, dependencies.Redis))
 	mux.HandleFunc("GET /v1/platform/status", dependencies.PlatformStatus.Get)
+	mux.HandleFunc("GET /v1/legal", dependencies.Legal.Get)
+	mux.HandleFunc("GET /v1/legal/documents/{documentID}", dependencies.Legal.GetDocument)
 
 	mux.HandleFunc("POST /v1/auth/register", dependencies.Auth.Register)
 	mux.HandleFunc("POST /v1/auth/login", dependencies.Auth.Login)
@@ -65,12 +71,15 @@ func New(cfg config.Config, dependencies Dependencies) *http.Server {
 	protected.HandleFunc("POST /v1/responsible-gaming/self-exclusion", dependencies.ResponsibleGaming.StartSelfExclusion)
 	protected.HandleFunc("GET /v1/bets", dependencies.BetHistory.List)
 	protected.HandleFunc("GET /v1/bets/{betID}", dependencies.BetHistory.Get)
+	protected.HandleFunc("GET /v1/support", dependencies.Support.Get)
+	protected.HandleFunc("POST /v1/support/requests", dependencies.Support.Create)
+	protected.HandleFunc("GET /v1/support/requests/{requestID}", dependencies.Support.GetRequest)
 	mux.Handle("/v1/", dependencies.Auth.RequireAuthentication(protected))
 
-	handler := requestIDMiddleware(mux)
-	handler = recoveryMiddleware(handler)
+	handler := recoveryMiddleware(mux)
 	handler = accessLogMiddleware(handler)
 	handler = securityHeaders(cfg.Environment, handler)
+	handler = requestIDMiddleware(handler)
 
 	return &http.Server{
 		Addr:              ":" + cfg.APIPort,
