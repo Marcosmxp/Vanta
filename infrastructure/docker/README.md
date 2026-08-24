@@ -1,11 +1,31 @@
-# Local infrastructure
+# Vanta local runtime
 
-Start development dependencies with:
+Start the complete development backend from the repository root:
 
 ```bash
-docker compose -f infrastructure/docker/compose.dev.yml up -d
+docker compose -f infrastructure/docker/compose.dev.yml up -d --build
 ```
 
-Both PostgreSQL and Redis bind to `127.0.0.1` only. The credentials in `compose.dev.yml` are development-only values and must never be reused in staging or production.
+Services:
 
-Persistent development database files live under `.infrastructure-data/`, which is ignored by Git.
+- API: `http://127.0.0.1:8080`
+- PostgreSQL: `127.0.0.1:5432`
+- Redis: `127.0.0.1:6379`
+
+Readiness:
+
+```bash
+curl http://127.0.0.1:8080/health/ready
+```
+
+Stop the runtime:
+
+```bash
+docker compose -f infrastructure/docker/compose.dev.yml down
+```
+
+PostgreSQL data is stored under `.infrastructure-data/`, which is ignored by Git. Redis is intentionally ephemeral because it is not a source of financial truth.
+
+All host ports bind to `127.0.0.1`. The database password and development cryptographic defaults are local-only placeholders. Never reuse them in staging or production.
+
+The API container runs as a non-root user, uses a read-only filesystem, drops Linux capabilities and enables `no-new-privileges`.
