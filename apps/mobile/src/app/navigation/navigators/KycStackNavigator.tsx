@@ -1,6 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { darkTheme } from '../../../design-system';
+import { useSession } from '../../../core/session/SessionProvider';
+import { SystemState, darkTheme } from '../../../design-system';
+import { createApiKycStatusProvider } from '../../../features/kyc/provider/ApiKycStatusProvider';
 import {
   KycApprovedScreen,
   KycDocumentCaptureScreen,
@@ -11,14 +15,66 @@ import {
   KycRetryScreen,
   KycSelfieScreen,
 } from '../../../features/kyc/screens/KycScreens';
+import type { KycStatus } from '../../../features/kyc/types';
 import type { KycStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<KycStackParamList>();
 
+function initialRoute(status: KycStatus): keyof KycStackParamList {
+  switch (status) {
+    case 'approved':
+      return 'Approved';
+    case 'rejected':
+      return 'Rejected';
+    case 'processing':
+      return 'Processing';
+    case 'selfie-required':
+      return 'Selfie';
+    case 'document-required':
+      return 'DocumentType';
+    case 'not-started':
+      return 'Intro';
+  }
+}
+
 export function KycStackNavigator() {
+  const { request } = useSession();
+  const provider = createApiKycStatusProvider(request);
+  const statusQuery = useQuery({
+    queryKey: ['kyc-status'],
+    queryFn: () => provider.getCurrentVerification(),
+  });
+
+  if (statusQuery.isPending) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: darkTheme.colors.background.app }}>
+        <SystemState
+          kind="loading"
+          title="A confirmar estado de verificação"
+          description="O estado KYC é carregado da API autenticada antes de apresentar o fluxo."
+        />
+      </SafeAreaView>
+    );
+  }
+
+  if (!statusQuery.data) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: darkTheme.colors.background.app }}>
+        <SystemState
+          kind="error"
+          title="Verificação indisponível"
+          description={statusQuery.error instanceof Error ? statusQuery.error.message : 'Não foi possível confirmar o estado KYC.'}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  const route = initialRoute(statusQuery.data.status);
+
   return (
     <Stack.Navigator
-      initialRouteName="Intro"
+      key={statusQuery.data.status}
+      initialRouteName={route}
       screenOptions={{
         headerStyle: { backgroundColor: darkTheme.colors.surface.default },
         headerTintColor: darkTheme.colors.text.primary,
