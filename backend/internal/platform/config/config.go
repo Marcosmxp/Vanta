@@ -31,17 +31,17 @@ type MaintenanceConfig struct {
 }
 
 type Config struct {
-	Environment       Environment
-	APIPort           string
-	LogLevel          string
-	DatabaseURL       string
-	DatabaseMaxConns  int32
-	RedisURL          string
-	AccessTokenTTL    time.Duration
-	RefreshTokenTTL   time.Duration
-	PIIEncryptionKey  []byte
-	PIILookupKey      []byte
-	Maintenance       MaintenanceConfig
+	Environment      Environment
+	APIPort          string
+	LogLevel         string
+	DatabaseURL      string
+	DatabaseMaxConns int32
+	RedisURL         string
+	AccessTokenTTL   time.Duration
+	RefreshTokenTTL  time.Duration
+	PIIEncryptionKey []byte
+	PIILookupKey     []byte
+	Maintenance      MaintenanceConfig
 }
 
 func Load() (Config, error) {
