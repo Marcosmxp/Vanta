@@ -98,24 +98,24 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	httpapi.WriteJSON(w, http.StatusOK, plinkoDetailsResponse{
 		betSummaryResponse: mapBetSummary(details.BetSummary),
-		RulesetID: details.RulesetID,
-		RulesetVersion: details.RulesetVersion,
-		Rows: details.Rows,
-		Risk: details.Risk,
-		Slot: details.Slot,
+		RulesetID:          details.RulesetID,
+		RulesetVersion:     details.RulesetVersion,
+		Rows:               details.Rows,
+		Risk:               details.Risk,
+		Slot:               details.Slot,
 	})
 }
 
 func mapBetSummary(bet BetSummary) betSummaryResponse {
 	return betSummaryResponse{
-		BetID: bet.BetID,
-		Game: bet.Game,
-		Status: string(bet.Status),
-		Currency: bet.Currency,
-		StakeMinor: bet.StakeMinor,
-		PayoutMinor: bet.PayoutMinor,
+		BetID:         bet.BetID,
+		Game:          bet.Game,
+		Status:        string(bet.Status),
+		Currency:      bet.Currency,
+		StakeMinor:    bet.StakeMinor,
+		PayoutMinor:   bet.PayoutMinor,
 		MultiplierBps: bet.MultiplierBps,
-		PlacedAt: bet.PlacedAt,
-		SettledAt: bet.SettledAt,
+		PlacedAt:      bet.PlacedAt,
+		SettledAt:     bet.SettledAt,
 	}
 }
