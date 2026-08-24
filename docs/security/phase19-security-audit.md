@@ -38,6 +38,29 @@ The recovery middleware included the recovered panic value directly in structure
 
 **Regression coverage:** middleware tests verify that a synthetic secret-bearing panic never appears in the client response.
 
+### F19-004 — Session activity touch query had an ambiguous PostgreSQL timestamp expression
+
+**Severity:** Medium
+
+`TouchSession` compared `last_seen_at` against a bind parameter minus an SQL interval. PostgreSQL could infer the bind parameter as an interval in this expression and reject the query at runtime. Authentication intentionally ignored touch failures, so login/authentication still succeeded while session activity timestamps stopped updating.
+
+**Fix:** the one-minute cutoff is calculated as a typed `time.Time` in Go and passed as its own PostgreSQL parameter. The database now compares `TIMESTAMPTZ` values directly without ambiguous operator inference.
+
+**Regression evidence:** Phase 19 integration logs exposed the failing query before the fix; the subsequent race/integration suite completed successfully after the typed cutoff change.
+
+### F19-005 — Reachable vulnerable Go dependencies
+
+**Severity:** High
+
+`govulncheck` found two vulnerabilities on call paths used by Vanta:
+
+- `GO-2026-5970` in `golang.org/x/text v0.28.0` (infinite loop on invalid input), reachable through PostgreSQL configuration processing;
+- `GO-2026-5004` in `github.com/jackc/pgx/v5 v5.7.6` (SQL placeholder confusion with dollar-quoted strings), reachable through migration/database paths.
+
+**Fix:** `pgx/v5` was upgraded to `v5.9.2`, `golang.org/x/text` to `v0.39.0`, and the normalized transitive module graph/checksums were committed from Go 1.27 `go mod tidy` output.
+
+**Regression coverage:** `govulncheck` is now a required pull-request gate so reachable Go vulnerabilities fail CI instead of remaining advisory-only.
+
 ## Security regression coverage added
 
 - strict JSON rejects unknown fields, multiple objects and oversized bodies;
