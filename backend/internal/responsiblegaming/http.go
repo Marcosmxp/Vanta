@@ -117,10 +117,10 @@ func (h *HTTPHandler) ChangeMoneyLimit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	command := RequestMoneyLimitChangeCommand{
-		PlayerID: principal.PlayerID,
-		LimitID: strings.TrimSpace(r.PathValue("limitID")),
+		PlayerID:             principal.PlayerID,
+		LimitID:              strings.TrimSpace(r.PathValue("limitID")),
 		RequestedAmountMinor: request.AmountMinor,
-		IdempotencyKey: strings.TrimSpace(r.Header.Get("Idempotency-Key")),
+		IdempotencyKey:       strings.TrimSpace(r.Header.Get("Idempotency-Key")),
 	}
 	if err := h.repository.RequestMoneyLimitChange(r.Context(), command); err != nil {
 		h.writeCommandError(w, err)
@@ -141,9 +141,9 @@ func (h *HTTPHandler) ChangeSessionLimit(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	command := RequestSessionLimitChangeCommand{
-		PlayerID: principal.PlayerID,
+		PlayerID:         principal.PlayerID,
 		RequestedMinutes: request.Minutes,
-		IdempotencyKey: strings.TrimSpace(r.Header.Get("Idempotency-Key")),
+		IdempotencyKey:   strings.TrimSpace(r.Header.Get("Idempotency-Key")),
 	}
 	if err := h.repository.RequestSessionLimitChange(r.Context(), command); err != nil {
 		h.writeCommandError(w, err)
@@ -183,9 +183,9 @@ func (h *HTTPHandler) StartSelfExclusion(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	command := StartSelfExclusionCommand{
-		PlayerID: principal.PlayerID,
-		OptionID: request.OptionID,
-		Acknowledged: request.Acknowledged,
+		PlayerID:       principal.PlayerID,
+		OptionID:       request.OptionID,
+		Acknowledged:   request.Acknowledged,
 		IdempotencyKey: strings.TrimSpace(r.Header.Get("Idempotency-Key")),
 	}
 	if err := h.repository.StartSelfExclusion(r.Context(), command); err != nil {
