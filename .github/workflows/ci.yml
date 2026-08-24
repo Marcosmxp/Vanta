@@ -47,7 +47,33 @@ jobs:
   backend:
     name: Go tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: vanta_test
+          POSTGRES_USER: vanta_test
+          POSTGRES_PASSWORD: vanta_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vanta_test -d vanta_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      VANTA_TEST_DATABASE_URL: postgres://vanta_test:vanta_test_only@127.0.0.1:5432/vanta_test?sslmode=disable
+      VANTA_TEST_REDIS_URL: redis://127.0.0.1:6379/15
     defaults:
       run:
         working-directory: backend
@@ -59,13 +85,32 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.27.0'
-          cache-dependency-path: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Verify module graph
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
 
       - name: Format verification
-        run: test -z "$(gofmt -l .)"
+        run: |
+          files="$(gofmt -l .)"
+          if [ -n "$files" ]; then
+            printf 'gofmt required for:\n%s\n' "$files"
+            exit 1
+          fi
 
-      - name: Run tests
+      - name: Run tests with race detector
         run: go test -race ./...
 
       - name: Run vet
         run: go vet ./...
+
+      - name: Build API binary
+        run: go build ./cmd/api
+
+      - name: Validate API container build
+        run: docker build --file Dockerfile .
+
+      - name: Validate development Compose model
+        run: docker compose --file ../infrastructure/docker/compose.dev.yml config --quiet

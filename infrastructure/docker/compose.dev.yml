@@ -29,3 +29,30 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  api:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    container_name: vanta-dev-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      VANTA_ENV: development
+      VANTA_API_PORT: "8080"
+      VANTA_DATABASE_URL: postgres://vanta:vanta_local_only@postgres:5432/vanta?sslmode=disable
+      VANTA_REDIS_URL: redis://redis:6379/0
+      VANTA_LOG_LEVEL: debug
+    ports:
+      - "127.0.0.1:8080:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
