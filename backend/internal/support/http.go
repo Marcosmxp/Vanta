@@ -94,10 +94,10 @@ func (h *HTTPHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	requestID, err := h.repository.CreateRequest(r.Context(), CreateRequestCommand{
-		PlayerID: principal.PlayerID,
-		Category: body.Category,
-		Subject: body.Subject,
-		Message: body.Message,
+		PlayerID:       principal.PlayerID,
+		Category:       body.Category,
+		Subject:        body.Subject,
+		Message:        body.Message,
 		IdempotencyKey: strings.TrimSpace(r.Header.Get("Idempotency-Key")),
 	})
 	if err != nil {
@@ -139,9 +139,9 @@ func (h *HTTPHandler) GetRequest(w http.ResponseWriter, r *http.Request) {
 func mapRequest(request RequestSummaryReadModel) requestResponse {
 	return requestResponse{
 		RequestID: request.RequestID,
-		Category: request.Category,
-		Subject: request.Subject,
-		Status: string(request.Status),
+		Category:  request.Category,
+		Subject:   request.Subject,
+		Status:    string(request.Status),
 		CreatedAt: request.CreatedAt,
 		UpdatedAt: request.UpdatedAt,
 	}
