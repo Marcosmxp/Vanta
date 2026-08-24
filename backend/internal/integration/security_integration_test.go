@@ -155,11 +155,20 @@ func TestConcurrentLedgerOverspendCommitsAtMostOneDebit(t *testing.T) {
 		WHERE w.player_id = $1`, player.PlayerID).Scan(&availableAccountID); err != nil {
 		t.Fatalf("load available account: %v", err)
 	}
-	houseAccountID := fmt.Sprintf("house_security_%d", time.Now().UnixNano())
+
+	candidateHouseAccountID := fmt.Sprintf("house_security_%d", time.Now().UnixNano())
 	if _, err := pool.Exec(context.Background(), `
 		INSERT INTO ledger_accounts(account_id, wallet_id, account_kind, currency)
-		VALUES ($1, NULL, 'house_cash', 'EUR')`, houseAccountID); err != nil {
-		t.Fatalf("create house account: %v", err)
+		VALUES ($1, NULL, 'house_cash', 'EUR')
+		ON CONFLICT DO NOTHING`, candidateHouseAccountID); err != nil {
+		t.Fatalf("ensure canonical house account: %v", err)
+	}
+	var houseAccountID string
+	if err := pool.QueryRow(context.Background(), `
+		SELECT account_id
+		FROM ledger_accounts
+		WHERE wallet_id IS NULL AND account_kind = 'house_cash' AND currency = 'EUR'`).Scan(&houseAccountID); err != nil {
+		t.Fatalf("load canonical house account: %v", err)
 	}
 
 	ledger := wallet.NewLedgerService(pool)
