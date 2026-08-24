@@ -11,6 +11,7 @@ import (
 	"time"
 
 	bettinghistory "github.com/Marcosmxp/Vanta/backend/internal/betting/history"
+	"github.com/Marcosmxp/Vanta/backend/internal/compliance/legal"
 	"github.com/Marcosmxp/Vanta/backend/internal/identity/auth"
 	identitysecurity "github.com/Marcosmxp/Vanta/backend/internal/identity/security"
 	"github.com/Marcosmxp/Vanta/backend/internal/kyc"
@@ -24,6 +25,7 @@ import (
 	platformstatus "github.com/Marcosmxp/Vanta/backend/internal/platform/status"
 	"github.com/Marcosmxp/Vanta/backend/internal/player/profile"
 	"github.com/Marcosmxp/Vanta/backend/internal/responsiblegaming"
+	"github.com/Marcosmxp/Vanta/backend/internal/support"
 	"github.com/Marcosmxp/Vanta/backend/internal/wallet"
 )
 
@@ -72,19 +74,23 @@ func main() {
 	responsibleGamingHandler := responsiblegaming.NewHTTPHandler(responsiblegaming.NewPostgresRepository(postgresPool))
 	betHistoryHandler := bettinghistory.NewHTTPHandler(bettinghistory.NewPostgresRepository(postgresPool))
 	kycHandler := kyc.NewHTTPHandler(kyc.NewPostgresRepository(postgresPool))
+	supportHandler := support.NewHTTPHandler(support.NewPostgresRepository(postgresPool, piiProtector))
+	legalHandler := legal.NewHTTPHandler(legal.NewPostgresRepository(postgresPool), "PT")
 	platformStatusHandler := platformstatus.NewHTTPHandler(platformstatus.NewService(postgresPool, redisClient, cfg.Maintenance))
 
 	server := httpserver.New(cfg, httpserver.Dependencies{
-		Postgres: postgresPool,
-		Redis: redisClient,
-		Auth: authHandler,
-		Profile: profileHandler,
-		Wallet: walletHandler,
-		Security: securityHandler,
+		Postgres:          postgresPool,
+		Redis:             redisClient,
+		Auth:              authHandler,
+		Profile:           profileHandler,
+		Wallet:            walletHandler,
+		Security:          securityHandler,
 		ResponsibleGaming: responsibleGamingHandler,
-		BetHistory: betHistoryHandler,
-		KYC: kycHandler,
-		PlatformStatus: platformStatusHandler,
+		BetHistory:        betHistoryHandler,
+		KYC:               kycHandler,
+		Support:           supportHandler,
+		Legal:             legalHandler,
+		PlatformStatus:    platformStatusHandler,
 	})
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
