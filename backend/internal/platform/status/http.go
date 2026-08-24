@@ -32,9 +32,9 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt    any    `json:"updatedAt"`
 	}{
 		Availability: string(model.Availability),
-		IncidentID: model.IncidentID,
-		Message: model.Message,
+		IncidentID:   model.IncidentID,
+		Message:      model.Message,
 		RetryAfterAt: model.RetryAfterAt,
-		UpdatedAt: model.UpdatedAt,
+		UpdatedAt:    model.UpdatedAt,
 	})
 }
