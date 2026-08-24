@@ -189,10 +189,11 @@ func (s *PostgresStore) RevokeSession(ctx context.Context, sessionID, reason str
 }
 
 func (s *PostgresStore) TouchSession(ctx context.Context, sessionID string, seenAt time.Time) error {
+	cutoff := seenAt.Add(-time.Minute)
 	_, err := s.pool.Exec(ctx, `
 		UPDATE sessions
 		SET last_seen_at = $2
-		WHERE session_id = $1 AND revoked_at IS NULL AND last_seen_at < $2 - INTERVAL '1 minute'`, sessionID, seenAt,
+		WHERE session_id = $1 AND revoked_at IS NULL AND last_seen_at < $3`, sessionID, seenAt, cutoff,
 	)
 	if err != nil {
 		return fmt.Errorf("touch session: %w", err)
