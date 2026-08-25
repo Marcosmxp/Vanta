@@ -24,6 +24,7 @@ export function WalletOverviewScreen({
   onOpenTransaction,
 }: WalletOverviewScreenProps) {
   const walletReady = snapshot.balance.availability === 'ready';
+  const transactions = Array.isArray(snapshot.transactions) ? snapshot.transactions : [];
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -49,12 +50,12 @@ export function WalletOverviewScreen({
               <Text style={styles.sectionTitle}>Atividade financeira</Text>
             </View>
             <Badge
-              label={snapshot.transactions.length > 0 ? `${snapshot.transactions.length} movimentos` : 'Sem movimentos'}
+              label={transactions.length > 0 ? `${transactions.length} movimentos` : 'Sem movimentos'}
               tone="neutral"
             />
           </View>
 
-          {snapshot.transactions.length === 0 ? (
+          {transactions.length === 0 ? (
             <SystemState
               kind={walletReady ? 'empty' : 'error'}
               compact
@@ -68,7 +69,7 @@ export function WalletOverviewScreen({
             />
           ) : (
             <View style={styles.list}>
-              {snapshot.transactions.map((transaction) => (
+              {transactions.map((transaction) => (
                 <WalletTransactionItemCard
                   key={transaction.transactionId}
                   transaction={transaction}
