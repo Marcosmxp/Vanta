@@ -129,6 +129,7 @@ Set-Location '$repoRoot'
 `$env:EXPO_PUBLIC_VANTA_ENV='development'
 `$env:EXPO_PUBLIC_VANTA_API_URL='http://${LanIp}:8080'
 `$env:REACT_NATIVE_PACKAGER_HOSTNAME='${LanIp}'
+`$env:EXPO_PACKAGER_PROXY_URL='http://${LanIp}:8081'
 Write-Host 'Starting Metro for physical device at ${LanIp}:8081 ...'
 pnpm --dir apps/mobile exec expo start --dev-client --lan --port 8081
 "@
@@ -141,4 +142,5 @@ Write-Host "API:   http://${LanIp}:8080"
 Write-Host "Health: $healthUrl"
 Write-Host "Metro: http://${LanIp}:8081"
 Write-Host ''
-Write-Host 'Keep both PowerShell windows open, keep the PC and phone on the same Wi-Fi, then open the installed Vanta app or scan the Metro QR code.'
+Write-Host 'Keep both PowerShell windows open, keep the PC and phone on the same Wi-Fi, then open the installed Vanta app.'
+Write-Host 'For this debug APK, set the device Dev Settings debug server host to the Metro address above if the app still points to localhost.'
