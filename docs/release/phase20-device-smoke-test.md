@@ -12,8 +12,11 @@ Use this checklist only with development or preview environments.
 - [x] Android physical-device debug APK exists and installs.
 - [x] Active test branch is `feat/phase20-native-builds`.
 - [x] API/Metro development environment recorded.
+- [x] Canonical release identity exists: `0.1.0-alpha.1`, build `2`.
+- [x] Android workflow generates version/build/Git-SHA artifact provenance.
 - [ ] Final controlled app version/build/commit metadata displayed inside the app.
-- [ ] Final release artifact provenance recorded under new version governance.
+- [ ] Intended `0.1.0-alpha.1` artifact validated after the provenance workflow change.
+- [ ] Git tag/GitHub Release created only after that artifact passes its gates.
 
 ## Session flow
 
@@ -154,7 +157,10 @@ Do not unblock these for smoke-testing convenience.
 - [ ] Production profile does not enable debug-only behavior.
 - [x] Payment/KYC/production game operations remain blocked in current test state.
 - [ ] APK inspection completed for embedded secrets/debug metadata.
-- [ ] Dependency graph/release build uses controlled lockfile strategy.
+- [x] Canonical release metadata is synchronized by CI validation.
+- [x] Artifact filename/manifest identifies release + build + commit.
+- [ ] `pnpm-lock.yaml` generated/reviewed/committed.
+- [ ] CI/native installs use `--frozen-lockfile`.
 
 ## iOS
 

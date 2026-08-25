@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { releaseMetadata } from '../../../app/config/releaseMetadata';
 import { Badge, Button, SystemState, darkTheme } from '../../../design-system';
 import { ProfileIdentityCard } from '../components/ProfileIdentityCard';
 import { ProfileMenuCard, type ProfileDestination } from '../components/ProfileMenuCard';
@@ -66,6 +67,14 @@ export function ProfileOverviewScreen({
           </Text>
         </View>
 
+        <View style={styles.buildSection} accessibilityLabel={`Vanta ${releaseMetadata.releaseVersion}, build ${releaseMetadata.buildNumber}`}>
+          <Text style={styles.eyebrow}>SOBRE</Text>
+          <Text style={styles.buildVersion}>Vanta {releaseMetadata.releaseVersion}</Text>
+          <Text style={styles.buildMeta}>
+            Build {releaseMetadata.buildNumber} · {releaseMetadata.channel.toUpperCase()}
+          </Text>
+        </View>
+
         <Text style={styles.footerNote}>
           Dados legais completos, documentos KYC e segredos de autenticação não pertencem ao read model desta tela.
         </Text>
@@ -113,6 +122,18 @@ const styles = StyleSheet.create({
   sessionNote: {
     ...darkTheme.typography.caption,
     color: darkTheme.colors.text.secondary,
+  },
+  buildSection: {
+    alignItems: 'center',
+    gap: darkTheme.spacing.xs,
+  },
+  buildVersion: {
+    ...darkTheme.typography.bodyStrong,
+    color: darkTheme.colors.text.primary,
+  },
+  buildMeta: {
+    ...darkTheme.typography.caption,
+    color: darkTheme.colors.text.disabled,
   },
   footerNote: {
     ...darkTheme.typography.caption,

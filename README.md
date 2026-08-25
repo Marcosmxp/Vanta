@@ -10,7 +10,19 @@ Phases **01–19 are complete and merged**.
 
 The current Android baseline is being validated on a physical device. Registration/login, authenticated Home/Profile/Wallet and protected Plinko rendering have been exercised against the local Go/PostgreSQL/Redis backend. Phase 20 is not yet ready to merge.
 
-The repository still contains inconsistent early version declarations (`0.0.1` vs `0.0.0`). Controlled SemVer/build governance is now an explicit Phase 20 requirement; see [`docs/release/versioning-and-release-governance.md`](./docs/release/versioning-and-release-governance.md).
+### Current controlled release identity
+
+```text
+Release: 0.1.0-alpha.1
+Native marketing version: 0.1.0
+Android versionCode: 2
+iOS buildNumber: 2
+Channel: alpha
+```
+
+Root `version.json` is the canonical source. Use `pnpm release:check` to detect drift. The `v0.1.0-alpha.1` Git tag is intentionally pending until the intended Phase 20 alpha artifact passes its release gates.
+
+See [`docs/release/versioning-and-release-governance.md`](./docs/release/versioning-and-release-governance.md) and [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Canonical project documentation
 
@@ -39,6 +51,7 @@ Read:
 - Sensitive production capabilities remain fail-closed until prerequisites exist.
 - Player-facing copy explains the product; developer docs explain architecture.
 - Releases must be traceable to version + native build + Git commit.
+- Project phases are not application versions.
 
 ## Product direction
 
@@ -56,7 +69,7 @@ Current product-polish direction includes:
 
 ## Important production boundary
 
-A successful APK/native build does **not** authorize regulated production operation.
+A successful APK/native build or a normalized software version does **not** authorize regulated production operation.
 
 Still blocked before production:
 - production game placement/settlement;
@@ -68,6 +81,7 @@ Still blocked before production:
 - approved game mathematics/exposure;
 - final licensing/certification;
 - store policy readiness;
-- independent security assessment.
+- independent security assessment;
+- committed JavaScript dependency lockfile/frozen installs for controlled production builds.
 
 Launch readiness requires evidence, not only code completion.

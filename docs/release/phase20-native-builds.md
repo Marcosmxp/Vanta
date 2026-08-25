@@ -3,22 +3,34 @@
 **Status:** IN PROGRESS on `feat/phase20-native-builds` / PR #24.  
 **Last consolidated:** 2026-08-25.
 
-Phase 20 turns the integrated Vanta MVP into reproducible native Android/iOS development and preview artifacts and validates native runtime behavior. It does **not** authorize production operation.
+Phase 20 turns the integrated Vanta MVP into traceable native Android/iOS development and preview artifacts and validates native runtime behavior. It does **not** authorize production operation.
 
 ---
 
-## Native baseline
+## Native/release baseline
 
 - Expo SDK 57 / React Native 0.86 / React 19.2.3.
 - Application name: `Vanta`.
 - Android application ID: `com.marcosmxp.vanta`.
 - iOS bundle identifier: `com.marcosmxp.vanta`.
 - Native URL scheme: `vanta`.
-- Current Expo marketing version: `0.0.1`.
-- Android versionCode: `1`.
-- iOS buildNumber: `1`.
+- Canonical source: root `version.json`.
+- Current release identity: `0.1.0-alpha.1`.
+- Native marketing version: `0.1.0`.
+- Android `versionCode`: `2`.
+- iOS `buildNumber`: `2`.
+- Release channel: `alpha`.
 
-Version fields are currently inconsistent with root/mobile package versions and historical milestone naming. This is explicit Phase 20 debt. See [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
+The earlier active drift (`0.0.0` package metadata versus `0.0.1` Expo metadata) has been normalized. Historical `v0.0.0.1` references remain history only and are not a release scheme.
+
+Use:
+
+```text
+pnpm release:sync
+pnpm release:check
+```
+
+See [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
 
 ---
 
@@ -37,30 +49,54 @@ Rules:
 
 ## Android native CI — current shape
 
-The current `.github/workflows/native-android.yml` intentionally produces **one Android artifact**:
+The current `.github/workflows/native-android.yml` intentionally produces **one Android artifact** for the physical-device development path.
+
+Artifact identity is derived from canonical release metadata and Git SHA:
 
 ```text
-Job:
-Android physical-device debug APK
-
-Artifact:
-vanta-android-physical-device-debug-apk
+vanta-<release>-build-<number>-android-physical-debug-<short-sha>
 ```
+
+The uploaded artifact contains:
+- a versioned installable APK;
+- `build-metadata.json` with non-secret provenance;
+- `IDENTITY.txt` with release/build/commit identity.
 
 Pipeline:
 1. checkout;
 2. Node/pnpm/Java setup;
-3. install workspace dependencies;
-4. install Skia native binaries;
-5. validate native release config;
+3. validate canonical version/release configuration;
+4. install workspace dependencies;
+5. install Skia native binaries;
 6. resolve Expo public config;
 7. clean Android prebuild;
 8. `:app:assembleDebug`;
-9. upload the APK.
+9. generate build provenance;
+10. upload the versioned artifact bundle.
 
-The workflow currently embeds a development LAN API address for the current physical-device test artifact. This is temporary development configuration, not a portable staging/production strategy.
+The workflow currently embeds a development LAN API address for the physical-device debug artifact. This is temporary development configuration, not a portable staging/production strategy.
 
 Do not add emulator + physical + release APK variants merely to increase artifact count. Additional artifacts require a concrete test/release purpose.
+
+---
+
+## Dependency reproducibility status
+
+The repository still lacks root `pnpm-lock.yaml`.
+
+Therefore JavaScript installs are not yet fully reproducible and current workflows temporarily retain:
+
+```text
+pnpm install --no-frozen-lockfile
+```
+
+Required follow-up before controlled production release:
+1. generate the lockfile with the pinned workspace/toolchain;
+2. review/commit it;
+3. change CI/native workflows to `--frozen-lockfile`;
+4. treat lockfile changes as mandatory when dependency declarations change.
+
+Do not fabricate the lockfile manually.
 
 ---
 
@@ -145,9 +181,10 @@ Major findings:
 - account password minimum mismatch;
 - Wallet `transactions: null` crash;
 - stale login-error UI;
-- unnecessary multi-APK workflow iteration.
+- unnecessary multi-APK workflow iteration;
+- uncontrolled/inconsistent early release metadata.
 
-The Wallet crash and major runtime blockers above have known fixes. The stale login-error UI and full password-copy alignment remain open.
+The version-metadata inconsistency is now normalized through root `version.json`; dependency lockfile reproducibility remains open.
 
 ---
 
@@ -176,10 +213,9 @@ High-risk actions will later use step-up authentication, not routine full re-log
 
 ---
 
-## Native UX/product polish added to Phase 20 scope
+## Native UX/product polish in Phase 20 scope
 
 Before alpha-quality native experience is considered complete, validate/implement:
-
 - final app icon;
 - Android adaptive icon;
 - custom Vanta native splash;
@@ -232,9 +268,11 @@ Before Phase 20 closes:
 - verify backend-only configuration absent from bundle;
 - verify HTTPS rule outside development;
 - verify production profile does not enable dev behavior;
-- normalize dependency/release provenance;
+- complete dependency lock/frozen install strategy;
 - document signing handling;
-- identify exact app version/build/commit for artifacts.
+- identify exact app version/build/commit for every distributed artifact;
+- add in-app About/version/build presentation;
+- create a release tag only after the intended artifact passes its gates.
 
 Release governance:
 - [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
@@ -266,9 +304,14 @@ Release governance:
 
 ### Security/release
 - [ ] artifact secret/log inspection.
-- [ ] normalize versioning source and build provenance.
-- [ ] move release dependency installation toward locked/frozen graph.
+- [x] canonical versioning source established.
+- [x] active version declarations normalized.
+- [x] Android artifact build provenance implemented.
+- [x] changelog/PR release governance introduced.
+- [ ] generate/commit `pnpm-lock.yaml`.
+- [ ] switch JS installs to frozen-lockfile mode.
 - [ ] final Phase 20 CI/security evidence.
+- [ ] create first controlled alpha tag/GitHub Release after validation.
 
 ### iOS
 - [ ] iOS Prebuild/config validation.

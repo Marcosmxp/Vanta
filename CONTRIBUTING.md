@@ -24,7 +24,7 @@ Use Conventional Commits with an explicit useful scope:
 - `test(wallet): cover concurrent balance reservations`
 - `docs(strategy): consolidate product and business goals`
 - `build(android): add native build provenance`
-- `chore(release): prepare v0.1.0-alpha.1`
+- `chore(release): prepare v0.1.0-alpha.2`
 - `security(api): enforce request rate limits`
 
 Each commit should represent one coherent concern. Avoid `update`, `fix stuff`, `changes`, `final`, `final2` and unrelated changes in one commit.
@@ -49,6 +49,22 @@ Phase branches are allowed for bounded multi-part work, but the phase number is 
 
 Read [`docs/release/versioning-and-release-governance.md`](./docs/release/versioning-and-release-governance.md).
 
+The canonical version source is root `version.json`.
+
+Before pushing version-sensitive work, use:
+
+```bash
+pnpm release:check
+```
+
+When intentionally changing the release identity/build:
+
+1. update `version.json` only;
+2. run `pnpm release:sync`;
+3. review the generated metadata changes;
+4. update `CHANGELOG.md` when distribution/user/security behavior changes;
+5. run `pnpm release:check`.
+
 Key rules:
 - SemVer product versions;
 - alpha/beta/rc prerelease channels;
@@ -56,7 +72,22 @@ Key rules:
 - Git tag points to exact release commit;
 - artifact records version/build/Git SHA;
 - release notes/changelog;
-- no random version names.
+- no random version names;
+- no manual independent version drift across package/Expo files.
+
+Do not create a release tag merely because a branch compiles. The intended artifact must pass its release gates first.
+
+## Pull-request standard
+
+Use `.github/pull_request_template.md` and explicitly record:
+- objective;
+- product/user impact;
+- security/financial/regulatory impact;
+- release impact;
+- validation evidence;
+- known limitations/blockers.
+
+If a PR distributes an artifact, identify the expected `version + build + commit` provenance.
 
 ## Security rules
 
@@ -69,6 +100,7 @@ Key rules:
 7. Do not move authoritative outcome or settlement decisions into the client for animation convenience.
 8. Do not weaken account, identity, Responsible Gaming or security controls to make a demo pass.
 9. Security-sensitive changes require appropriate tests and updated documentation.
+10. Release/build metadata must never expose secrets or private infrastructure credentials.
 
 ## Player UX copy rule
 
@@ -81,6 +113,12 @@ Prefer explaining what the user can do, what is unavailable, what action is requ
 When work changes architecture, security, game math, financial invariants, product UX principles, version/release policy, regulation/business strategy or phase status, update the corresponding canonical documentation in the same PR.
 
 Recurring non-sensitive failures should be added to the relevant troubleshooting record.
+
+## Dependency reproducibility
+
+The repository is still missing `pnpm-lock.yaml` during the current Phase 20 normalization. Until it is generated/reviewed/committed, JavaScript builds are not considered fully reproducible.
+
+Do not create a lockfile manually. Once committed, dependency declaration changes must update it and release/CI installs must use frozen-lockfile mode.
 
 ## Review standard
 

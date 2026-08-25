@@ -1,6 +1,6 @@
 {
   "name": "vanta",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.1",
   "private": true,
   "packageManager": "pnpm@10.15.0",
   "engines": {
@@ -14,6 +14,9 @@
     "mobile:test": "pnpm --dir apps/mobile test",
     "api:test": "cd backend && go test ./...",
     "api:run": "cd backend && go run ./cmd/api",
-    "check": "pnpm mobile:typecheck && pnpm mobile:test && pnpm api:test"
+    "release:sync": "node scripts/sync-release-version.mjs --write",
+    "release:check": "node scripts/sync-release-version.mjs --check && node scripts/validate-mobile-release-config.mjs",
+    "release:metadata": "node scripts/write-build-metadata.mjs",
+    "check": "pnpm release:check && pnpm mobile:typecheck && pnpm mobile:test && pnpm api:test"
   }
 }

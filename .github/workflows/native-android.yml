@@ -7,6 +7,9 @@ on:
     paths:
       - 'apps/mobile/**'
       - 'scripts/validate-mobile-release-config.mjs'
+      - 'scripts/sync-release-version.mjs'
+      - 'scripts/write-build-metadata.mjs'
+      - 'version.json'
       - 'package.json'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/native-android.yml'
@@ -41,6 +44,26 @@ jobs:
       - name: Install pnpm
         run: npm install --global pnpm@10.15.0
 
+      - name: Validate release identity
+        id: release
+        shell: bash
+        run: |
+          node scripts/sync-release-version.mjs --check
+          node scripts/validate-mobile-release-config.mjs
+          node <<'NODE'
+          const fs = require('node:fs');
+          const v = require('./version.json');
+          const release = v.channel === 'stable' ? v.version : `${v.version}-${v.channel}.${v.iteration}`;
+          const shortSha = process.env.GITHUB_SHA.slice(0, 7);
+          const artifact = `vanta-${release}-build-${v.build}-android-physical-debug-${shortSha}`;
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_RELEASE_VERSION=${release}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_BUILD_NUMBER=${v.build}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_ARTIFACT_NAME=${artifact}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_version=${release}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_number=${v.build}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `artifact_name=${artifact}\n`);
+          NODE
+
       - name: Install workspace dependencies
         run: pnpm install --no-frozen-lockfile
 
@@ -48,9 +71,6 @@ jobs:
         run: |
           pnpm --dir apps/mobile exec install-skia
           test -f apps/mobile/node_modules/@shopify/react-native-skia/libs/android/arm64-v8a/libskia.a
-
-      - name: Validate native release configuration
-        run: node scripts/validate-mobile-release-config.mjs
 
       - name: Resolve Expo public configuration
         run: pnpm --dir apps/mobile exec expo config --type public
@@ -64,10 +84,19 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :app:assembleDebug --no-daemon
 
+      - name: Prepare versioned artifact and provenance
+        shell: bash
+        run: |
+          mkdir -p .release
+          cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk ".release/${VANTA_ARTIFACT_NAME}.apk"
+          VANTA_BUILD_PLATFORM=android-physical-debug \
+            node scripts/write-build-metadata.mjs .release/build-metadata.json
+          printf '%s\n' "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER} @ ${GITHUB_SHA}" > .release/IDENTITY.txt
+
       - name: Upload installable APK
         uses: actions/upload-artifact@v7
         with:
-          name: vanta-android-physical-device-debug-apk
-          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          name: ${{ steps.release.outputs.artifact_name }}
+          path: .release/*
           if-no-files-found: error
           retention-days: 7

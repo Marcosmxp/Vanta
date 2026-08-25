@@ -32,6 +32,11 @@ jobs:
           npm --version
           pnpm --version
 
+      - name: Validate canonical release metadata
+        run: |
+          node scripts/sync-release-version.mjs --check
+          node scripts/validate-mobile-release-config.mjs
+
       - name: Install workspace dependencies
         run: pnpm install --no-frozen-lockfile
 

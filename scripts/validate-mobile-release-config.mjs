@@ -5,6 +5,7 @@ const root = process.cwd();
 const readJson = (relativePath) =>
   JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
 
+const metadata = readJson('version.json');
 const appConfig = readJson('apps/mobile/app.json');
 const easConfig = readJson('apps/mobile/eas.json');
 const expo = appConfig.expo ?? {};
@@ -14,14 +15,18 @@ function expect(condition, message) {
   if (!condition) failures.push(message);
 }
 
+const releaseVersion = metadata.channel === 'stable'
+  ? metadata.version
+  : `${metadata.version}-${metadata.channel}.${metadata.iteration}`;
+
 expect(expo.name === 'Vanta', 'Expo app name must be Vanta.');
 expect(expo.slug === 'vanta-mobile', 'Expo slug must remain vanta-mobile.');
 expect(expo.scheme === 'vanta', 'Native deep-link scheme must be vanta.');
-expect(expo.version === '0.0.1', 'Native marketing version must be 0.0.1 for MVP v0.0.0.1.');
+expect(expo.version === metadata.version, `Native marketing version must be ${metadata.version}.`);
 expect(expo.ios?.bundleIdentifier === 'com.marcosmxp.vanta', 'Unexpected iOS bundle identifier.');
-expect(expo.ios?.buildNumber === '1', 'Unexpected iOS build number.');
+expect(expo.ios?.buildNumber === String(metadata.build), `iOS build number must be ${metadata.build}.`);
 expect(expo.android?.package === 'com.marcosmxp.vanta', 'Unexpected Android application ID.');
-expect(expo.android?.versionCode === 1, 'Unexpected Android versionCode.');
+expect(expo.android?.versionCode === metadata.build, `Android versionCode must be ${metadata.build}.`);
 
 const expectedProfiles = {
   development: { environment: 'development', publicEnvironment: 'development', apk: true },
@@ -67,5 +72,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('Vanta native release configuration is structurally valid.');
+console.log(`Vanta native release configuration is valid for ${releaseVersion} build ${metadata.build}.`);
 console.log('API URLs remain externally injected and regulated mutation surfaces remain outside build configuration.');

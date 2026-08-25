@@ -1,42 +1,92 @@
-# Vanta — Versioning and Release Governance
+# Vanta — Versioning, Releases and GitHub Governance
 
-**Status:** approved governance direction; implementation normalization is part of active Phase 20 work.  
-**Last consolidated:** 2026-08-25.
+**Status:** canonical release-governance specification.  
+**Last consolidated:** 2026-08-25.  
+**Current normalized release identity:** `0.1.0-alpha.1`, native build `2`.
 
-## 1. Why this exists
+## 1. Purpose
 
-Vanta needs an exact answer to:
-- which source produced an APK/IPA;
+Vanta must always be able to answer:
+- which source commit produced an APK/IPA/AAB;
 - which build a tester is running;
 - which changes belong to a release;
 - whether a bug belongs to an old or current artifact;
-- how to update without random version names/commits.
+- which configuration/channel produced an artifact;
+- how releases progress without random names or unrelated commits.
 
-Project phases are not application versions.
+Project phases are project-management labels. They are **not** application versions.
 
-## 2. Current inconsistency
+## 2. Canonical version source
 
-At this checkpoint:
-- `apps/mobile/app.json` uses `version: 0.0.1`;
-- Android `versionCode` is `1`;
-- iOS `buildNumber` is `1`;
-- root `package.json` uses `0.0.0`;
-- `apps/mobile/package.json` uses `0.0.0`;
-- historical planning refers to `MVP v0.0.0.1`.
+The source of truth is root [`version.json`](../../version.json):
 
-These values must be normalized before the next controlled release line.
+```json
+{
+  "schemaVersion": 1,
+  "version": "0.1.0",
+  "channel": "alpha",
+  "iteration": 1,
+  "build": 2
+}
+```
 
-Do not rewrite old Git history solely to make historical version values look cleaner.
+Derived identities:
 
-## 3. Product version format
+```text
+Product/native marketing version: 0.1.0
+Release/package identity:          0.1.0-alpha.1
+Git tag when released:             v0.1.0-alpha.1
+Android versionCode:               2
+iOS buildNumber:                   2
+```
 
-Use Semantic Versioning:
+Do not manually choose independent versions in `package.json`, `apps/mobile/package.json`, `apps/mobile/app.json` or the generated mobile release metadata module.
+
+Use:
+
+```bash
+pnpm release:sync
+pnpm release:check
+```
+
+`release:sync` derives repository declarations and the mobile metadata module from `version.json`; `release:check` fails when they drift.
+
+## 3. Why native version and prerelease identity are separated
+
+The release identity may contain prerelease labels such as:
+
+```text
+0.1.0-alpha.1
+0.1.0-beta.1
+0.1.0-rc.1
+```
+
+Native store-facing marketing versions remain numeric SemVer-shaped values such as:
+
+```text
+0.1.0
+```
+
+The channel/iteration lives in release metadata/tag/package identity rather than relying on prerelease text in native store version fields.
+
+## 4. SemVer policy
+
+Use:
 
 ```text
 MAJOR.MINOR.PATCH
 ```
 
-During pre-1.0 development, use prerelease identifiers:
+Channels:
+
+```text
+alpha  → active internal development
+beta   → broader feature-complete testing
+rc     → release candidate
+stable → public stable line
+```
+
+Examples:
 
 ```text
 0.1.0-alpha.1
@@ -47,93 +97,84 @@ During pre-1.0 development, use prerelease identifiers:
 ```
 
 Interpretation:
-- `MAJOR`: incompatible product/platform contract change after public stability;
+- `MAJOR`: incompatible public product/platform contract change after stability;
 - `MINOR`: meaningful compatible feature release;
-- `PATCH`: compatible bug/security fixes;
-- `alpha`: active internal development;
-- `beta`: broader feature-complete testing;
-- `rc`: release candidate.
+- `PATCH`: compatible bug/security fix;
+- prerelease iteration: another build/release candidate on the same product version.
 
-Recommended next controlled baseline is the `0.1.x` alpha line rather than continuing ad-hoc four-component milestone labels. The exact first normalized tag/build must be created only when repository fields and CI are updated together.
+Do not revive historical four-component milestone labels such as `v0.0.0.1` as release versions.
 
-## 4. Native build numbers
+## 5. Native build numbers
 
-Product version and native build number are different.
-
-Example:
-
-```text
-Vanta 0.1.0-alpha.3
-Android versionCode: 17
-iOS buildNumber: 17
-```
+Product version and build number are independent.
 
 Rules:
 - Android `versionCode` always increases;
 - iOS `buildNumber` always increases;
-- a rebuild of the same marketing version still gets a new native build number;
-- never reuse a build number after distribution.
+- rebuilding the same marketing version for distribution requires a new build number;
+- never reuse a distributed build number;
+- Android and iOS currently share the same canonical `build` integer unless a future platform-specific requirement justifies separation.
 
-## 5. Canonical version source
-
-Planned structure:
-
-```text
-version.json
-```
-
-Example:
-
-```json
-{
-  "version": "0.1.0-alpha.1",
-  "channel": "alpha"
-}
-```
-
-Release tooling should derive/synchronize:
-- Expo marketing version;
-- package metadata where relevant;
-- Android versionCode;
-- iOS buildNumber;
-- release notes metadata.
-
-Avoid manually editing the same version in several independent files.
+The first normalized Vanta alpha uses build `2` because build `1` already existed in the early Phase 20 native configuration.
 
 ## 6. Build provenance
 
-Every internal/release artifact should be traceable to:
+Every distributed/internal artifact must be traceable to:
 
 ```text
-APP_VERSION
-BUILD_NUMBER
-GIT_SHA
-BUILD_DATE
-BUILD_CHANNEL
+APP / PRODUCT VERSION
+RELEASE VERSION
+BUILD NUMBER
+GIT SHA
+BUILD DATE
+BUILD CHANNEL
 ENVIRONMENT
 PLATFORM
 ```
 
-Development/About surfaces may show:
+`scripts/write-build-metadata.mjs` writes a non-secret provenance manifest.
+
+The Phase 20 Android workflow also renames the debug APK using the pattern:
 
 ```text
-Vanta 0.1.0-alpha.2
-Build 8
-Development
-Commit abc1234
+vanta-<release>-build-<number>-android-physical-debug-<short-sha>.apk
 ```
 
-Public production UI may show only:
+Example shape:
+
+```text
+vanta-0.1.0-alpha.1-build-2-android-physical-debug-a1b2c3d.apk
+```
+
+The uploaded artifact contains:
+- the versioned APK;
+- `build-metadata.json`;
+- `IDENTITY.txt`.
+
+Do not expose secrets, private endpoints, credentials or internal signing material through provenance metadata.
+
+## 7. In-app version display
+
+The mobile app now receives generated release metadata from the canonical version source and the Profile surface displays:
+
+```text
+Vanta 0.1.0-alpha.1
+Build 2 · ALPHA
+```
+
+This is sufficient for Phase 20 tester identification without adding another independent version source.
+
+A later dedicated About screen may additionally show environment and short Git SHA for non-production builds when those values are injected safely at build/runtime time.
+
+Public stable UI may reduce this to:
 
 ```text
 Vanta 1.4.2 (387)
 ```
 
-Do not expose secrets or internal infrastructure endpoints through build metadata.
+## 8. Git tags and GitHub Releases
 
-## 7. Git tags and releases
-
-Release tags:
+Allowed release tag shapes:
 
 ```text
 v0.1.0-alpha.1
@@ -142,26 +183,18 @@ v0.1.0-rc.1
 v0.1.0
 ```
 
-A tag must point to the exact commit used for that release.
+Rules:
+- a tag points to the exact release commit;
+- do not tag arbitrary development commits;
+- do not create the tag until intended CI/native validation has passed;
+- a GitHub Release must identify version, build, channel, commit, supported platform/artifact, notable changes and known limitations;
+- a production release additionally requires signing, store, security, regulatory and operational gates.
 
-GitHub Release entry should contain:
-- version/tag;
-- build numbers;
-- channel;
-- commit;
-- supported platform/artifact;
-- notable changes;
-- security notes where appropriate;
-- known limitations;
-- migration/rollback information when needed.
+`0.1.0-alpha.1` is the normalized current identity. Its tag remains pending until the intended Phase 20 alpha artifact passes release gates.
 
-Do not tag random development commits as releases.
+## 9. CHANGELOG
 
-## 8. Changelog
-
-Maintain a release-oriented `CHANGELOG.md` when automated release tooling is introduced.
-
-Suggested categories:
+Root `CHANGELOG.md` is release-oriented and uses categories such as:
 
 ```text
 Added
@@ -173,27 +206,13 @@ Removed
 Known limitations
 ```
 
-Example:
+Update the changelog when a change affects a distributed artifact, user-visible behavior, security posture, compatibility or a known limitation.
 
-```text
-## 0.1.0-alpha.2
+Do not use commit history as the only release notes.
 
-### Fixed
-- Prevent Wallet crash when API returns no transactions.
-- Align account password minimum with backend policy.
+## 10. Commit convention
 
-### Changed
-- Physical-device Android workflow now produces one debug APK.
-
-### Known limitations
-- Production payments remain disabled.
-- Production KYC provider is not connected.
-- iOS physical-device validation is pending.
-```
-
-## 9. Commit convention
-
-Use Conventional Commits with an explicit useful scope:
+Use Conventional Commits with explicit useful scopes:
 
 ```text
 feat(wallet): add transaction history
@@ -203,16 +222,25 @@ feat(ui): animate bottom navigation
 refactor(motion): centralize animation tokens
 docs(strategy): consolidate product and business goals
 test(wallet): cover empty transaction response
-build(android): configure release metadata
-chore(release): prepare v0.1.0-alpha.1
+build(android): add native build provenance
+chore(release): prepare v0.1.0-alpha.2
 security(auth): harden refresh replay handling
 ```
 
-Avoid `update`, `changes`, `fix stuff`, `new version`, `final` and unrelated changes in one commit.
+Avoid:
 
-Documentation checkpoint updates that intentionally touch several canonical documents may use one grouped commit because they represent one coherent context synchronization.
+```text
+update
+changes
+fix stuff
+new version
+final
+final2
+```
 
-## 10. Branch convention
+One commit should represent one coherent concern. A grouped canonical-documentation synchronization is acceptable when its single purpose is one project checkpoint.
+
+## 11. Branch convention
 
 Use:
 
@@ -231,46 +259,85 @@ Examples:
 ```text
 feat/animated-navigation
 feat/legal-center
-feat/game-math
-fix/login-error-state
 security/device-attestation
+fix/login-error-state
 release/v0.1.0
 hotfix/wallet-crash
 ```
 
-Phase branches may remain useful for a bounded multi-part phase, but the branch name is not the software version.
+Phase branches remain acceptable for bounded multi-part work, but phase numbers never become software version numbers.
 
-## 11. Pull requests
+## 12. Pull-request governance
 
-A PR should state objective, user/security impact, changed boundaries, validation performed, release impact and known blockers.
+`.github/pull_request_template.md` requires every PR to capture:
+- objective;
+- product/user impact;
+- security/financial/regulatory impact;
+- release impact;
+- validation evidence;
+- known limitations/blockers;
+- relevant references.
 
-Do not merge because “the APK opens”. Sensitive or regulated features require evidence appropriate to the boundary.
+A PR is not complete because an APK opens.
 
-## 12. CI release rules
+Sensitive boundaries require evidence appropriate to the change: session tests, financial concurrency tests, game-math evidence, device testing, security scans, migrations, provider validation or regulatory review as applicable.
 
-Before controlled release:
-- dependency graph must be locked;
-- use frozen lockfile installs;
-- typecheck/tests/security scans pass;
-- native build succeeds;
+## 13. CI release rules
+
+Current CI now validates version synchronization before dependency installation/build work.
+
+Before controlled production release, all of the following are required:
+- canonical version synchronized;
+- dependency graph locked;
+- frozen dependency installation;
+- typecheck/tests/security scans green;
+- native build successful;
 - public build config contains no secrets;
-- correct environment/channel is verified;
-- artifact metadata matches intended tag/commit.
+- environment/channel verified;
+- artifact metadata matches intended version/build/tag/commit;
+- signing protected outside source control.
 
-Current CI still has places using `pnpm install --no-frozen-lockfile`. Before production release governance is considered complete, normalize and commit the lockfile, then use frozen installation in release gates.
+### Current reproducibility blocker
 
-## 13. Release channels
+The repository still does **not** contain `pnpm-lock.yaml`.
+
+Therefore CI currently must temporarily use:
+
+```text
+pnpm install --no-frozen-lockfile
+```
+
+This is not considered final release governance.
+
+Required follow-up:
+1. generate `pnpm-lock.yaml` with the pinned workspace/toolchain;
+2. review and commit it;
+3. replace `--no-frozen-lockfile` with `--frozen-lockfile` in CI/native release workflows;
+4. require lockfile changes whenever JS dependency declarations change.
+
+Do not fabricate a lockfile by hand.
+
+## 14. GitHub Actions supply-chain policy
+
+Current workflows still use action version tags. Before production release governance closes:
+- inventory every third-party/official action;
+- pin security-sensitive production workflows to reviewed immutable commit SHAs where practical;
+- keep workflow permissions minimal;
+- avoid unnecessary write permissions;
+- protect release/signing credentials with GitHub Environments or equivalent controls.
+
+## 15. Release channels
 
 ### Development
-- developer/runtime testing;
-- may use LAN HTTP;
+- local/runtime testing;
+- LAN HTTP permitted only in development;
 - debug tools allowed;
-- never distributed as production.
+- never represented as production.
 
 ### Alpha
 - internal/limited native testing;
-- incomplete features allowed if explicitly blocked/labeled;
-- exact build provenance required.
+- incomplete features allowed when explicitly blocked/labeled;
+- exact provenance required.
 
 ### Beta
 - broader product testing;
@@ -280,48 +347,62 @@ Current CI still has places using `pnpm install --no-frozen-lockfile`. Before pr
 
 ### Release Candidate
 - candidate for public release;
-- only known accepted non-blocking issues;
-- production config/signing/security gates.
+- only accepted non-blocking issues remain;
+- production config/signing/security gates apply.
 
-### Production
+### Stable / Production
 - store/user release;
-- no debug endpoints;
-- no dev HTTP;
-- all jurisdiction/provider/legal gates satisfied.
+- no debug endpoints or development HTTP;
+- provider, security, jurisdiction, legal, operational and store gates satisfied.
 
-## 14. Update policy
+A stable software version does not itself mean regulated real-money operation is legally authorized.
 
-App updates should eventually support:
+## 16. Update policy
+
+Future app update control should distinguish:
 - minimum supported version;
 - recommended version;
-- forced update only for genuine security/compatibility reasons;
-- maintenance message;
-- staged rollout/rollback where platform/store support it.
+- forced update for genuine security/compatibility requirements;
+- maintenance state;
+- staged rollout/rollback where stores support it.
 
-## 15. Release checklist
+A forced update must not be used simply to hide poor backward compatibility discipline.
 
-Before creating a release:
-- [ ] canonical version updated;
-- [ ] native build number incremented;
-- [ ] changelog/release notes prepared;
-- [ ] branch/commit identified;
-- [ ] CI/security green;
-- [ ] Android artifact validated;
-- [ ] iOS path validated as applicable;
-- [ ] no secrets in artifact/config/logs;
-- [ ] environment correct;
+## 17. Release checklist
+
+Before creating a tag/GitHub Release:
+- [ ] `version.json` reflects intended product/channel/iteration/build;
+- [ ] `pnpm release:check` passes;
+- [ ] native build number is greater than every previously distributed build;
+- [ ] changelog/release notes are current;
+- [ ] exact release commit identified;
+- [ ] CI/security gates green;
+- [ ] Android artifact validated where applicable;
+- [ ] iOS path validated where applicable;
+- [ ] artifact contains no secrets/debug production behavior;
+- [ ] environment/channel correct;
 - [ ] known limitations documented;
-- [ ] Git tag created;
-- [ ] GitHub Release created;
-- [ ] artifact/test evidence attached or referenced.
+- [ ] dependency lock/frozen install requirement satisfied for controlled production;
+- [ ] Git tag points to exact release commit;
+- [ ] GitHub Release records artifact provenance/evidence.
 
-## 16. Current Phase 20 action
+## 18. Phase 20 / Etapa 6 status
 
-Before Phase 20 closes:
-1. choose/create canonical version source;
-2. normalize current `0.0.1` / `0.0.0` inconsistency;
-3. introduce build provenance;
-4. show app version/build in About/Profile;
-5. document first controlled alpha release;
-6. ensure Android artifact can be unambiguously identified;
-7. define iOS build-number path even if physical iPhone validation remains pending.
+Completed by the Etapa 6 normalization:
+- canonical `version.json` introduced;
+- active `0.0.0`/`0.0.1` drift removed;
+- normalized identity set to `0.1.0-alpha.1` / build `2`;
+- automated sync/check tooling added;
+- generated mobile release metadata added;
+- release/build identity displayed in Profile;
+- Android artifact provenance added;
+- changelog started;
+- PR governance template added;
+- CI checks version drift.
+
+Remaining before Etapa 6 is fully closed:
+- generate and commit `pnpm-lock.yaml`;
+- switch JS installs to frozen-lockfile mode;
+- validate the newly versioned Android artifact in CI/on device;
+- create the first Git tag/GitHub Release only after that intended alpha artifact passes validation;
+- continue production supply-chain hardening/action pinning before public release.
