@@ -48,7 +48,7 @@ services:
       VANTA_REDIS_URL: redis://redis:6379/0
       VANTA_LOG_LEVEL: debug
     ports:
-      - "127.0.0.1:8080:8080"
+      - "${VANTA_DEV_API_BIND_ADDRESS:-127.0.0.1}:8080:8080"
     read_only: true
     tmpfs:
       - /tmp:size=16m,mode=1777
