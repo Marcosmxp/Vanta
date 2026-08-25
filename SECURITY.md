@@ -56,6 +56,8 @@ Every production game action must validate authentication, authorization, identi
 
 Approved game configurations require versioned mathematics/risk metadata and immutable historical linkage.
 
+Positive house edge does not prove solvency. Bankroll, max payout, aggregate exposure, risk of ruin and tail behavior must be approved before production wager activation.
+
 ## Required verification
 
 Changes affecting authentication, authorization, session persistence, financial state, game math, Responsible Gaming, support ownership, identity/payment boundaries or infrastructure must keep security gates green.
@@ -113,7 +115,13 @@ Use `.env.example` only for documented placeholders.
 
 Production operation remains fail-closed until applicable dependencies are implemented/reviewed, including production identity/compliance providers, payments/reconciliation, replay-safe callbacks, MFA/passkey/step-up, device trust, production key management, approved game mathematics, exposure/bankroll controls, fraud/risk monitoring, final jurisdiction controls and independent security assessment.
 
-The detailed completed audit record remains under `docs/security/`.
+## Canonical security design references
+
+- `docs/security/README.md` — security documentation index.
+- `docs/security/phase19-security-audit.md` — latest completed audit/regression evidence.
+- `docs/security/phase20-security-architecture.md` — current trust model and production hardening plan.
+- `docs/security/session-device-security-roadmap.md` — persistent session, MFA/passkeys, step-up and device-trust policy.
+- `docs/architecture/game-math-financial-risk-engine.md` — RTP, variance, bankroll, exposure, risk-of-ruin and game-integrity architecture.
 
 ## Vulnerability reporting
 
