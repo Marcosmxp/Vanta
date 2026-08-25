@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 const passwordRule = z
   .string()
-  .min(10, 'Use pelo menos 10 caracteres.')
+  .min(12, 'Use pelo menos 12 caracteres.')
+  .max(128, 'Use no máximo 128 caracteres.')
   .regex(/[a-z]/, 'Inclua uma letra minúscula.')
   .regex(/[A-Z]/, 'Inclua uma letra maiúscula.')
   .regex(/[0-9]/, 'Inclua um número.');
