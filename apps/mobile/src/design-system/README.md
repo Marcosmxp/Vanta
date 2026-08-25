@@ -3,8 +3,8 @@
 This directory is the code-first source of truth for Vanta's executable mobile visual language.
 
 Product-experience intent and acceptance criteria are documented separately in:
-- [`../../../../../docs/product/ux-motion-guidelines.md`](../../../../../docs/product/ux-motion-guidelines.md)
-- [`../../../../../docs/product/player-copy-content-guidelines.md`](../../../../../docs/product/player-copy-content-guidelines.md)
+- [`../../../../docs/product/ux-motion-guidelines.md`](../../../../docs/product/ux-motion-guidelines.md)
+- [`../../../../docs/product/player-copy-content-guidelines.md`](../../../../docs/product/player-copy-content-guidelines.md)
 
 The product docs define **what the experience should be**; this directory defines the reusable tokens/components used to implement it.
 
