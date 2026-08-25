@@ -1,0 +1,68 @@
+name: Native Android MVP
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'scripts/validate-mobile-release-config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/native-android.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  android-debug-apk:
+    name: Android native debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      EXPO_PUBLIC_VANTA_ENV: development
+      EXPO_PUBLIC_VANTA_API_URL: http://10.0.2.2:8080
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install pnpm
+        run: npm install --global pnpm@10.15.0
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate native release configuration
+        run: node scripts/validate-mobile-release-config.mjs
+
+      - name: Resolve Expo public configuration
+        run: pnpm --dir apps/mobile exec expo config --type public
+
+      - name: Generate Android native project
+        run: pnpm --dir apps/mobile exec expo prebuild --platform android --clean --no-install
+
+      - name: Build Android debug APK
+        working-directory: apps/mobile/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: vanta-android-debug-apk
+          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
