@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
+      NODE_ENV: development
       EXPO_PUBLIC_VANTA_ENV: development
       EXPO_PUBLIC_VANTA_API_URL: http://10.0.2.2:8080
     steps:
