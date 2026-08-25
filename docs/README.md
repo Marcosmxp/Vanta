@@ -13,6 +13,15 @@ Read these first, in this order:
 5. [`architecture/backend-runtime-phase17.md`](./architecture/backend-runtime-phase17.md) — Phase 17 backend runtime details.
 6. [`architecture/mobile-backend-integration.md`](./architecture/mobile-backend-integration.md) — Phase 18 mobile/backend integration details.
 
+## Active Phase 20 records
+
+Phase 20 implementation is tracked in PR #24 on `feat/phase20-native-builds`.
+
+- [`release/phase20-native-builds.md`](./release/phase20-native-builds.md) — native build profiles, versioning, environment rules, CI artifact path, open work and exit criteria.
+- [`release/phase20-device-smoke-test.md`](./release/phase20-device-smoke-test.md) — Android/iOS device and emulator validation checklist.
+
+Until PR #24 is merged, `main` remains the canonical completed-state reference and `ROADMAP.md` may still identify Phase 20 as `NEXT`. The active branch/PR records are the implementation state for the in-progress phase.
+
 ## Documentation precedence
 
 When two documents conflict, use this precedence:
@@ -21,7 +30,7 @@ When two documents conflict, use this precedence:
 2. `docs/VANTA_PROJECT_CONTEXT.md`.
 3. `docs/ROADMAP.md`.
 4. `docs/PHASE_HISTORY.md`.
-5. Current phase-specific architecture/security documents.
+5. Current phase-specific architecture/security/release documents.
 6. Older ADRs, bootstrap documents, historical notes, PR descriptions, screenshots, PDFs, and external planning artifacts.
 
 Older documents are not deleted solely because they are historical. They remain useful as implementation history, but they must not override the canonical documents above.
