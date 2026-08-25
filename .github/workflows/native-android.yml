@@ -16,13 +16,23 @@ permissions:
 
 jobs:
   android-debug-apk:
-    name: Android native debug APK
+    name: Android native debug APK (${{ matrix.target.name }})
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - name: emulator
+            api_url: http://10.0.2.2:8080
+            artifact_name: vanta-android-emulator-debug-apk
+          - name: physical-device
+            api_url: http://192.168.1.70:8080
+            artifact_name: vanta-android-physical-device-debug-apk
     env:
       NODE_ENV: development
       EXPO_PUBLIC_VANTA_ENV: development
-      EXPO_PUBLIC_VANTA_API_URL: http://10.0.2.2:8080
+      EXPO_PUBLIC_VANTA_API_URL: ${{ matrix.target.api_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -65,9 +75,9 @@ jobs:
           ./gradlew :app:assembleDebug --no-daemon
 
       - name: Upload installable APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: vanta-android-debug-apk
+          name: ${{ matrix.target.artifact_name }}
           path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
