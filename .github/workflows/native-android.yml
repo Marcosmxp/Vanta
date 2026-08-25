@@ -44,6 +44,11 @@ jobs:
       - name: Install workspace dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Install React Native Skia native binaries
+        run: |
+          pnpm --dir apps/mobile exec install-skia
+          test -f apps/mobile/node_modules/@shopify/react-native-skia/libs/android/arm64-v8a/libskia.a
+
       - name: Validate native release configuration
         run: node scripts/validate-mobile-release-config.mjs
 
