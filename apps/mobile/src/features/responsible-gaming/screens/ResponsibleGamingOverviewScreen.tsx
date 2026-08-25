@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n } from '../../../core/i18n';
 import { Card, SystemState, darkTheme } from '../../../design-system';
 import { ProtectionStateCard } from '../components/ProtectionStateCard';
 import {
@@ -19,56 +20,48 @@ export function ResponsibleGamingOverviewScreen({
   snapshot = disconnectedResponsibleGamingSnapshot,
   onOpenDestination,
 }: ResponsibleGamingOverviewScreenProps) {
+  const { t } = useI18n();
   const ready = snapshot.availability === 'ready';
-  const limits = Array.isArray(snapshot.limits) ? snapshot.limits : [];
-  const normalizedSnapshot = { ...snapshot, limits };
-  const configuredLimits = limits.length + (snapshot.sessionLimit ? 1 : 0);
+  const configuredLimits = (snapshot.limits ?? []).length + (snapshot.sessionLimit ? 1 : 0);
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>JOGO RESPONSÁVEL</Text>
-          <Text style={styles.title}>Proteções sob seu controlo</Text>
-          <Text style={styles.subtitle}>
-            Consulte limites, pausas e autoexclusão. O backend aplica estas proteções mesmo quando esta tela não está aberta.
-          </Text>
+          <Text style={styles.eyebrow}>{t('rg.eyebrow')}</Text>
+          <Text style={styles.title}>{t('rg.title')}</Text>
+          <Text style={styles.subtitle}>{t('rg.subtitle')}</Text>
         </View>
 
         {ready ? (
           <>
-            <ProtectionStateCard snapshot={normalizedSnapshot} />
+            <ProtectionStateCard snapshot={snapshot} />
 
             <Card style={styles.summaryCard}>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryCopy}>
-                  <Text style={styles.summaryLabel}>Limites configurados</Text>
+                  <Text style={styles.summaryLabel}>{t('rg.configuredLimits')}</Text>
                   <Text style={styles.summaryValue}>{configuredLimits}</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.summaryCopy}>
-                  <Text style={styles.summaryLabel}>Estado</Text>
-                  <Text style={styles.summaryState}>Sincronizado</Text>
+                  <Text style={styles.summaryLabel}>{t('rg.state')}</Text>
+                  <Text style={styles.summaryState}>{t('rg.synced')}</Text>
                 </View>
               </View>
-              <Text style={styles.summaryHint}>
-                Aumentos de limite e datas de vigência são definidos pela política server-side. O aplicativo não calcula cooling-off.
-              </Text>
+              <Text style={styles.summaryHint}>{t('rg.summaryHint')}</Text>
             </Card>
           </>
         ) : (
           <SystemState
             kind="error"
-            title="Proteções não sincronizadas"
-            description={snapshot.message ?? 'O estado de jogo responsável não está disponível. Operações reguladas continuam sujeitas à validação server-side e não são liberadas pelo cliente.'}
+            title={t('rg.notSyncedTitle')}
+            description={t('rg.notSyncedDescription')}
           />
         )}
 
         <ResponsibleGamingActionCard onOpenDestination={onOpenDestination} />
-
-        <Text style={styles.footer}>
-          Restrições de jogo responsável são verificadas novamente pelo servidor antes de operações reguladas.
-        </Text>
+        <Text style={styles.footer}>{t('rg.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

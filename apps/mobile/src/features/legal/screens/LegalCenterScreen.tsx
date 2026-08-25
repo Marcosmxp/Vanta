@@ -1,9 +1,10 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n, type TranslationKey } from '../../../core/i18n';
 import { Badge, Card, SystemState, darkTheme } from '../../../design-system';
 import { disconnectedLegalSnapshot } from '../provider/LegalProvider';
-import type { LegalSnapshot } from '../types';
+import type { LegalDocumentKind, LegalSnapshot } from '../types';
 
 export interface LegalCenterScreenProps {
   snapshot?: LegalSnapshot;
@@ -12,66 +13,71 @@ export interface LegalCenterScreenProps {
   onOpenRegulatory?: () => void;
 }
 
+const kindKeys: Record<LegalDocumentKind, TranslationKey> = {
+  terms: 'legal.kind.terms',
+  privacy: 'legal.kind.privacy',
+  cookies: 'legal.kind.cookies',
+  'game-rules': 'legal.kind.game-rules',
+  'responsible-gaming': 'legal.kind.responsible-gaming',
+  complaints: 'legal.kind.complaints',
+  regulatory: 'legal.kind.regulatory',
+};
+
 export function LegalCenterScreen({
   snapshot = disconnectedLegalSnapshot,
   onOpenDocument,
   onOpenPrivacy,
   onOpenRegulatory,
 }: LegalCenterScreenProps) {
+  const { locale, t } = useI18n();
   const ready = snapshot.availability === 'ready';
-  const documents = Array.isArray(snapshot.documents) ? snapshot.documents : [];
+  const documents = snapshot.documents ?? [];
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>LEGAL E TRANSPARÊNCIA</Text>
-          <Text style={styles.title}>Documentos, privacidade e regulação</Text>
-          <Text style={styles.subtitle}>
-            Consulte apenas versões fornecidas pela API legal versionada. O cliente não declara licença nem substitui o conteúdo oficial do operador.
-          </Text>
+          <Text style={styles.eyebrow}>{t('legal.eyebrow')}</Text>
+          <Text style={styles.title}>{t('legal.title')}</Text>
+          <Text style={styles.subtitle}>{t('legal.subtitle')}</Text>
         </View>
 
         <Card style={styles.statusCard}>
           <View style={styles.rowBetween}>
-            <Text style={styles.cardTitle}>Estado do conteúdo</Text>
-            <Badge label={ready ? 'Atualizado' : 'Indisponível'} tone={ready ? 'success' : 'neutral'} />
+            <Text style={styles.cardTitle}>{t('legal.contentState')}</Text>
+            <Badge label={ready ? t('common.updated') : t('common.unavailable')} tone={ready ? 'success' : 'neutral'} />
           </View>
-          <Text style={styles.cardText}>{snapshot.message ?? 'Documentos carregados e verificados pela API.'}</Text>
+          <Text style={styles.cardText}>{ready ? t('legal.readyMessage') : t('legal.unavailableMessage')}</Text>
         </Card>
 
         <View style={styles.quickGrid}>
           <Pressable accessibilityRole="button" disabled={!snapshot.privacy || !onOpenPrivacy} onPress={onOpenPrivacy} style={styles.quickPressable}>
             <Card style={styles.quickCard}>
-              <Text style={styles.quickEyebrow}>PRIVACIDADE</Text>
-              <Text style={styles.quickTitle}>Dados e direitos RGPD</Text>
-              <Text style={styles.quickText}>Responsável pelo tratamento, contacto e autoridade supervisora.</Text>
+              <Text style={styles.quickEyebrow}>{t('legal.privacyEyebrow')}</Text>
+              <Text style={styles.quickTitle}>{t('legal.privacyTitle')}</Text>
+              <Text style={styles.quickText}>{t('legal.privacyText')}</Text>
             </Card>
           </Pressable>
           <Pressable accessibilityRole="button" disabled={!snapshot.regulatory || !onOpenRegulatory} onPress={onOpenRegulatory} style={styles.quickPressable}>
             <Card style={styles.quickCard}>
-              <Text style={styles.quickEyebrow}>REGULAÇÃO</Text>
-              <Text style={styles.quickTitle}>Operador e licenciamento</Text>
-              <Text style={styles.quickText}>Disclosure regulatório sem alegações locais ou não verificadas.</Text>
+              <Text style={styles.quickEyebrow}>{t('legal.regulatoryEyebrow')}</Text>
+              <Text style={styles.quickTitle}>{t('legal.regulatoryTitle')}</Text>
+              <Text style={styles.quickText}>{t('legal.regulatoryText')}</Text>
             </Card>
           </Pressable>
         </View>
 
         <View style={styles.section}>
           <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>Documentos</Text>
+            <Text style={styles.sectionTitle}>{t('legal.documents')}</Text>
             <Text style={styles.count}>{documents.length}</Text>
           </View>
           {documents.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
-              title={ready ? 'Nenhum documento publicado' : 'Documentos indisponíveis'}
-              description={
-                ready
-                  ? 'Não existem documentos legais publicados para este contexto.'
-                  : snapshot.message ?? 'O Vanta não apresenta textos legais locais como substituto da API compliance versionada.'
-              }
+              title={ready ? t('legal.noDocuments') : t('legal.documentsUnavailable')}
+              description={ready ? t('legal.noDocumentsDescription') : t('legal.documentsUnavailableDescription')}
             />
           ) : (
             documents.map((document) => (
@@ -85,21 +91,18 @@ export function LegalCenterScreen({
                   <View style={styles.rowBetween}>
                     <View style={styles.flexCopy}>
                       <Text style={styles.documentTitle}>{document.title}</Text>
-                      <Text style={styles.documentMeta}>Versão {document.version}</Text>
+                      <Text style={styles.documentMeta}>{t('legal.version')} {document.version}</Text>
                     </View>
-                    <Badge label={document.kind} tone="neutral" />
+                    <Badge label={t(kindKeys[document.kind])} tone="neutral" />
                   </View>
-                  <Text style={styles.documentMeta}>Vigente desde {new Date(document.effectiveAt).toLocaleDateString('pt-PT')}</Text>
-                  <Text numberOfLines={1} style={styles.digest}>SHA-256: {document.contentSHA256}</Text>
+                  <Text style={styles.documentMeta}>{t('legal.effectiveSince')} {new Date(document.effectiveAt).toLocaleDateString(locale)}</Text>
                 </Card>
               </Pressable>
             ))
           )}
         </View>
 
-        <Text style={styles.footer}>
-          Em produção, a identidade do operador, licenças, contactos e procedimentos de reclamação devem vir de configuração compliance verificada.
-        </Text>
+        <Text style={styles.footer}>{t('legal.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -129,6 +132,5 @@ const styles = StyleSheet.create({
   flexCopy: { flex: 1, gap: darkTheme.spacing.xs },
   documentTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
   documentMeta: { ...darkTheme.typography.caption, color: darkTheme.colors.text.secondary },
-  digest: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
   footer: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled, textAlign: 'center' },
 });

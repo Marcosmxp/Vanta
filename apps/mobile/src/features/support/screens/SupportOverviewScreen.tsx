@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n, type TranslationKey } from '../../../core/i18n';
 import { Badge, Button, Card, SystemState, darkTheme } from '../../../design-system';
 import {
   disconnectedSupportCapabilities,
@@ -15,18 +16,12 @@ export interface SupportOverviewScreenProps {
   onOpenRequest?: (requestId: string) => void;
 }
 
-function statusLabel(status: SupportRequestStatus) {
-  switch (status) {
-    case 'open':
-      return 'Aberto';
-    case 'waiting-player':
-      return 'A aguardar resposta';
-    case 'resolved':
-      return 'Resolvido';
-    case 'closed':
-      return 'Fechado';
-  }
-}
+const statusKeys: Record<SupportRequestStatus, TranslationKey> = {
+  open: 'support.status.open',
+  'waiting-player': 'support.status.waiting-player',
+  resolved: 'support.status.resolved',
+  closed: 'support.status.closed',
+};
 
 export function SupportOverviewScreen({
   snapshot = disconnectedSupportSnapshot,
@@ -34,56 +29,49 @@ export function SupportOverviewScreen({
   onCreateRequest,
   onOpenRequest,
 }: SupportOverviewScreenProps) {
+  const { locale, t } = useI18n();
   const ready = snapshot.availability === 'ready';
-  const unavailableDescription = snapshot.message ?? 'Os dados de suporte só são apresentados depois de confirmados pela API autenticada.';
-  const topics = Array.isArray(snapshot.topics) ? snapshot.topics : [];
-  const channels = Array.isArray(snapshot.channels) ? snapshot.channels : [];
-  const recentRequests = Array.isArray(snapshot.recentRequests) ? snapshot.recentRequests : [];
+  const topics = snapshot.topics ?? [];
+  const channels = snapshot.channels ?? [];
+  const recentRequests = snapshot.recentRequests ?? [];
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>SUPORTE VANTA</Text>
-          <Text style={styles.title}>Ajuda, pedidos e transparência</Text>
-          <Text style={styles.subtitle}>
-            Consulte tópicos de ajuda e acompanhe pedidos sem expor credenciais ou dados sensíveis desnecessários.
-          </Text>
+          <Text style={styles.eyebrow}>{t('support.eyebrow')}</Text>
+          <Text style={styles.title}>{t('support.title')}</Text>
+          <Text style={styles.subtitle}>{t('support.subtitle')}</Text>
         </View>
 
         <Card style={styles.statusCard}>
           <View style={styles.rowBetween}>
-            <Text style={styles.cardTitle}>Disponibilidade</Text>
+            <Text style={styles.cardTitle}>{t('support.availability')}</Text>
             <Badge
-              label={ready ? 'Online' : snapshot.availability === 'restricted' ? 'Restrito' : 'Indisponível'}
+              label={ready ? t('common.online') : snapshot.availability === 'restricted' ? t('common.restricted') : t('common.unavailable')}
               tone={ready ? 'success' : snapshot.availability === 'restricted' ? 'warning' : 'neutral'}
             />
           </View>
-          <Text style={styles.cardText}>
-            {snapshot.message ?? 'Os canais e pedidos apresentados são fornecidos pela API autenticada.'}
-          </Text>
           <Button
-            label="Criar pedido"
+            label={t('support.createRequest')}
             fullWidth
             disabled={!capabilities.canCreateRequest || !onCreateRequest}
             onPress={onCreateRequest}
           />
-          <Text style={styles.helper}>{capabilities.message}</Text>
         </Card>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tópicos de ajuda</Text>
+          <Text style={styles.sectionTitle}>{t('support.helpTopics')}</Text>
           {topics.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
-              title={ready ? 'Nenhum tópico disponível' : 'Tópicos indisponíveis'}
-              description={ready ? 'Não existem tópicos publicados para apresentar neste momento.' : unavailableDescription}
+              title={ready ? t('support.noTopics') : t('support.topicsUnavailable')}
+              description={ready ? t('support.noTopicsDescription') : t('support.unavailableDescription')}
             />
           ) : (
             topics.map((topic) => (
               <Card key={topic.topicId} style={styles.listCard}>
-                <Text style={styles.itemEyebrow}>{topic.category.toUpperCase()}</Text>
                 <Text style={styles.itemTitle}>{topic.title}</Text>
                 <Text style={styles.itemText}>{topic.summary}</Text>
               </Card>
@@ -92,24 +80,19 @@ export function SupportOverviewScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Canais oficiais</Text>
+          <Text style={styles.sectionTitle}>{t('support.channels')}</Text>
           {channels.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
-              title={ready ? 'Nenhum canal publicado' : 'Canais oficiais indisponíveis'}
-              description={ready ? 'O backend ainda não publicou canais de contacto para este contexto.' : unavailableDescription}
+              title={ready ? t('support.noChannels') : t('support.channelsUnavailable')}
+              description={ready ? t('support.noChannelsDescription') : t('support.unavailableDescription')}
             />
           ) : (
             channels.map((channel) => (
               <Card key={channel.channelId} style={styles.channelCard}>
-                <View style={styles.rowBetween}>
-                  <View style={styles.flexCopy}>
-                    <Text style={styles.itemTitle}>{channel.label}</Text>
-                    <Text style={styles.itemText}>{channel.target}</Text>
-                  </View>
-                  <Badge label={channel.type} tone="neutral" />
-                </View>
+                <Text style={styles.itemTitle}>{channel.label}</Text>
+                <Text style={styles.itemText}>{channel.target}</Text>
               </Card>
             ))
           )}
@@ -117,15 +100,15 @@ export function SupportOverviewScreen({
 
         <View style={styles.section}>
           <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>Pedidos recentes</Text>
+            <Text style={styles.sectionTitle}>{t('support.recentRequests')}</Text>
             <Text style={styles.count}>{recentRequests.length}</Text>
           </View>
           {recentRequests.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
-              title={ready ? 'Nenhum pedido de suporte' : 'Pedidos indisponíveis'}
-              description={ready ? 'Os pedidos criados pela sua conta aparecerão aqui.' : unavailableDescription}
+              title={ready ? t('support.noRequests') : t('support.requestsUnavailable')}
+              description={ready ? t('support.noRequestsDescription') : t('support.unavailableDescription')}
             />
           ) : (
             recentRequests.map((request) => (
@@ -137,16 +120,13 @@ export function SupportOverviewScreen({
               >
                 <Card style={styles.listCard}>
                   <View style={styles.rowBetween}>
-                    <View style={styles.flexCopy}>
-                      <Text style={styles.itemTitle}>{request.subject}</Text>
-                      <Text style={styles.itemText}>{request.category}</Text>
-                    </View>
+                    <Text style={styles.itemTitle}>{request.subject}</Text>
                     <Badge
-                      label={statusLabel(request.status)}
+                      label={t(statusKeys[request.status])}
                       tone={request.status === 'resolved' ? 'success' : request.status === 'waiting-player' ? 'warning' : 'neutral'}
                     />
                   </View>
-                  <Text style={styles.meta}>Atualizado: {new Date(request.updatedAt).toLocaleString('pt-PT')}</Text>
+                  <Text style={styles.meta}>{t('support.updatedAt')}: {new Date(request.updatedAt).toLocaleString(locale)}</Text>
                 </Card>
               </Pressable>
             ))
@@ -154,10 +134,8 @@ export function SupportOverviewScreen({
         </View>
 
         <Card style={styles.warningCard}>
-          <Text style={styles.warningTitle}>Nunca envie segredos no suporte</Text>
-          <Text style={styles.warningText}>
-            Não envie passwords, códigos OTP, tokens, recovery codes, PAN/CVV de cartões, chaves privadas ou imagens KYC por mensagem.
-          </Text>
+          <Text style={styles.warningTitle}>{t('support.warningTitle')}</Text>
+          <Text style={styles.warningText}>{t('support.warningText')}</Text>
         </Card>
       </ScrollView>
     </SafeAreaView>
@@ -173,16 +151,12 @@ const styles = StyleSheet.create({
   subtitle: { ...darkTheme.typography.bodyLarge, color: darkTheme.colors.text.secondary },
   statusCard: { gap: darkTheme.spacing.md },
   cardTitle: { ...darkTheme.typography.heading3, color: darkTheme.colors.text.primary },
-  cardText: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
-  helper: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
   section: { gap: darkTheme.spacing.md },
   sectionTitle: { ...darkTheme.typography.heading3, color: darkTheme.colors.text.primary },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: darkTheme.spacing.md },
-  flexCopy: { flex: 1, gap: darkTheme.spacing.xs },
   listCard: { gap: darkTheme.spacing.sm },
   channelCard: { gap: darkTheme.spacing.xs },
-  itemEyebrow: { ...darkTheme.typography.labelSmall, color: darkTheme.colors.brand.primary },
-  itemTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
+  itemTitle: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary, flex: 1 },
   itemText: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   meta: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
   count: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.brand.primary },
