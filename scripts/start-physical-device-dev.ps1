@@ -128,7 +128,9 @@ $metroCommand = @"
 Set-Location '$repoRoot'
 `$env:EXPO_PUBLIC_VANTA_ENV='development'
 `$env:EXPO_PUBLIC_VANTA_API_URL='http://${LanIp}:8080'
-pnpm --dir apps/mobile start -- --host lan
+`$env:REACT_NATIVE_PACKAGER_HOSTNAME='${LanIp}'
+Write-Host 'Starting Metro for physical device at ${LanIp}:8081 ...'
+pnpm --dir apps/mobile exec expo start --dev-client --lan --port 8081
 "@
 
 Start-Process powershell.exe -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-Command', $metroCommand
@@ -137,6 +139,6 @@ Write-Host ''
 Write-Host 'Vanta physical-device development runtime is ready.'
 Write-Host "API:   http://${LanIp}:8080"
 Write-Host "Health: $healthUrl"
-Write-Host 'Metro:  a new PowerShell window was opened on the LAN.'
+Write-Host "Metro: http://${LanIp}:8081"
 Write-Host ''
-Write-Host 'Keep both PowerShell windows open, keep the PC and phone on the same Wi-Fi, then open the installed Vanta app.'
+Write-Host 'Keep both PowerShell windows open, keep the PC and phone on the same Wi-Fi, then open the installed Vanta app or scan the Metro QR code.'
