@@ -69,7 +69,13 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 		httpapi.WriteError(w, http.StatusServiceUnavailable, "support_unavailable", "Support information is temporarily unavailable.", "")
 		return
 	}
-	response := supportResponse{Availability: string(snapshot.Availability), Message: snapshot.Message}
+	response := supportResponse{
+		Availability:   string(snapshot.Availability),
+		Topics:         make([]topicResponse, 0),
+		Channels:       make([]channelResponse, 0),
+		RecentRequests: make([]requestResponse, 0),
+		Message:        snapshot.Message,
+	}
 	for _, topic := range snapshot.Topics {
 		response.Topics = append(response.Topics, topicResponse{TopicID: topic.TopicID, Category: topic.Category, Title: topic.Title, Summary: topic.Summary})
 	}
