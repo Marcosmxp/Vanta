@@ -87,16 +87,16 @@ jobs:
       - name: Prepare versioned artifact and provenance
         shell: bash
         run: |
-          mkdir -p .release
-          cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk ".release/${VANTA_ARTIFACT_NAME}.apk"
+          mkdir -p release-artifacts
+          cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk "release-artifacts/${VANTA_ARTIFACT_NAME}.apk"
           VANTA_BUILD_PLATFORM=android-physical-debug \
-            node scripts/write-build-metadata.mjs .release/build-metadata.json
-          printf '%s\n' "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER} @ ${GITHUB_SHA}" > .release/IDENTITY.txt
+            node scripts/write-build-metadata.mjs release-artifacts/build-metadata.json
+          printf '%s\n' "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER} @ ${GITHUB_SHA}" > release-artifacts/IDENTITY.txt
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.release.outputs.artifact_name }}
-          path: .release/*
+          path: release-artifacts/*
           if-no-files-found: error
           retention-days: 7
