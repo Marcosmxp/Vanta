@@ -19,6 +19,7 @@ export function LegalCenterScreen({
   onOpenRegulatory,
 }: LegalCenterScreenProps) {
   const ready = snapshot.availability === 'ready';
+  const documents = Array.isArray(snapshot.documents) ? snapshot.documents : [];
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -59,9 +60,9 @@ export function LegalCenterScreen({
         <View style={styles.section}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>Documentos</Text>
-            <Text style={styles.count}>{snapshot.documents.length}</Text>
+            <Text style={styles.count}>{documents.length}</Text>
           </View>
-          {snapshot.documents.length === 0 ? (
+          {documents.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
@@ -73,7 +74,7 @@ export function LegalCenterScreen({
               }
             />
           ) : (
-            snapshot.documents.map((document) => (
+            documents.map((document) => (
               <Pressable
                 key={document.documentId}
                 accessibilityRole="button"

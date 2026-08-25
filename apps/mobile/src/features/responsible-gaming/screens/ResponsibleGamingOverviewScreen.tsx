@@ -20,7 +20,9 @@ export function ResponsibleGamingOverviewScreen({
   onOpenDestination,
 }: ResponsibleGamingOverviewScreenProps) {
   const ready = snapshot.availability === 'ready';
-  const configuredLimits = snapshot.limits.length + (snapshot.sessionLimit ? 1 : 0);
+  const limits = Array.isArray(snapshot.limits) ? snapshot.limits : [];
+  const normalizedSnapshot = { ...snapshot, limits };
+  const configuredLimits = limits.length + (snapshot.sessionLimit ? 1 : 0);
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -35,7 +37,7 @@ export function ResponsibleGamingOverviewScreen({
 
         {ready ? (
           <>
-            <ProtectionStateCard snapshot={snapshot} />
+            <ProtectionStateCard snapshot={normalizedSnapshot} />
 
             <Card style={styles.summaryCard}>
               <View style={styles.summaryRow}>

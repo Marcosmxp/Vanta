@@ -36,6 +36,9 @@ export function SupportOverviewScreen({
 }: SupportOverviewScreenProps) {
   const ready = snapshot.availability === 'ready';
   const unavailableDescription = snapshot.message ?? 'Os dados de suporte só são apresentados depois de confirmados pela API autenticada.';
+  const topics = Array.isArray(snapshot.topics) ? snapshot.topics : [];
+  const channels = Array.isArray(snapshot.channels) ? snapshot.channels : [];
+  const recentRequests = Array.isArray(snapshot.recentRequests) ? snapshot.recentRequests : [];
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -70,7 +73,7 @@ export function SupportOverviewScreen({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tópicos de ajuda</Text>
-          {snapshot.topics.length === 0 ? (
+          {topics.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
@@ -78,7 +81,7 @@ export function SupportOverviewScreen({
               description={ready ? 'Não existem tópicos publicados para apresentar neste momento.' : unavailableDescription}
             />
           ) : (
-            snapshot.topics.map((topic) => (
+            topics.map((topic) => (
               <Card key={topic.topicId} style={styles.listCard}>
                 <Text style={styles.itemEyebrow}>{topic.category.toUpperCase()}</Text>
                 <Text style={styles.itemTitle}>{topic.title}</Text>
@@ -90,7 +93,7 @@ export function SupportOverviewScreen({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Canais oficiais</Text>
-          {snapshot.channels.length === 0 ? (
+          {channels.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
@@ -98,7 +101,7 @@ export function SupportOverviewScreen({
               description={ready ? 'O backend ainda não publicou canais de contacto para este contexto.' : unavailableDescription}
             />
           ) : (
-            snapshot.channels.map((channel) => (
+            channels.map((channel) => (
               <Card key={channel.channelId} style={styles.channelCard}>
                 <View style={styles.rowBetween}>
                   <View style={styles.flexCopy}>
@@ -115,9 +118,9 @@ export function SupportOverviewScreen({
         <View style={styles.section}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>Pedidos recentes</Text>
-            <Text style={styles.count}>{snapshot.recentRequests.length}</Text>
+            <Text style={styles.count}>{recentRequests.length}</Text>
           </View>
-          {snapshot.recentRequests.length === 0 ? (
+          {recentRequests.length === 0 ? (
             <SystemState
               kind={ready ? 'empty' : 'error'}
               compact
@@ -125,7 +128,7 @@ export function SupportOverviewScreen({
               description={ready ? 'Os pedidos criados pela sua conta aparecerão aqui.' : unavailableDescription}
             />
           ) : (
-            snapshot.recentRequests.map((request) => (
+            recentRequests.map((request) => (
               <Pressable
                 key={request.requestId}
                 accessibilityRole="button"
