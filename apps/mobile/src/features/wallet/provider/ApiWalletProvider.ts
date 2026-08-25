@@ -6,7 +6,14 @@ import type {
 } from '../types';
 
 export function createApiWalletProvider(request: SessionContextValue['request']): WalletProvider {
-  const loadSnapshot = () => request<WalletSnapshot>('/v1/wallet');
+  const loadSnapshot = async (): Promise<WalletSnapshot> => {
+    const snapshot = await request<WalletSnapshot>('/v1/wallet');
+    return {
+      ...snapshot,
+      transactions: Array.isArray(snapshot.transactions) ? snapshot.transactions : [],
+      nextCursor: snapshot.nextCursor ?? null,
+    };
+  };
 
   return {
     getSnapshot: loadSnapshot,
