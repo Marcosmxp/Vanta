@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "requireCommit": true
+  },
+  "build": {
+    "development": {
+      "environment": "development",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_VANTA_ENV": "development"
+      }
+    },
+    "preview": {
+      "environment": "preview",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_VANTA_ENV": "staging"
+      }
+    },
+    "production": {
+      "environment": "production",
+      "env": {
+        "EXPO_PUBLIC_VANTA_ENV": "production"
+      }
+    }
+  }
+}
