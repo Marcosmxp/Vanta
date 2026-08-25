@@ -1,8 +1,11 @@
 # Phase 20 — Native MVP Builds and Device Validation
 
-**Status:** IN PROGRESS on `feat/phase20-native-builds`.
+**Status:** IN PROGRESS on `feat/phase20-native-builds` / PR #24.  
+**Last consolidated:** 2026-08-25.
 
-Phase 20 turns the integrated Vanta MVP into reproducible native Android/iOS development and preview artifacts. It does not authorize real-money operation and must not open any mutation surface that is still provider, regulatory or security blocked.
+Phase 20 turns the integrated Vanta MVP into reproducible native Android/iOS development and preview artifacts and validates native runtime behavior. It does **not** authorize production operation.
+
+---
 
 ## Native baseline
 
@@ -11,108 +14,284 @@ Phase 20 turns the integrated Vanta MVP into reproducible native Android/iOS dev
 - Android application ID: `com.marcosmxp.vanta`.
 - iOS bundle identifier: `com.marcosmxp.vanta`.
 - Native URL scheme: `vanta`.
-- Native marketing version: `0.0.1`.
+- Current Expo marketing version: `0.0.1`.
 - Android versionCode: `1`.
 - iOS buildNumber: `1`.
-- Product milestone label remains **MVP v0.0.0.1**; the native store-facing version uses the platform-compatible three-component value `0.0.1`.
 
-Expo SDK 57 currently targets Android API 36 / Android 7+ and iOS 16.4+; native builds should use the SDK-appropriate toolchain rather than pinning older platform targets locally.
+Version fields are currently inconsistent with root/mobile package versions and historical milestone naming. This is explicit Phase 20 debt. See [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
+
+---
 
 ## Build profiles
 
-`apps/mobile/eas.json` defines:
+`apps/mobile/eas.json` defines development/preview/production profiles.
 
-| Profile | EAS environment | Vanta public environment | Android artifact | Purpose |
-|---|---|---|---|---|
-| `development` | `development` | `development` | APK | Internal development/runtime validation |
-| `preview` | `preview` | `staging` | APK | Internal production-like validation |
-| `production` | `production` | `production` | AAB default | Future store-oriented build only |
+Rules:
+- no production secrets committed to Git;
+- API URL/environment injected explicitly;
+- `EXPO_PUBLIC_*` values are public build-time configuration and cannot contain privileged secrets;
+- staging/production API must use HTTPS;
+- signing credentials remain outside source control.
 
-`EXPO_PUBLIC_VANTA_API_URL` is deliberately not committed in `eas.json`. It must be injected through the corresponding EAS environment or a local ignored `.env` file. `EXPO_PUBLIC_*` values are public build-time configuration and must never contain credentials or privileged secrets.
+---
 
-The mobile runtime already fails closed when the API URL is missing or when a staging/production URL does not use HTTPS.
+## Android native CI — current shape
 
-## Android native CI
-
-`.github/workflows/native-android.yml` performs a clean native generation and Android debug build on Phase 20 changes:
-
-1. install the pinned Node/pnpm toolchain;
-2. validate release configuration;
-3. resolve Expo public configuration;
-4. run a clean Android Expo Prebuild;
-5. compile `:app:assembleDebug` with Java 17;
-6. upload `app-debug.apk` as a short-lived GitHub Actions artifact.
-
-The CI development artifact uses `http://10.0.2.2:8080`, which is an Android-emulator development address only. It is not a staging or production endpoint and must not be reused for a production-like build.
-
-## EAS environment setup required before remote builds
-
-Create the following public variables in the relevant EAS environments:
+The current `.github/workflows/native-android.yml` intentionally produces **one Android artifact**:
 
 ```text
-development:
-  EXPO_PUBLIC_VANTA_API_URL=<reachable development API URL>
+Job:
+Android physical-device debug APK
 
-preview:
-  EXPO_PUBLIC_VANTA_API_URL=<HTTPS staging API URL>
-
-production:
-  EXPO_PUBLIC_VANTA_API_URL=<HTTPS production API URL>
+Artifact:
+vanta-android-physical-device-debug-apk
 ```
 
-The values are not secrets, but the build/environment separation is security-sensitive. Database URLs, Redis URLs, PII keys, provider credentials, signing private keys and backend session secrets must never use `EXPO_PUBLIC_*`.
+Pipeline:
+1. checkout;
+2. Node/pnpm/Java setup;
+3. install workspace dependencies;
+4. install Skia native binaries;
+5. validate native release config;
+6. resolve Expo public config;
+7. clean Android prebuild;
+8. `:app:assembleDebug`;
+9. upload the APK.
 
-## Build commands
+The workflow currently embeds a development LAN API address for the current physical-device test artifact. This is temporary development configuration, not a portable staging/production strategy.
 
-From `apps/mobile`:
+Do not add emulator + physical + release APK variants merely to increase artifact count. Additional artifacts require a concrete test/release purpose.
 
-```bash
-# Validate Expo configuration
-pnpm exec expo config --type public
+---
 
-# Generate native projects locally when needed
-pnpm exec expo prebuild --clean
+## Physical Android development runtime
 
-# EAS internal Android build
-npx eas-cli@latest build --platform android --profile preview
+The Windows development helper:
 
-# EAS internal iOS build (requires Apple signing/device setup as applicable)
-npx eas-cli@latest build --platform ios --profile preview
+```powershell
+.\scripts\start-physical-device-dev.ps1 -LanIp <LAN_IP>
 ```
 
-EAS project linking and platform signing credentials are external account operations. They must not be fabricated or committed to source control.
+does the following:
+- ensures Docker/pnpm availability;
+- opens Private/LocalSubnet firewall rules for API 8080 and Metro 8081 when elevated;
+- binds only the development API to the selected LAN address;
+- starts PostgreSQL/Redis/API through Compose;
+- waits for `/health`;
+- starts Metro in a separate PowerShell window.
+
+Runtime:
+
+```text
+API:   http://<LAN_IP>:8080
+Metro: http://<LAN_IP>:8081
+```
+
+PostgreSQL and Redis are not intended to be exposed to the phone/LAN.
+
+Phone and workstation must be on the same trusted development network.
+
+---
+
+## Metro/dev-build caveat
+
+Current repository start commands use `expo start --dev-client`, but `expo-dev-client` is not currently an explicit mobile dependency.
+
+The installed Android debug APK was successfully connected by setting Android React Native Dev Settings:
+
+```text
+Debug server host & port for device:
+<LAN_IP>:8081
+```
+
+QR/deep-link behavior should not be treated as canonical until the dev-build approach is deliberately normalized.
+
+Do not require Expo Go or ADB for the current Wi-Fi path.
+
+---
+
+## Android validation completed so far
+
+Validated on a physical Android device:
+- APK starts and loads the JS bundle;
+- onboarding renders;
+- account registration;
+- login;
+- authenticated Home;
+- Profile;
+- server-backed KYC/account state;
+- Wallet after empty-transaction fix;
+- Deposit presentation;
+- Plinko rendering in protected mode;
+- logout and subsequent login.
+
+Observed backend wallet state:
+- available balance can render as zero from authoritative API;
+- empty transaction list renders without crash.
+
+Production payment/game execution remains blocked as designed.
+
+---
+
+## Issues discovered during Phase 20
+
+See [`phase20-troubleshooting-and-findings.md`](./phase20-troubleshooting-and-findings.md) for detail.
+
+Major findings:
+- PostgreSQL 18 volume mount incompatibility;
+- Windows Docker/WSL2 setup requirement;
+- physical-device Metro/dev-client mismatch;
+- Metro cache/runtime `EventEmitter` error;
+- account password minimum mismatch;
+- Wallet `transactions: null` crash;
+- stale login-error UI;
+- unnecessary multi-APK workflow iteration.
+
+The Wallet crash and major runtime blockers above have known fixes. The stale login-error UI and full password-copy alignment remain open.
+
+---
+
+## Player-session expectations
+
+Phase 20 must validate this UX:
+
+```text
+minimize app
+→ return authenticated
+
+force-close app
+→ reopen
+→ restore SecureStore session
+
+expired access token
+→ refresh silently
+
+revoked/expired refresh
+→ return to authentication
+```
+
+Requiring password login after a normal minimize/restart is a failure unless security policy intentionally revoked/expired the session.
+
+High-risk actions will later use step-up authentication, not routine full re-login.
+
+---
+
+## Native UX/product polish added to Phase 20 scope
+
+Before alpha-quality native experience is considered complete, validate/implement:
+
+- final app icon;
+- Android adaptive icon;
+- custom Vanta native splash;
+- removal of stretched/generic Expo-looking launch presentation;
+- short Vanta branded app-entry transition;
+- bottom-navigation icons;
+- bottom-navigation/screen motion foundation;
+- reduced-motion support;
+- player-facing copy cleanup;
+- About/version/build display;
+- Legal Center completeness/navigation.
+
+These changes do not open regulated production capabilities.
+
+---
+
+## iOS path
+
+There is no local physical iPhone available for current testing.
+
+Phase 20 iOS goal therefore is:
+- validate Expo/iOS native configuration;
+- build/compile through macOS CI/EAS as available;
+- use simulator where appropriate;
+- document Apple signing/account requirements;
+- later validate via TestFlight/cloud/borrowed physical device.
+
+Do not mark physical iOS validation as complete without actual device evidence.
+
+---
 
 ## Security boundaries that remain closed
 
-Phase 20 must preserve the Phase 19 posture. In particular, it must not enable:
-
-- real-money Plinko placement or settlement;
-- deposit/withdraw execution;
-- payment-provider callbacks;
-- production KYC document/liveness upload or callbacks;
-- MFA enrollment or withdrawal step-up;
+Phase 20 must not enable:
+- production game placement/settlement;
+- payment execution;
+- provider callbacks;
+- production KYC document/liveness upload/callbacks;
+- fabricated KYC approval;
 - fabricated licensing/operator state;
-- client-side canonical wallet, settlement, KYC or Responsible Gaming decisions.
+- production MFA/withdrawal step-up until implemented;
+- client-side canonical wallet/game/RG decisions.
+
+---
+
+## Artifact/release security
+
+Before Phase 20 closes:
+- inspect APK/config/logs for tokens/secrets;
+- verify backend-only configuration absent from bundle;
+- verify HTTPS rule outside development;
+- verify production profile does not enable dev behavior;
+- normalize dependency/release provenance;
+- document signing handling;
+- identify exact app version/build/commit for artifacts.
+
+Release governance:
+- [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
+
+---
 
 ## Remaining Phase 20 work
 
-- [x] native app identifiers and build numbers normalized;
-- [x] native URL scheme defined;
-- [x] development/preview/production build profiles defined;
-- [x] source-controlled release-config validation added;
-- [x] Android clean Prebuild + debug APK CI added;
-- [ ] validate the first Android workflow run and inspect the artifact;
-- [ ] add/approve final Vanta icon, Android adaptive icon and splash assets;
-- [ ] validate SecureStore/Reanimated/Worklets/Skia on installed Android runtime;
-- [ ] run the full device smoke-test checklist;
-- [ ] link the Expo/EAS project and configure public environment values;
-- [ ] create a preview Android EAS artifact;
-- [ ] validate iOS Prebuild/native configuration;
-- [ ] produce an iOS simulator/development/preview artifact where Apple signing constraints permit;
-- [ ] inspect native artifacts/logging for sensitive data;
-- [ ] publish MVP release notes and final Phase 20 evidence;
-- [ ] update canonical roadmap/context and mark Phase 20 complete only after exit criteria pass.
+### Build/runtime
+- [x] Android physical-device debug APK pipeline.
+- [x] Physical Android can load Metro/API over LAN.
+- [x] PostgreSQL/Redis/API local runtime healthy.
+- [x] Native Skia board renders.
+- [ ] normalize dev-client/debug-binary strategy.
+- [ ] validate silent access-token refresh on physical runtime.
+- [ ] validate force-close/reopen SecureStore session restoration.
+- [ ] validate remote revocation evidence.
+
+### Product/UX
+- [ ] fix stale login-error presentation.
+- [ ] align all password helper/policy copy.
+- [ ] replace technical player-facing copy.
+- [ ] bottom-navigation icons.
+- [ ] navigation/motion design-system foundation.
+- [ ] final app icon/adaptive icon.
+- [ ] final native splash/launch animation.
+- [ ] About/version/build display.
+- [ ] Legal Center content/navigation review.
+
+### Security/release
+- [ ] artifact secret/log inspection.
+- [ ] normalize versioning source and build provenance.
+- [ ] move release dependency installation toward locked/frozen graph.
+- [ ] final Phase 20 CI/security evidence.
+
+### iOS
+- [ ] iOS Prebuild/config validation.
+- [ ] macOS CI/simulator/build path.
+- [ ] Apple signing/account steps documented.
+- [ ] physical iOS validation when device access exists.
+
+---
 
 ## Exit rule
 
-A generated APK alone does not complete Phase 20. Completion requires native runtime validation, security checks, documentation, and explicit evidence that all regulated mutation surfaces remain blocked.
+A generated APK alone does not complete Phase 20.
+
+Completion requires:
+1. stable Android native runtime;
+2. documented iOS build path;
+3. persistent/silent session behavior validated;
+4. no critical native crashes;
+5. core integrated screens validated;
+6. artifact/config security review;
+7. version/release traceability;
+8. native branding/launch UX no longer generic/broken;
+9. documentation current;
+10. regulated production capabilities still blocked.
+
+Do not merge PR #24 until these exit conditions are satisfied or any explicit external iOS/account blocker is documented and accepted.

@@ -1,422 +1,437 @@
 # Vanta Roadmap
 
-**Canonical roadmap.** If an older plan conflicts with this file, this file wins unless current `main` code/migrations prove a newer state.
+**Canonical roadmap.** If an older plan conflicts with this file, this file wins unless current `main` code/migrations prove a newer completed state.
 
-Last consolidated: **2026-08-24**, after Phase 19 was merged.
-
----
+**Last consolidated:** 2026-08-25 during Phase 20.
 
 ## Status legend
 
 - `COMPLETE / MERGED` — implemented, validated and integrated into `main`.
 - `IN PROGRESS` — active branch/PR, not yet canonical in `main`.
-- `NEXT` — next planned phase.
+- `NEXT` — next planned work.
 - `PLANNED` — sequenced future work.
-- `BLOCKED` — intentionally unavailable until prerequisites exist.
+- `BLOCKED` — unavailable until prerequisites exist.
 
 ---
 
-# MVP v0.0.0.1 — Core phases
+# Completed MVP foundation
 
-## Phase 01 — Monorepo + secure configuration
-**Status:** COMPLETE / MERGED
+| Phase | Status | Outcome |
+|---|---|---|
+| 01 | COMPLETE / MERGED | Monorepo, Expo/Go bootstrap, CI/CodeQL, security baseline |
+| 02 | COMPLETE / MERGED | Design-system foundations |
+| 03 | COMPLETE / MERGED | Storybook + reusable component library |
+| 04 | COMPLETE / MERGED | Typed navigation shell/root states |
+| 05 | COMPLETE / MERGED | Splash/onboarding/auth UX foundation |
+| 06 | COMPLETE / MERGED | KYC UX/provider boundary |
+| 07 | COMPLETE / MERGED | Home |
+| 08 | COMPLETE / MERGED | Plinko visual + server outcome foundation; approved red palette |
+| 09 | COMPLETE / MERGED | Bet History/Details |
+| 10 | COMPLETE / MERGED | Wallet UX/read models |
+| 11 | COMPLETE / MERGED | Deposit/withdraw UX/contracts; execution blocked |
+| 12 | COMPLETE / MERGED | Profile |
+| 13 | COMPLETE / MERGED | Security Center |
+| 14 | COMPLETE / MERGED | Responsible Gaming |
+| 15 | COMPLETE / MERGED | Support + Legal + Privacy + Regulatory surfaces |
+| 16 | COMPLETE / MERGED | System states |
+| 17 | COMPLETE / MERGED | Executable PostgreSQL/Redis/Go backend |
+| 18 | COMPLETE / MERGED | Mobile ↔ backend integration |
+| 19 | COMPLETE / MERGED | Tests, security hardening, dependency audit/regression gates |
 
-Monorepo scaffold, Expo mobile app, Go backend bootstrap, CI/CodeQL baseline, environment placeholders and security/governance rules.
-
-## Phase 02 — Design-system foundations
-**Status:** COMPLETE / MERGED
-
-Typed design tokens and dark-theme foundations. Phase 08 later normalized the active brand palette to approved Vanta reds `#FF3B30` and `#D92D25`.
-
-## Phase 03 — Storybook + foundational components
-**Status:** COMPLETE / MERGED
-
-Code-first Storybook and reusable mobile component library.
-
-## Phase 04 — Navigation + application shell
-**Status:** COMPLETE / MERGED
-
-Typed React Navigation root/main structure, main tabs and explicit session/account routes.
-
-## Phase 05 — Splash + onboarding + authentication UX
-**Status:** COMPLETE / MERGED
-
-Onboarding, eligibility, login, account creation, verification and password-recovery presentation. Real session integration arrived in Phases 17–18.
-
-## Phase 06 — KYC UX foundation
-**Status:** COMPLETE / MERGED
-
-Document/selfie/processing/approval/retry UX and KYC provider boundary. Real upload/liveness provider remains blocked.
-
-## Phase 07 — Home
-**Status:** COMPLETE / MERGED
-
-Premium home/dashboard UX. Real server-backed data integration arrived in Phase 18.
-
-## Phase 08 — Plinko visual + authoritative engine foundation
-**Status:** COMPLETE / MERGED
-
-Skia/Reanimated/Worklets Plinko UI, server-side CSPRNG engine foundation, rules/result contracts and corrected Vanta red palette.
-
-Public real-money placement remains blocked.
-
-## Phase 09 — Bet History
-**Status:** COMPLETE / MERGED
-
-Read-only bet-history/detail UX with opaque `betId` navigation and server-authoritative read models.
-
-## Phase 10 — Wallet
-**Status:** COMPLETE / MERGED
-
-Wallet/transaction UX and financial read-model boundaries. PostgreSQL/ledger integration arrived in Phases 17–18.
-
-## Phase 11 — Deposit / Withdraw experience
-**Status:** COMPLETE / MERGED
-
-Deposit/withdrawal amount, method, review and status UX plus payment-intent/provider contracts.
-
-**Execution remains BLOCKED** until production PSP, signed webhooks, reconciliation, step-up policy and ledger integration are intentionally opened.
-
-## Phase 12 — Profile
-**Status:** COMPLETE / MERGED
-
-Privacy-minimized profile/account UX with masked identity/contact information and feature entry points.
-
-## Phase 13 — Security Center
-**Status:** COMPLETE / MERGED
-
-Sessions/devices/security UX and server-side security contracts. Real session persistence/revocation arrived in Phase 17 and mobile integration in Phase 18.
-
-MFA enrollment/step-up remains blocked.
-
-## Phase 14 — Responsible Gaming
-**Status:** COMPLETE / MERGED
-
-Limits, cooling-off, time-out and self-exclusion UX/contracts, later persisted/integrated in Phases 17–18.
-
-## Phase 15 — Support + Legal + Privacy + Regulatory Information
-**Status:** COMPLETE / MERGED
-
-Support requests, legal/privacy/regulatory surfaces, versioned documents and protection against fabricated licensing claims.
-
-## Phase 16 — System States
-**Status:** COMPLETE / MERGED
-
-Reusable Loading, Empty, Offline, Error and Maintenance states with fail-closed behavior.
-
-## Phase 17 — Executable backend runtime
-**Status:** COMPLETE / MERGED
-
-Real Go runtime with PostgreSQL, Redis, migrations, Docker/Compose, auth/sessions, PII encryption, wallet/ledger, history, KYC status, Responsible Gaming, Support, Legal, platform status and integration CI.
-
-Real Plinko/payment/KYC-provider mutation surfaces remained deliberately closed.
-
-## Phase 18 — Mobile ↔ Backend integration
-**Status:** COMPLETE / MERGED
-
-Real API client, SecureStore session management, rotating refresh flow, login/register/logout and server-backed Profile, Wallet, Home, History, Security, Responsible Gaming, Support, Legal, KYC status and Maintenance/AccountBlocked coordination.
-
-## Phase 19 — Tests + Security + Audit
-**Status:** COMPLETE / MERGED
-
-Final merge commit on `main`:
+Phase 19 canonical `main` merge checkpoint:
 
 ```text
 b12c56928eba8e79f1c48a2361683e1e1746e224
 ```
 
-Delivered:
-
-- mobile Vitest API/security tests;
-- `pnpm audit --audit-level=high`;
-- PostgreSQL/Redis security integration tests;
-- `go test -race`;
-- `go vet`;
-- `govulncheck`;
-- refreshed security audit record;
-- refresh-token compare-and-swap against concurrent replay;
-- canonical-IP auth throttling;
-- panic-log data minimization;
-- `TouchSession` timestamp fix;
-- concurrent wallet overspend test;
-- Support/Security ownership/IDOR tests;
-- strict JSON/body/request-ID/security-header tests;
-- reachable dependency remediation for `pgx` and `x/text`.
-
-All required Phase 19 gates passed before merge.
+Historical detail: [`PHASE_HISTORY.md`](./PHASE_HISTORY.md).
 
 ---
 
-# Phase 20 — Native MVP builds and device validation
+# Phase 20 — Native MVP Builds and Device Validation
 
-**Status:** NEXT
+**Status:** IN PROGRESS  
+**Branch:** `feat/phase20-native-builds`  
+**PR:** #24
 
 ## Objective
 
-Produce reproducible Android/iOS native MVP builds from the integrated application and validate native runtime behavior without opening any capability that remains regulator/provider/security blocked.
+Produce reproducible Android/iOS native MVP builds, validate real native runtime behavior and raise the product from functional prototype to controlled alpha quality without opening any regulated capability that remains blocked.
 
-Phase 20 is a **development/preview release-engineering phase**, not real-money production launch.
+Phase 20 is **not** production launch.
 
-## 20.1 Native configuration audit
+## 20.1 Native configuration/build baseline
 
-- inspect current Expo configuration and Prebuild requirements;
-- confirm Android application ID and iOS bundle identifier naming;
-- normalize app display name/version/build-number strategy;
-- remove obsolete AURABET naming/assets if any remain;
-- verify orientation/status-bar/safe-area configuration;
-- verify Reanimated/Worklets/Skia native setup;
-- verify SecureStore native setup;
-- check Android/iOS minimum supported OS targets;
-- document native modules requiring dev builds rather than Expo Go.
+Current implemented:
+- Android/iOS application identifiers;
+- URL scheme;
+- Expo build profiles;
+- Android debug APK CI;
+- physical-device LAN helper;
+- development API/Metro routing.
 
-## 20.2 Build profiles
+Still required:
+- normalize versioning;
+- final icon/adaptive icon;
+- final custom native splash;
+- build provenance;
+- iOS build path;
+- artifact inspection.
 
-Define reproducible profiles:
+## 20.2 Android physical-device validation
 
-```text
-development
-preview
-production
-```
-
-Rules:
-
-- no production secrets committed to Git;
-- environment-specific API base URLs injected through supported build/deployment configuration;
-- `EXPO_PUBLIC_VANTA_ENV` remains explicit;
-- production-like profiles reject plaintext HTTP;
-- signing credentials are handled outside source control.
-
-Where EAS is used, it is build infrastructure, not a source of secrets committed to the repository.
-
-## 20.3 Branding/native assets
-
-Validate and normalize:
-
-- application icon;
-- Android adaptive icon;
-- splash screen;
-- dark launch background;
-- app name and native metadata;
-- required privacy/permission strings.
-
-No paid design tooling is required.
-
-## 20.4 Android MVP build
-
-Target deliverables:
-
-- successful native Android development/preview build;
-- installable artifact (APK for internal testing where appropriate and/or AAB for pipeline validation);
-- documented build process;
-- version/build metadata captured;
-- no bundled secrets.
-
-## 20.5 iOS MVP build
-
-Target deliverables:
-
-- validated iOS native configuration;
-- successful simulator/dev/preview build where signing/account constraints permit;
-- documented Apple signing/provisioning requirements;
-- no false claim of App Store readiness if an external Apple developer account/signing step remains.
-
-## 20.6 Device smoke tests
-
-### Session
-
-- fresh install;
-- register;
-- login;
-- SecureStore persistence;
-- app restart;
-- access-token refresh;
-- refresh-token rotation;
-- logout;
-- revoked/expired session behavior.
-
-### Navigation/platform state
-
-- Maintenance;
-- AccountBlocked;
-- offline/error states;
-- background/foreground transition;
-- no sensitive payload in navigation state.
-
-### Integrated features
-
+Validated:
+- Docker Desktop/WSL2 runtime;
+- PostgreSQL/Redis/API health;
+- API reachable on LAN;
+- Metro reachable on physical Android;
+- installed APK;
+- onboarding;
+- register/login;
 - Home;
+- Profile/KYC status;
 - Wallet;
-- Bet History/Details;
-- Profile;
-- Security Center;
-- Responsible Gaming;
-- Support;
-- Legal;
-- KYC status.
+- Deposit presentation;
+- Plinko protected-mode rendering;
+- logout followed by login.
 
-### Native rendering/performance
+Resolved during testing:
+- PostgreSQL 18 volume path;
+- Metro host/dev-client connection;
+- stale Metro-cache runtime failure;
+- registration password minimum mismatch;
+- Wallet `transactions: null` crash;
+- excessive multi-artifact Android workflow.
 
-- Plinko Skia rendering;
-- animation/frame behavior;
-- Reanimated/Worklets;
-- safe areas;
-- keyboard behavior;
-- screen-size/responsive layout;
-- accessibility basics.
+Open:
+- stale login error UI;
+- password helper/policy consistency;
+- persistent session after force-close;
+- silent token refresh evidence;
+- remote revocation evidence;
+- remaining integrated-screen interaction pass.
 
-## 20.7 Native artifact security checks
+See:
+- [`release/phase20-native-builds.md`](./release/phase20-native-builds.md)
+- [`release/phase20-device-smoke-test.md`](./release/phase20-device-smoke-test.md)
+- [`release/phase20-troubleshooting-and-findings.md`](./release/phase20-troubleshooting-and-findings.md)
 
-- tokens absent from logs;
-- tokens absent from AsyncStorage/MMKV;
-- API URL/env config contains no privileged secret;
-- bundled configuration contains no credentials;
-- HTTPS enforced outside development;
-- debug/dev conveniences disabled in production profile;
-- Android backup/export and iOS secure-storage behavior reviewed;
-- no public real-money endpoint accidentally opened.
+## 20.3 Session UX
 
-## 20.8 Phase 20 repository deliverables
+Required alpha behavior:
+- minimize → no login;
+- close/reopen → restore SecureStore session;
+- access-token expiry → silent refresh;
+- revoked/expired refresh → authentication.
 
-Expected outputs:
+Routine reopening must not require a password.
 
-- native/build configuration;
-- build profiles;
-- build/release documentation;
-- smoke-test checklist and results;
-- MVP release notes;
-- artifact/version metadata;
-- CI/build validation updates;
-- explicit external signing/account steps where they cannot be automated in repository tooling.
+Future high-risk actions use step-up authentication.
 
-## 20.9 Phase 20 exit criteria
+Exit evidence:
+- [ ] force-close/reopen;
+- [ ] background/foreground;
+- [ ] access expiry/refresh;
+- [ ] revocation/expiry;
+- [ ] logout remote revocation.
 
-Phase 20 can be marked complete when:
+## 20.4 Native product polish
 
-1. Android native preview/development build succeeds.
-2. iOS native build path is validated and either succeeds or has only clearly documented external signing/account blockers.
-3. core native modules initialize correctly.
-4. integrated API/session smoke tests pass on native runtime.
-5. no sensitive secret appears in artifacts/config/logging.
-6. Phase 19 security gates remain green.
-7. blocked regulated capabilities remain blocked.
-8. build/release documentation is current.
+Required:
+- [ ] final app icon;
+- [ ] Android adaptive icon;
+- [ ] correct Vanta native splash;
+- [ ] remove stretched/generic Expo-looking launch;
+- [ ] short Vanta app-entry animation;
+- [ ] no white flash;
+- [ ] safe-area/keyboard checks;
+- [ ] accessibility font scaling;
+- [ ] Reduce Motion support.
+
+## 20.5 Navigation/motion
+
+Required:
+- [ ] icons + labels in bottom navigation;
+- [ ] animated active indicator;
+- [ ] subtle icon/label feedback;
+- [ ] consistent screen transitions;
+- [ ] shared motion tokens/durations/easing;
+- [ ] tactile button/card states;
+- [ ] preserve restrained motion for financial/legal reading.
+
+Game animation may be more expressive than application navigation.
+
+## 20.6 Copy/content cleanup
+
+Normal users should not see engineering architecture explanations.
+
+Required:
+- [ ] remove player-facing `ledger`, `read-only projection`, component/settlement explanations;
+- [ ] rewrite blocked states in plain language;
+- [ ] review Portuguese copy consistency;
+- [ ] keep detailed server/security wording in technical/audit docs;
+- [ ] keep legally required disclosures at relevant flows.
+
+## 20.7 Legal Center completeness
+
+Review/add where applicable:
+- [ ] Terms;
+- [ ] Privacy;
+- [ ] Responsible Gaming;
+- [ ] KYC/identity information;
+- [ ] deposit/withdraw policy;
+- [ ] game rules;
+- [ ] promotion/bonus rules;
+- [ ] account closure;
+- [ ] self-exclusion/time-out;
+- [ ] complaints/disputes;
+- [ ] 18+/minors;
+- [ ] data-protection rights;
+- [ ] operator/license/regulator only when verified.
+
+## 20.8 Versioning/release governance
+
+Current repository version declarations are inconsistent.
+
+Before Phase 20 completion:
+- [ ] define one canonical version source;
+- [ ] adopt SemVer prerelease line;
+- [ ] increment Android/iOS build numbers monotonically;
+- [ ] capture version/build/Git SHA/date/channel/environment;
+- [ ] show version/build in About/Profile;
+- [ ] define Git tag/release/changelog process;
+- [ ] normalize dependency lock/frozen release installs.
+
+See [`release/versioning-and-release-governance.md`](./release/versioning-and-release-governance.md).
+
+## 20.9 Android artifact security
+
+- [ ] inspect APK for secrets/tokens/backend-only configuration;
+- [ ] verify production profile rejects debug behavior;
+- [ ] verify HTTPS outside development;
+- [ ] verify no production endpoint is accidentally opened;
+- [ ] verify logs do not contain session credentials;
+- [ ] record exact artifact commit/build.
+
+## 20.10 iOS without a local iPhone
+
+No physical iPhone is currently available.
+
+Approach:
+- [ ] validate iOS Expo/native configuration;
+- [ ] macOS CI/simulator build path;
+- [ ] document Apple signing/account requirements;
+- [ ] create dev/preview artifact where possible;
+- [ ] later TestFlight/cloud/borrowed physical-device validation.
+
+Do not claim physical iOS validation without a device.
+
+## 20.11 Phase 20 exit criteria
+
+Phase 20 can be marked complete only when:
+
+1. Android native artifact builds reproducibly.
+2. Physical Android core runtime is stable.
+3. session persistence + silent refresh are validated.
+4. no known critical native/runtime crash remains.
+5. core integrated screens pass the smoke test.
+6. native launch branding is no longer generic/broken.
+7. version/build provenance is controlled.
+8. artifact/config/log security review passes.
+9. iOS build path is validated and external blockers are explicit.
+10. Phase 19 security gates remain green.
+11. blocked production capabilities remain blocked.
+12. canonical docs are current.
+
+PR #24 must not merge merely because an APK exists.
 
 ---
 
-# Post-MVP regulated roadmap
+# Post-MVP / regulated roadmap
 
-The original 20-phase plan ends with a native MVP build. The following work is required before real-money production and must not be confused with Phase 20.
+## Phase 21 — Production environment + observability
 
-## Phase 21 — Production environment + observability foundation
 **Status:** PLANNED
 
-- staging/production deployment architecture;
+- staging/production deployment;
 - managed PostgreSQL/Redis design;
-- OpenTelemetry traces/metrics/logs;
+- OpenTelemetry;
 - alerts/SLOs;
-- production secrets/KMS strategy;
+- secrets/KMS;
 - backup/restore/DR;
-- infrastructure as code;
-- trusted reverse-proxy policy.
+- IaC;
+- trusted reverse-proxy/client-IP policy;
+- controlled release pipeline.
 
-## Phase 22 — Device trust + MFA/step-up
+## Phase 22 — Device trust + MFA/passkeys/step-up
+
 **Status:** PLANNED
 
 - Play Integrity;
 - App Attest;
-- jailbreak/root risk signals;
+- device-risk signals;
 - MFA enrollment;
-- recovery controls;
-- step-up policy for withdrawals and other sensitive actions.
+- passkeys where appropriate;
+- account recovery;
+- step-up policy for withdrawals/security changes;
+- new-device/security notifications;
+- session absolute/idle lifetime policy.
 
 ## Phase 23 — Production KYC/AML provider
+
 **Status:** PLANNED / PROVIDER DEPENDENT
 
 - provider adapter;
-- document/selfie/liveness flow;
+- document/selfie/liveness;
 - signed callbacks;
-- callback replay protection;
-- KYC media policy;
-- AML/sanctions/PEP workflow where required;
-- audit/manual-review states.
+- replay protection;
+- verified media policy;
+- sanctions/PEP/AML workflows where required;
+- audit/manual review.
 
-## Phase 24 — Payment provider + reconciliation
+## Phase 24 — Payments + reconciliation
+
 **Status:** PLANNED / PROVIDER DEPENDENT
 
-- deposit/withdraw provider adapters;
-- PSP tokenization;
-- signed webhooks;
-- idempotent webhook processing;
+- payment provider adapters;
+- hosted/tokenized payment methods;
+- signed/replay-safe webhooks;
+- idempotent processing;
 - destination ownership;
 - reconciliation;
-- ledger integration;
-- fraud/risk checks.
+- immutable ledger posting;
+- chargeback/fraud handling;
+- withdrawal step-up.
 
-## Phase 25 — Production Plinko betting pipeline
+## Phase 25 — Game Mathematics, Exposure and Production Plinko
+
 **Status:** PLANNED
 
-- approved production ruleset/payout configuration;
-- authenticated placement endpoint;
-- policy enforcement before reservation;
-- idempotent wager reservation;
-- authoritative CSPRNG result;
+This phase must be completed before production Plinko is considered safe.
+
+### 25.1 Game-math specification
+
+For each approved Plinko ruleset/risk profile:
+- exact probabilities;
+- payout table;
+- theoretical RTP;
+- house edge;
+- variance/volatility;
+- max multiplier/tail probability;
+- approved stake range.
+
+### 25.2 Statistical validation
+
+- deterministic math tests;
+- Monte Carlo simulation;
+- convergence/tolerance;
+- stress/tail scenarios;
+- version/hash configuration;
+- independent review/certification where required.
+
+### 25.3 Financial risk
+
+- max stake;
+- max payout;
+- bankroll assumptions;
+- risk of ruin;
+- drawdown;
+- aggregate exposure;
+- reserves/limits;
+- failure/concurrency stress.
+
+Risk controls apply before acceptance. Authorized results are not changed afterward to protect operator exposure.
+
+### 25.4 Production game pipeline
+
+- authenticated action endpoint;
+- KYC/jurisdiction/RG checks;
+- exposure check;
+- idempotent reservation;
+- authoritative outcome;
 - transactional settlement;
-- immutable ledger/bet/audit records;
-- replay/duplicate controls;
-- concurrency/failure testing.
+- immutable ledger/result/audit;
+- duplicate/replay protection;
+- monitoring.
 
 ## Phase 26 — Risk, fraud and operational admin
+
 **Status:** PLANNED
 
-- risk/fraud foundation;
+- fraud/risk signals;
 - manual review;
-- operational/admin console;
+- admin console;
 - least-privilege roles;
-- audit trails;
-- protected support/compliance tooling.
+- immutable audit;
+- player/session/payment/game risk views;
+- incident tooling.
+
+This phase is operational fraud/risk and is distinct from mathematical game/exposure design in Phase 25.
 
 ## Phase 27 — Regulatory readiness and certification
+
 **Status:** PLANNED / JURISDICTION DEPENDENT
 
-For Portugal, final legal/regulatory work must satisfy applicable SRIJ and data-protection requirements where relevant.
-
-- operator/legal entity configuration;
-- approved terms/privacy/cookies/rules;
-- licensing/certification;
+- choose initial B2C jurisdiction only after legal/economic analysis;
+- operator/legal entity;
+- licensing;
+- approved terms/privacy/rules;
 - Responsible Gaming verification;
 - complaints/support process;
 - data-protection review;
-- reporting/audit requirements.
+- reporting/audit;
+- game/platform certification.
 
-No `licensed` UI state may be configured before actual verified license data exists.
+For Portugal, verify current SRIJ requirements directly.
+
+No `licensed` UI state without verified real license data.
 
 ## Phase 28 — Independent security assessment
+
 **Status:** PLANNED
 
-- independent penetration test;
-- mobile/API/infrastructure review;
+- independent mobile/API/infrastructure pentest;
+- threat-model review;
 - remediation;
 - retest;
-- evidence package where required.
+- evidence package.
 
-## Phase 29 — Store/release readiness for regulated product
+## Phase 29 — Store/release readiness
+
 **Status:** PLANNED
 
-- Apple/Google gambling-app policy review;
-- jurisdiction/distribution controls;
+- Apple/Google policy review;
+- distribution/jurisdiction controls;
 - age/location requirements;
-- production signing/release process;
+- production signing;
 - privacy/store metadata;
-- rollback/incident playbooks.
+- staged rollout/rollback;
+- incident/update policy.
 
 ## Phase 30 — Regulated production launch
-**Status:** BLOCKED until all required technical, security, provider, store and regulatory prerequisites are complete.
+
+**Status:** BLOCKED until technical, provider, game-math, financial-risk, security, store and regulatory prerequisites are evidenced.
 
 Launch readiness requires evidence, not only code completion.
 
 ---
 
-# Current next action
+# Parallel business workstream
 
-Start **Phase 20** from `main` at or after `b12c56928eba8e79f1c48a2361683e1e1746e224`, after this documentation checkpoint is merged.
+This is not a software phase number, but it must proceed before commercial launch.
+
+See [`VANTA_PRODUCT_BUSINESS_STRATEGY.md`](./VANTA_PRODUCT_BUSINESS_STRATEGY.md).
+
+Evaluate:
+- B2B Vanta Originals/technology vs first B2C operation;
+- initial jurisdiction;
+- GGR/NGR model;
+- LTV/CAC;
+- payment/fraud/compliance costs;
+- gaming/corporate tax;
+- required capital;
+- lawful entity/holding structure;
+- license/certification cost;
+- banking/provider feasibility.
+
+Do not choose a jurisdiction only because a headline tax rate looks low.
