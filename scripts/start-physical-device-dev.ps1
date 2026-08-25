@@ -6,6 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$composeFile = 'infrastructure/docker/compose.dev.yml'
 Set-Location $repoRoot
 
 function Test-Command {
@@ -47,6 +48,24 @@ function Ensure-FirewallRule {
     }
 }
 
+function Show-DockerDiagnostics {
+    Write-Host ''
+    Write-Host 'Docker service status:' -ForegroundColor Yellow
+    docker compose -f $composeFile ps
+
+    Write-Host ''
+    Write-Host 'PostgreSQL logs:' -ForegroundColor Yellow
+    docker compose -f $composeFile logs --no-color --tail 120 postgres
+
+    Write-Host ''
+    Write-Host 'Redis logs:' -ForegroundColor Yellow
+    docker compose -f $composeFile logs --no-color --tail 80 redis
+
+    Write-Host ''
+    Write-Host 'API logs:' -ForegroundColor Yellow
+    docker compose -f $composeFile logs --no-color --tail 120 api
+}
+
 if (-not (Test-Command docker)) {
     throw 'Docker CLI was not found. Install/start Docker Desktop first.'
 }
@@ -69,11 +88,15 @@ $env:EXPO_PUBLIC_VANTA_ENV = 'development'
 $env:EXPO_PUBLIC_VANTA_API_URL = "http://${LanIp}:8080"
 
 Write-Host "Starting Vanta backend on http://${LanIp}:8080 ..."
-docker compose -f infrastructure/docker/compose.dev.yml up -d --build
+docker compose -f $composeFile up -d --build
+if ($LASTEXITCODE -ne 0) {
+    Show-DockerDiagnostics
+    throw 'Docker Compose could not start the Vanta development runtime. The diagnostics above identify the failing service.'
+}
 
 $healthUrl = "http://${LanIp}:8080/health"
 $ready = $false
-for ($attempt = 1; $attempt -le 30; $attempt++) {
+for ($attempt = 1; $attempt -le 45; $attempt++) {
     try {
         $response = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 2
         if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 300) {
@@ -87,9 +110,8 @@ for ($attempt = 1; $attempt -le 30; $attempt++) {
 }
 
 if (-not $ready) {
-    Write-Host ''
-    docker compose -f infrastructure/docker/compose.dev.yml ps
-    throw "Vanta API did not become reachable at $healthUrl. Check Docker logs with: docker compose -f infrastructure/docker/compose.dev.yml logs api"
+    Show-DockerDiagnostics
+    throw "Vanta API did not become reachable at $healthUrl."
 }
 
 Write-Host "Vanta API is reachable: $healthUrl"
@@ -97,6 +119,9 @@ Write-Host "Vanta API is reachable: $healthUrl"
 if (-not (Test-Path (Join-Path $repoRoot 'node_modules'))) {
     Write-Host 'Installing workspace dependencies...'
     pnpm install --no-frozen-lockfile
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Workspace dependency installation failed.'
+    }
 }
 
 $metroCommand = @"
