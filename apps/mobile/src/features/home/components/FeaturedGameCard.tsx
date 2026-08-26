@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, darkTheme } from '../../../design-system';
 import type { HomeFeaturedGame } from '../types';
 
@@ -11,15 +12,17 @@ export interface FeaturedGameCardProps {
 const pegRows = [3, 4, 5, 6, 7] as const;
 
 export function FeaturedGameCard({ game, onPlay }: FeaturedGameCardProps) {
+  const { t } = useI18n();
+
   return (
     <Card elevated style={styles.card}>
       <View style={styles.copy}>
-        <Badge label={game.eyebrow} tone="brand" />
-        <Text style={styles.title}>{game.title}</Text>
-        <Text style={styles.description}>{game.description}</Text>
+        <Badge label={t('home.featuredOriginal')} tone="brand" />
+        <Text style={styles.title}>{game.title || 'Plinko'}</Text>
+        <Text style={styles.description}>{t('home.featuredDescription')}</Text>
       </View>
 
-      <View accessibilityLabel="Pré-visualização abstrata do tabuleiro Plinko" style={styles.board}>
+      <View accessibilityLabel={t('home.featuredPreview')} style={styles.board}>
         <View style={styles.ball} />
         {pegRows.map((count, rowIndex) => (
           <View key={count} style={styles.pegRow}>
@@ -37,7 +40,7 @@ export function FeaturedGameCard({ game, onPlay }: FeaturedGameCardProps) {
         </View>
       </View>
 
-      <Button label="Abrir Plinko" fullWidth onPress={onPlay} />
+      <Button label={t('home.featuredOpen')} fullWidth onPress={onPlay} />
     </Card>
   );
 }
@@ -49,17 +52,9 @@ const styles = StyleSheet.create({
     backgroundColor: darkTheme.colors.background.deep,
     borderColor: darkTheme.colors.brand.strong,
   },
-  copy: {
-    gap: darkTheme.spacing.sm,
-  },
-  title: {
-    ...darkTheme.typography.heading1,
-    color: darkTheme.colors.text.primary,
-  },
-  description: {
-    ...darkTheme.typography.bodyMedium,
-    color: darkTheme.colors.text.secondary,
-  },
+  copy: { gap: darkTheme.spacing.sm },
+  title: { ...darkTheme.typography.heading1, color: darkTheme.colors.text.primary },
+  description: { ...darkTheme.typography.bodyMedium, color: darkTheme.colors.text.secondary },
   board: {
     minHeight: 218,
     alignItems: 'center',
@@ -71,31 +66,10 @@ const styles = StyleSheet.create({
     borderColor: darkTheme.colors.border.default,
     backgroundColor: darkTheme.colors.background.app,
   },
-  ball: {
-    width: 16,
-    height: 16,
-    borderRadius: darkTheme.radius.full,
-    backgroundColor: darkTheme.colors.brand.primary,
-    ...darkTheme.shadows.brandGlow,
-  },
-  pegRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: darkTheme.spacing.lg,
-  },
-  peg: {
-    width: 6,
-    height: 6,
-    borderRadius: darkTheme.radius.full,
-    backgroundColor: darkTheme.colors.text.disabled,
-  },
-  multiplierRow: {
-    marginTop: darkTheme.spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: darkTheme.spacing.xs,
-  },
+  ball: { width: 16, height: 16, borderRadius: darkTheme.radius.full, backgroundColor: darkTheme.colors.brand.primary, ...darkTheme.shadows.brandGlow },
+  pegRow: { flexDirection: 'row', justifyContent: 'center', gap: darkTheme.spacing.lg },
+  peg: { width: 6, height: 6, borderRadius: darkTheme.radius.full, backgroundColor: darkTheme.colors.text.disabled },
+  multiplierRow: { marginTop: darkTheme.spacing.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: darkTheme.spacing.xs },
   multiplier: {
     minWidth: 40,
     alignItems: 'center',
@@ -104,8 +78,5 @@ const styles = StyleSheet.create({
     borderRadius: darkTheme.radius.sm,
     backgroundColor: darkTheme.colors.surface.interactive,
   },
-  multiplierText: {
-    ...darkTheme.typography.labelSmall,
-    color: darkTheme.colors.text.primary,
-  },
+  multiplierText: { ...darkTheme.typography.labelSmall, color: darkTheme.colors.text.primary },
 });

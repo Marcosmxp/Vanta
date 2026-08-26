@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useI18n } from '../../../core/i18n';
 import { Button, Card, darkTheme } from '../../../design-system';
 import { AuthScreenLayout } from './AuthScreenLayout';
 
@@ -22,6 +23,8 @@ export function OnboardingSlide({
   onContinue,
   onSkip,
 }: OnboardingSlideProps) {
+  const { t } = useI18n();
+
   return (
     <AuthScreenLayout
       eyebrow={eyebrow}
@@ -29,8 +32,8 @@ export function OnboardingSlide({
       description={description}
       footer={
         <View style={styles.actions}>
-          <Button label={step === 3 ? 'Continuar' : 'Próximo'} fullWidth onPress={onContinue} />
-          {onSkip ? <Button label="Saltar introdução" variant="ghost" fullWidth onPress={onSkip} /> : null}
+          <Button label={step === 3 ? t('auth.onboarding.continue') : t('auth.onboarding.next')} fullWidth onPress={onContinue} />
+          {onSkip ? <Button label={t('auth.onboarding.skip')} variant="ghost" fullWidth onPress={onSkip} /> : null}
         </View>
       }
     >
@@ -42,7 +45,7 @@ export function OnboardingSlide({
         </View>
       </Card>
 
-      <View style={styles.progress} accessibilityLabel={`Passo ${step} de 3`}>
+      <View style={styles.progress} accessibilityLabel={`${t('auth.onboarding.step')} ${step} ${t('auth.onboarding.of')} 3`}>
         {[1, 2, 3].map((item) => (
           <View key={item} style={[styles.dot, item === step && styles.activeDot]} />
         ))}
@@ -52,41 +55,12 @@ export function OnboardingSlide({
 }
 
 const styles = StyleSheet.create({
-  visual: {
-    minHeight: 280,
-    justifyContent: 'flex-end',
-    gap: darkTheme.spacing.lg,
-  },
-  step: {
-    ...darkTheme.typography.display,
-    color: darkTheme.colors.text.disabled,
-  },
-  accent: {
-    width: 56,
-    height: 4,
-    borderRadius: darkTheme.radius.full,
-    backgroundColor: darkTheme.colors.brand.primary,
-  },
-  highlight: {
-    ...darkTheme.typography.heading2,
-    color: darkTheme.colors.text.primary,
-  },
-  progress: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: darkTheme.spacing.sm,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: darkTheme.radius.full,
-    backgroundColor: darkTheme.colors.border.strong,
-  },
-  activeDot: {
-    width: 28,
-    backgroundColor: darkTheme.colors.brand.primary,
-  },
-  actions: {
-    gap: darkTheme.spacing.sm,
-  },
+  visual: { minHeight: 280, justifyContent: 'flex-end', gap: darkTheme.spacing.lg },
+  step: { ...darkTheme.typography.display, color: darkTheme.colors.text.disabled },
+  accent: { width: 56, height: 4, borderRadius: darkTheme.radius.full, backgroundColor: darkTheme.colors.brand.primary },
+  highlight: { ...darkTheme.typography.heading2, color: darkTheme.colors.text.primary },
+  progress: { flexDirection: 'row', justifyContent: 'center', gap: darkTheme.spacing.sm },
+  dot: { width: 8, height: 8, borderRadius: darkTheme.radius.full, backgroundColor: darkTheme.colors.border.strong },
+  activeDot: { width: 28, backgroundColor: darkTheme.colors.brand.primary },
+  actions: { gap: darkTheme.spacing.sm },
 });
