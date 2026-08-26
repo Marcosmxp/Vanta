@@ -1,7 +1,7 @@
 # Phase 20 — Native MVP Builds and Device Validation
 
 **Status:** IN PROGRESS on `feat/phase20-native-builds` / PR #24.  
-**Last consolidated:** 2026-08-25.
+**Last consolidated:** 2026-08-26.
 
 Phase 20 turns the integrated Vanta MVP into traceable native Android/iOS development and preview artifacts and validates native runtime behavior. It does **not** authorize production operation.
 
@@ -20,6 +20,9 @@ Phase 20 turns the integrated Vanta MVP into traceable native Android/iOS develo
 - Android `versionCode`: `2`.
 - iOS `buildNumber`: `2`.
 - Release channel: `alpha`.
+- JavaScript dependency lock: root `pnpm-lock.yaml`.
+- Controlled Node baseline: `22.13.0`.
+- Controlled pnpm baseline: `10.15.0`.
 
 The earlier active drift (`0.0.0` package metadata versus `0.0.1` Expo metadata) has been normalized. Historical `v0.0.0.1` references remain history only and are not a release scheme.
 
@@ -66,7 +69,7 @@ Pipeline:
 1. checkout;
 2. Node/pnpm/Java setup;
 3. validate canonical version/release configuration;
-4. install workspace dependencies;
+4. install workspace dependencies with the committed lockfile in frozen mode;
 5. install Skia native binaries;
 6. resolve Expo public config;
 7. clean Android prebuild;
@@ -82,21 +85,22 @@ Do not add emulator + physical + release APK variants merely to increase artifac
 
 ## Dependency reproducibility status
 
-The repository still lacks root `pnpm-lock.yaml`.
-
-Therefore JavaScript installs are not yet fully reproducible and current workflows temporarily retain:
+Root `pnpm-lock.yaml` is committed and controlled installs now use:
 
 ```text
-pnpm install --no-frozen-lockfile
+pnpm install --frozen-lockfile
 ```
 
-Required follow-up before controlled production release:
-1. generate the lockfile with the pinned workspace/toolchain;
-2. review/commit it;
-3. change CI/native workflows to `--frozen-lockfile`;
-4. treat lockfile changes as mandatory when dependency declarations change.
+The baseline was generated and verified with the pinned project toolchain:
 
-Do not fabricate the lockfile manually.
+```text
+Node 22.13.0
+pnpm 10.15.0
+```
+
+Local frozen installation succeeded, CI mobile validation succeeded using frozen installation, and the Native Android workflow also passed frozen dependency installation before producing the Android artifact.
+
+Dependency declaration changes must update the lockfile. Do not fabricate or hand-edit the lockfile. Peer/deprecation/build-script warnings remain separate dependency-health work and must not be hidden by unrelated upgrades.
 
 ---
 
@@ -159,11 +163,13 @@ Validated on a physical Android device:
 - Wallet after empty-transaction fix;
 - Deposit presentation;
 - Plinko rendering in protected mode;
+- Legal, Support and Responsible Gaming screens after empty-collection hardening;
+- force-close/reopen restores the persisted authenticated session;
 - logout and subsequent login.
 
-Observed backend wallet state:
+Observed backend wallet/support/legal/Responsible Gaming behavior:
 - available balance can render as zero from authoritative API;
-- empty transaction list renders without crash.
+- empty collections are serialized/normalized as arrays and no longer crash `.length` rendering on the validated screens.
 
 Production payment/game execution remains blocked as designed.
 
@@ -179,12 +185,13 @@ Major findings:
 - physical-device Metro/dev-client mismatch;
 - Metro cache/runtime `EventEmitter` error;
 - account password minimum mismatch;
-- Wallet `transactions: null` crash;
+- Wallet/support/legal/Responsible Gaming empty-collection crash class;
 - stale login-error UI;
 - unnecessary multi-APK workflow iteration;
-- uncontrolled/inconsistent early release metadata.
+- uncontrolled/inconsistent early release metadata;
+- missing JavaScript dependency lock/reproducibility baseline.
 
-The version-metadata inconsistency is now normalized through root `version.json`; dependency lockfile reproducibility remains open.
+The version-metadata inconsistency and dependency reproducibility gap are now normalized through root `version.json`, committed `pnpm-lock.yaml` and frozen installs.
 
 ---
 
@@ -210,6 +217,8 @@ revoked/expired refresh
 Requiring password login after a normal minimize/restart is a failure unless security policy intentionally revoked/expired the session.
 
 High-risk actions will later use step-up authentication, not routine full re-login.
+
+Force-close/reopen persistence is validated on physical Android. Silent access-token refresh and explicit remote revocation/expiry still require direct evidence.
 
 ---
 
@@ -268,11 +277,12 @@ Before Phase 20 closes:
 - verify backend-only configuration absent from bundle;
 - verify HTTPS rule outside development;
 - verify production profile does not enable dev behavior;
-- complete dependency lock/frozen install strategy;
 - document signing handling;
 - identify exact app version/build/commit for every distributed artifact;
 - add in-app About/version/build presentation;
 - create a release tag only after the intended artifact passes its gates.
+
+Dependency lock/frozen-install strategy is complete and remains a release invariant.
 
 Release governance:
 - [`versioning-and-release-governance.md`](./versioning-and-release-governance.md).
@@ -288,29 +298,31 @@ Release governance:
 - [x] Native Skia board renders.
 - [ ] normalize dev-client/debug-binary strategy.
 - [ ] validate silent access-token refresh on physical runtime.
-- [ ] validate force-close/reopen SecureStore session restoration.
+- [x] validate force-close/reopen SecureStore session restoration.
 - [ ] validate remote revocation evidence.
 
 ### Product/UX
-- [ ] fix stale login-error presentation.
-- [ ] align all password helper/policy copy.
-- [ ] replace technical player-facing copy.
-- [ ] bottom-navigation icons.
-- [ ] navigation/motion design-system foundation.
+- [x] fix stale login-error presentation.
+- [ ] align canonical backend/mobile password policy, validation and copy completely.
+- [ ] complete player-facing technical-copy cleanup across all remaining routes.
+- [x] bottom-navigation icons.
+- [x] bottom-navigation motion foundation with Reduce Motion support.
 - [ ] final app icon/adaptive icon.
 - [ ] final native splash/launch animation.
-- [ ] About/version/build display.
-- [ ] Legal Center content/navigation review.
+- [x] About/version/build display implementation; physical identity evidence still required for release sign-off.
+- [ ] Legal Center content/navigation completeness review.
+- [ ] complete localization sweep beyond the already migrated core player journeys.
 
 ### Security/release
 - [ ] artifact secret/log inspection.
 - [x] canonical versioning source established.
 - [x] active version declarations normalized.
-- [x] Android artifact build provenance implemented.
+- [x] Android artifact build provenance implemented; source-vs-PR-merge SHA semantics still require final correction/verification.
 - [x] changelog/PR release governance introduced.
-- [ ] generate/commit `pnpm-lock.yaml`.
-- [ ] switch JS installs to frozen-lockfile mode.
-- [ ] final Phase 20 CI/security evidence.
+- [x] generate/commit `pnpm-lock.yaml`.
+- [x] switch JS installs to frozen-lockfile mode.
+- [x] CI, CodeQL and Native Android build green on the deterministic dependency baseline.
+- [ ] final Phase 20 security/release evidence and sign-off.
 - [ ] create first controlled alpha tag/GitHub Release after validation.
 
 ### iOS
