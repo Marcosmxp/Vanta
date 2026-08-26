@@ -7,7 +7,7 @@
 
 ## Current state
 
-Vanta has completed Phases 01–19 on `main`. Phase 20 is raising the integrated MVP to a reproducible, testable native alpha.
+Vanta has completed Phases 01–19 on `main`. Phase 20 is raising the integrated MVP to a reproducible, testable native alpha while the repository is being professionalized for continuous AI-assisted development.
 
 The deterministic JavaScript baseline is complete:
 
@@ -20,6 +20,15 @@ The deterministic JavaScript baseline is complete:
 - CI green;
 - CodeQL green;
 - Native Android build green.
+
+The canonical project/engineering foundation is also established:
+
+- root `AGENTS.md` operating contract;
+- canonical `PROJECT`, `MVP`, `REQUIREMENTS`;
+- canonical `STATUS`, `BACKLOG`, `TECH_DEBT`, `RISKS`;
+- canonical engineering `ARCHITECTURE`, `COMPONENTS`, `DATABASE`, `CODING_STANDARDS`, `DEPENDENCIES`, `GIT_WORKFLOW`;
+- canonical quality/testing strategy;
+- documentation index/precedence updated so future Codex sessions can recover current state without chat history.
 
 ## Completed in current Phase 20 branch
 
@@ -36,7 +45,8 @@ The deterministic JavaScript baseline is complete:
 - localization of core player journeys in progress;
 - navbar icon/motion foundation;
 - stale auth error/password-helper improvements;
-- root `AGENTS.md` AI/developer operating contract;
+- repository-level AI/developer operating contract;
+- canonical product/project/engineering/quality documentation foundation;
 - Phase 20 release documentation updated for reproducible baseline.
 
 ## In progress
@@ -49,7 +59,8 @@ The deterministic JavaScript baseline is complete:
 - artifact provenance correction for PR source SHA;
 - artifact/config secret inspection;
 - Legal Center completeness/content review;
-- iOS CI/build/simulator path.
+- iOS CI/build/simulator path;
+- continue operations/security documentation only where it adds real project value.
 
 ## Blocked by deliberate production gates
 
@@ -74,9 +85,10 @@ Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md` and the c
 1. finish Phase 20 session evidence and product/native polish gates;
 2. correct source-SHA artifact provenance and inspect artifact/config for secrets;
 3. complete iOS build-path evidence;
-4. keep CI/CodeQL/native build green;
-5. do not merge PR #24 until documented Phase 20 exit criteria are satisfied;
-6. after Phase 20, proceed into production-readiness roadmap rather than opening real-money features prematurely.
+4. establish the remaining security/privacy and operations-readiness documents without duplicating existing sources;
+5. keep CI/CodeQL/native build green;
+6. do not merge PR #24 until documented Phase 20 exit criteria are satisfied;
+7. after Phase 20, proceed into production-readiness roadmap rather than opening regulated capabilities prematurely.
 
 ## Baseline health
 
@@ -88,6 +100,7 @@ Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md` and the c
 | Backend tests/vet/vulnerability/container checks | GREEN in latest baseline CI |
 | CodeQL | GREEN |
 | Android native build | GREEN |
+| Canonical AI/project/engineering docs | GREEN / established |
 | Physical Android core smoke | PARTIAL / continuing |
 | iOS build path | PENDING |
 | Production readiness | BLOCKED / intentionally incomplete |
