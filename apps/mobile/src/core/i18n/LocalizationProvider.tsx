@@ -1,10 +1,11 @@
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { detectDeviceLocale, isSupportedLocale, type SupportedLocale } from './localePolicy';
 import { productEn, productEs, productPtBR, type ProductTranslationKey } from './productTranslations';
 import { en, es, ptBR, type TranslationKey } from './translations';
 
-export type SupportedLocale = 'pt-BR' | 'en' | 'es';
+export type { SupportedLocale } from './localePolicy';
 export type AppTranslationKey = TranslationKey | ProductTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
@@ -23,22 +24,6 @@ interface LocalizationContextValue {
 }
 
 const LocalizationContext = createContext<LocalizationContextValue | null>(null);
-
-function isSupportedLocale(value: string | null | undefined): value is SupportedLocale {
-  return value === 'pt-BR' || value === 'en' || value === 'es';
-}
-
-function detectDeviceLocale(): SupportedLocale {
-  try {
-    const locale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
-    if (locale.startsWith('es')) return 'es';
-    if (locale.startsWith('en')) return 'en';
-    if (locale.startsWith('pt')) return 'pt-BR';
-  } catch {
-    // Fall through to the product default.
-  }
-  return 'pt-BR';
-}
 
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<SupportedLocale>(() => detectDeviceLocale());
