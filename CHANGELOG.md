@@ -6,6 +6,20 @@ The format is inspired by Keep a Changelog and release identifiers follow the go
 
 ## [Unreleased]
 
+### Added
+- Player-facing localization for Home, Wallet, authentication and Plinko in Brazilian Portuguese, English and Spanish.
+- Locale-aware currency formatting for player money surfaces.
+- Bottom-navigation icons and subtle selection motion that respects the operating system Reduce Motion preference.
+
+### Changed
+- Home, Wallet, authentication and Plinko copy now prioritizes player actions and outcomes instead of backend/API implementation details.
+- Brazilian Portuguese is the Portuguese product variant for the current mobile localization layer.
+- Wallet transaction details now surface player-relevant references and movement information instead of internal wallet identifiers.
+
+### Fixed
+- Registration password helper now matches the enforced 12-character minimum.
+- Login submission errors are cleared as credentials are edited, preventing stale invalid-credential copy from remaining after correction.
+
 ### Planned
 - Final Vanta app icon, splash and launch identity.
 - Dependency lockfile and frozen pnpm installs.
