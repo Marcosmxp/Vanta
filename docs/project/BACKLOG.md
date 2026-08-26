@@ -34,15 +34,15 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### REL-PROVENANCE-001 — Use PR source SHA in artifact provenance
 - Type: Infrastructure / Security
-- Status: Testing
-- Description: Android workflow now separates `pull_request.head.sha`/source SHA from CI `github.sha`; artifact name, metadata and `IDENTITY.txt` use explicit provenance.
-- Acceptance: latest Android artifact must prove the source SHA in its name/metadata and preserve CI SHA separately.
+- Status: Done
+- Description: Android workflow separates `pull_request.head.sha`/source SHA from CI `github.sha`; artifact name, metadata and `IDENTITY.txt` use explicit provenance.
+- Evidence: final FOUNDATION-005 Native Android run succeeded on source HEAD `f8eeecf51d275aaea23efbcc7dbceb20e967465e`.
 
 ### REL-ARTIFACT-002 — Inspect Android artifact for secrets/debug configuration
 - Type: Security
-- Status: Testing
-- Description: Android workflow now unpacks the APK and rejects secret-like files or known server-only configuration markers before artifact upload.
-- Acceptance: latest native workflow passes the inspection; debug public API URL is treated as public config, not a secret.
+- Status: Done
+- Description: Android workflow unpacks the APK and rejects secret-like files or known server-only configuration markers before artifact upload.
+- Evidence: final FOUNDATION-005 Native Android run passed the APK inspection gate on source HEAD `f8eeecf51d275aaea23efbcc7dbceb20e967465e`.
 
 ### IOS-BUILD-001 — Establish iOS CI/build path
 - Type: Infrastructure / Testing
@@ -73,10 +73,9 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### GIT-GOV-001 — Protect `main`
 - Type: Infrastructure / Security
-- Status: Blocked
-- Description: GitHub currently reports `main` as unprotected. Target required checks/rules are documented in `docs/engineering/GIT_WORKFLOW.md`.
-- Blocker: current repository connector does not expose branch-protection/ruleset writes; repository settings must be changed explicitly in GitHub.
-- Acceptance: PR required; Repository hygiene, Mobile validation, Go tests and both CodeQL analyses required; force-push/deletion blocked; solo workflow must not require impossible self-approval.
+- Status: Done
+- Description: repository ruleset `main-protection` (`21597647`) is active for `refs/heads/main`.
+- Enforcement: pull request required; `Repository hygiene`, `Mobile validation`, `Go tests`, `Analyze javascript-typescript` and `Analyze go` required; strict status-check policy enabled; force-push/non-fast-forward and branch deletion blocked; zero approving reviews required for the current solo workflow.
 
 ### TEST-MOBILE-001 — Add critical mobile regression tests
 - Type: Testing
@@ -112,7 +111,7 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 ### CI-GATES-001 — Enforce repository/PR quality gates
 - Type: Infrastructure / Quality
 - Status: Done
-- Description: repository hygiene/secret-file checks, PR template controls, current Actions runtimes and concurrency cancellation for superseded CI/CodeQL/Android runs are implemented.
+- Description: repository hygiene/secret-file checks, PR template controls, current Actions runtimes and concurrency cancellation for superseded CI/CodeQL/Android runs are implemented and passed on final FOUNDATION-005 HEAD.
 
 ### OPS-DOC-001 — Canonical operations documentation
 - Type: Documentation
