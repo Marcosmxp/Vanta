@@ -11,6 +11,7 @@ on:
       - 'scripts/write-build-metadata.mjs'
       - 'version.json'
       - 'package.json'
+      - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/native-android.yml'
 
@@ -65,7 +66,7 @@ jobs:
           NODE
 
       - name: Install workspace dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install React Native Skia native binaries
         run: |
