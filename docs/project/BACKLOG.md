@@ -22,9 +22,11 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### AUTH-REFRESH-001 — Prove silent refresh on physical runtime
 - Type: Security / Testing
-- Status: Ready
+- Status: Testing
 - Description: after access-token expiry, trigger a protected API request and prove refresh rotation completes without visible re-login.
 - Acceptance: protected request succeeds; refresh state rotates; no token is logged/exposed; failure path is understood.
+- Evidence: physical Android session `session_...37f2` completed three consecutive rotations (`1 -> 2`, `2 -> 3`, `3 -> 4`) with advancing access expiry under the controlled 1m access TTL; token values/hashes were not queried or printed. Detailed timestamps are recorded in `docs/release/phase20-session-security-evidence.md`.
+- Remaining: explicit tester confirmation that the app stayed in the authenticated experience without visible re-login during the successful rotations.
 - Dependencies: physical Android dev runtime.
 
 ### AUTH-REVOCATION-002 — Validate remote revocation/expired refresh
