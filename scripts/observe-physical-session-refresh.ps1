@@ -75,7 +75,7 @@ FROM sessions
 WHERE session_id = '$escaped';
 "@
 
-    $lines = Invoke-PsqlLines -Sql $sql
+    $lines = @(Invoke-PsqlLines -Sql $sql)
     if ($lines.Count -eq 0) {
         return $null
     }
