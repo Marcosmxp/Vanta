@@ -79,11 +79,9 @@ if (-not (Test-Command pnpm.cmd)) {
     throw 'pnpm.cmd was not found. Install pnpm 10.15.0 first.'
 }
 
-try {
-    docker info | Out-Null
-}
-catch {
-    throw 'Docker Desktop is not running or the Docker daemon is unavailable.'
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    throw 'Docker Desktop is not running or the Docker daemon is unavailable. Start Docker Desktop, wait until its engine reports ready, then run this command again.'
 }
 
 Ensure-FirewallRule -DisplayName 'Vanta API Dev 8080' -Port 8080
