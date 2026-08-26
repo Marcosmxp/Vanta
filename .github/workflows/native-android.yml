@@ -27,6 +27,8 @@ jobs:
       NODE_ENV: development
       EXPO_PUBLIC_VANTA_ENV: development
       EXPO_PUBLIC_VANTA_API_URL: http://192.168.1.70:8080
+      VANTA_GIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      VANTA_CI_SHA: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -55,7 +57,11 @@ jobs:
           const fs = require('node:fs');
           const v = require('./version.json');
           const release = v.channel === 'stable' ? v.version : `${v.version}-${v.channel}.${v.iteration}`;
-          const shortSha = process.env.GITHUB_SHA.slice(0, 7);
+          const sourceSha = process.env.VANTA_GIT_SHA;
+          if (!sourceSha || sourceSha.length < 7) {
+            throw new Error('VANTA_GIT_SHA is missing or invalid.');
+          }
+          const shortSha = sourceSha.slice(0, 7);
           const artifact = `vanta-${release}-build-${v.build}-android-physical-debug-${shortSha}`;
           fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_RELEASE_VERSION=${release}\n`);
           fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_BUILD_NUMBER=${v.build}\n`);
@@ -92,7 +98,10 @@ jobs:
           cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk "release-artifacts/${VANTA_ARTIFACT_NAME}.apk"
           VANTA_BUILD_PLATFORM=android-physical-debug \
             node scripts/write-build-metadata.mjs release-artifacts/build-metadata.json
-          printf '%s\n' "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER} @ ${GITHUB_SHA}" > release-artifacts/IDENTITY.txt
+          printf '%s\n' \
+            "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER}" \
+            "source ${VANTA_GIT_SHA}" \
+            "ci ${VANTA_CI_SHA}" > release-artifacts/IDENTITY.txt
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v7
