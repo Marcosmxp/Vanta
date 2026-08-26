@@ -57,15 +57,35 @@ Do not assume a package that works in Metro is valid in a native release build.
 
 ## Build scripts
 
-pnpm may warn about ignored package build scripts. Do not globally approve scripts without reviewing the package and why execution is required. Native artifacts needed by a package should be installed through an intentional, documented step where possible.
+pnpm currently reports ignored build scripts for `@shopify/react-native-skia` and `esbuild` in the deterministic install. Do not globally approve scripts without reviewing the package and why execution is required.
 
-## Current known dependency-health work
+The Android workflow intentionally installs the Skia native binary and verifies the expected arm64 artifact. Keep this explicit until a reviewed package-build policy replaces it.
 
-Peer/deprecation/build-script warnings discovered during the Phase 20 baseline are tracked as technical debt rather than being hidden by unrelated upgrades.
+## Current dependency-health evidence
 
-## Security
+As of the Phase 20 / FOUNDATION-005 checkpoint:
 
-Current gates include JavaScript dependency audit, CodeQL and Go vulnerability scanning. A green scanner does not remove the need to review dependency purpose, permissions and runtime behavior.
+- `pnpm install --frozen-lockfile` succeeds with the controlled lockfile;
+- `pnpm audit --audit-level=high` succeeds, so no high/critical advisory currently blocks CI;
+- the audit output reports **2 moderate vulnerabilities**;
+- peer/transitive warnings remain around the React/ReactDOM version relationship, React Native safe-area compatibility, valibot and deprecated transitive packages from the current dependency graph;
+- no broad framework/native upgrade has been performed to hide those warnings.
+
+The two moderate advisories and compatibility warnings remain tracked under `DEP-HEALTH-001` / `TECH-001`. Resolve them in a scoped dependency task that identifies the affected packages, validates the Expo SDK 57 compatibility envelope and reruns native builds. Do not lower the audit gate or add ignores merely to make output quiet.
+
+## Security gates
+
+Current dependency/supply-chain gates include:
+
+- frozen pnpm installation;
+- `pnpm audit --audit-level=high`;
+- CodeQL for JS/TS and Go;
+- `govulncheck` for Go;
+- repository rejection of tracked secret-like files;
+- Android artifact inspection for server-only configuration/secret-like packaged files;
+- exact source/CI commit provenance in native build metadata.
+
+A green scanner does not remove the need to review dependency purpose, permissions and runtime behavior.
 
 ## Licenses
 
