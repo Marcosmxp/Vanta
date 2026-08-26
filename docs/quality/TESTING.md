@@ -29,7 +29,19 @@ Use for boundaries where correctness depends on PostgreSQL, Redis, HTTP behavior
 
 ### Mobile component/boundary tests
 
-Vitest currently validates mobile/API boundary behavior. Expand coverage around session lifecycle, localization, nullable API collections, auth error state and critical providers without overfitting implementation details.
+Vitest validates mobile/API/session boundary behavior without requiring a full native runtime.
+
+Current high-value mobile coverage includes:
+
+- API configuration must fail closed before network access when unsafe;
+- bearer tokens remain in authorization headers rather than URLs;
+- structured API errors/request IDs are preserved;
+- malformed successful API responses fail explicitly;
+- session access/refresh expiry timing policy is deterministic and tested;
+- malformed/incomplete SecureStore session state is cleared fail-closed;
+- valid session pairs are persisted with device-only unlocked keychain accessibility.
+
+Continue expanding around full SessionProvider refresh/logout behavior, localization persistence, nullable API collections and critical auth states. Do not add a rendering-test dependency merely for convenience unless it is justified by the coverage gained.
 
 ### Storybook
 
@@ -43,6 +55,16 @@ Before production, add a small automated E2E set for genuinely critical journeys
 
 ## Current standard validation
 
+### Repository hygiene
+
+CI performs a dependency-free repository gate that:
+
+- runs `git diff --check` over the PR/push change range;
+- rejects tracked `.env` files other than `.env.example`;
+- rejects tracked private-key/keystore-style files such as `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks` and `*.keystore`.
+
+This complements `.gitignore`; it does not replace secret scanning or artifact inspection.
+
 ### Mobile/root
 
 ```bash
@@ -53,6 +75,13 @@ pnpm mobile:test
 pnpm --filter @vanta/mobile app:validate
 pnpm --filter @vanta/mobile storybook:validate
 ```
+
+The native Android workflow additionally:
+
+- runs frozen dependency installation;
+- performs Expo prebuild/native compilation;
+- inspects the produced APK for server-only configuration markers and secret-like packaged files;
+- writes source-SHA and CI-SHA provenance separately.
 
 ### Backend
 
@@ -127,6 +156,12 @@ register/login
 ```
 
 Provider-enabled production phases should later add KYC/payment/reconciliation and controlled game-action journeys only after those capabilities exist.
+
+## JavaScript/TypeScript lint and formatting
+
+Current enforced quality comes from strict TypeScript, tests, bundle validation and repository whitespace checks. A dedicated ESLint/Prettier policy is not yet installed.
+
+`TOOL-LINT-001` remains open because adding lint/format tooling is a dependency and policy change. Before adoption, evaluate Expo/React Native compatibility, maintenance cost, ruleset scope and lockfile impact. Do not fetch an unpinned formatter/linter dynamically in CI and do not introduce a mass style rewrite as part of setup.
 
 ## Coverage
 
