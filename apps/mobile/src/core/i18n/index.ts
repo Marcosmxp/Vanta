@@ -1,3 +1,4 @@
+// Public entry point for player-facing localization and locale-aware formatters.
 export {
   LocalizationProvider,
   useI18n,
