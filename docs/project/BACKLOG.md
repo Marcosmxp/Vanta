@@ -34,14 +34,15 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### REL-PROVENANCE-001 — Use PR source SHA in artifact provenance
 - Type: Infrastructure / Security
-- Status: Ready
-- Description: distinguish source branch commit from synthetic pull-request merge commit in Android artifact name/metadata/IDENTITY.
-- Acceptance: artifact records intended source SHA and optionally CI merge SHA separately.
+- Status: Testing
+- Description: Android workflow now separates `pull_request.head.sha`/source SHA from CI `github.sha`; artifact name, metadata and `IDENTITY.txt` use explicit provenance.
+- Acceptance: latest Android artifact must prove the source SHA in its name/metadata and preserve CI SHA separately.
 
 ### REL-ARTIFACT-002 — Inspect Android artifact for secrets/debug configuration
 - Type: Security
-- Status: Ready
-- Description: inspect built artifact/public config/log behavior for credentials, tokens, backend-only configuration and inappropriate production settings.
+- Status: Testing
+- Description: Android workflow now unpacks the APK and rejects secret-like files or known server-only configuration markers before artifact upload.
+- Acceptance: latest native workflow passes the inspection; debug public API URL is treated as public config, not a secret.
 
 ### IOS-BUILD-001 — Establish iOS CI/build path
 - Type: Infrastructure / Testing
@@ -72,14 +73,16 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### GIT-GOV-001 — Protect `main`
 - Type: Infrastructure / Security
-- Status: Ready
-- Description: configure branch/ruleset protection so required CI/security checks cannot be bypassed accidentally.
-- Acceptance: pull request + required checks enforced; force-push/deletion policy deliberate.
+- Status: Blocked
+- Description: GitHub currently reports `main` as unprotected. Target required checks/rules are documented in `docs/engineering/GIT_WORKFLOW.md`.
+- Blocker: current repository connector does not expose branch-protection/ruleset writes; repository settings must be changed explicitly in GitHub.
+- Acceptance: PR required; Repository hygiene, Mobile validation, Go tests and both CodeQL analyses required; force-push/deletion blocked; solo workflow must not require impossible self-approval.
 
 ### TEST-MOBILE-001 — Add critical mobile regression tests
 - Type: Testing
-- Status: Ready
-- Description: cover session provider/refresh, logout, API empty-array normalization, locale switching and critical auth states.
+- Status: In Progress
+- Description: coverage now protects session expiry/refresh timing, SecureStore fail-closed persistence, locale selection, API configuration/client behavior and the Wallet/Legal/Support/Responsible Gaming null-collection regressions.
+- Remaining: full SessionProvider silent-refresh/logout interaction and other critical auth-state behavior still require focused tests/evidence.
 
 ---
 
@@ -92,24 +95,29 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### DEP-HEALTH-001 — Review dependency warnings
 - Type: Tech Debt / Security
-- Status: Backlog
-- Description: review React/ReactDOM, safe-area, valibot, deprecated transitive dependencies and ignored build scripts against Expo compatibility; avoid blind upgrades.
+- Status: In Progress
+- Description: deterministic install is stable and high-severity audit gate passes, but current audit reports 2 moderate advisories plus peer/transitive/build-script warnings.
+- Acceptance: identify affected packages, review Expo SDK 57/native compatibility, upgrade only in a scoped change, and rerun CI/native validation without broad blind upgrades.
 
 ### TOOL-LINT-001 — Establish JS/TS lint/format policy
 - Type: Infrastructure / Quality
 - Status: Backlog
-- Description: adopt tooling only after checking existing stack and CI cost; avoid stylistic mass rewrite.
+- Description: strict TypeScript/tests/bundle validation and a dependency-free repository whitespace gate exist; dedicated ESLint/formatter adoption remains a scoped dependency/policy decision.
 
 ### TEST-E2E-001 — Add minimal native E2E critical paths
 - Type: Testing
 - Status: Backlog
 - Description: evaluate Maestro/Detox/Appium or equivalent for a small critical flow set after current native baseline is stable.
 
+### CI-GATES-001 — Enforce repository/PR quality gates
+- Type: Infrastructure / Quality
+- Status: Done
+- Description: repository hygiene/secret-file checks, PR template controls, current Actions runtimes and concurrency cancellation for superseded CI/CodeQL/Android runs are implemented.
+
 ### OPS-DOC-001 — Canonical operations documentation
 - Type: Documentation
 - Status: Done
-- Description: canonical ENVIRONMENTS, DEPLOYMENT, ROLLBACK, BACKUP/RESTORE, OBSERVABILITY, INCIDENT_RESPONSE and EXTERNAL_SERVICES documentation created, with production unknowns explicitly marked instead of invented.
-- Note: implementation/rehearsal of production infrastructure remains separate work and is tracked by `docs/quality/PRODUCTION_READINESS.md`.
+- Description: canonical ENVIRONMENTS, DEPLOYMENT, ROLLBACK, BACKUP/RESTORE, OBSERVABILITY, INCIDENT_RESPONSE and EXTERNAL_SERVICES documentation exists, with production unknowns explicitly marked instead of invented.
 
 ### DB-MIGRATION-001 — Separate production migration execution from app boot
 - Type: Infrastructure / Database

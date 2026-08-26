@@ -5,18 +5,19 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 ## TECH-001 — JavaScript peer/transitive dependency warnings
 - Area: Mobile / Dependencies
 - Priority: P2
-- Problem: current deterministic install reports peer/deprecation/transitive warnings, including React/ReactDOM, safe-area-context, valibot and deprecated transitive packages.
+- Problem: deterministic install still reports peer/deprecation/transitive warnings; the current high-severity audit gate passes but reports 2 moderate advisories.
 - Impact: future upgrade friction and potential compatibility/security exposure.
 - Risk: Medium.
-- Possible solution: review against Expo SDK 57 compatibility matrix and upgrade only as a scoped dependency task with CI/native validation.
+- Current evidence: React/ReactDOM relationship, safe-area compatibility, valibot/deprecated transitive warnings, and 2 moderate audit findings remain under scoped review.
+- Possible solution: identify exact advisory paths and review against Expo SDK 57 compatibility before controlled upgrades; do not lower audit gates or broadly upgrade unrelated packages.
 
 ## TECH-002 — Ignored dependency build scripts
 - Area: Mobile / Supply chain
 - Priority: P2
-- Problem: pnpm reports ignored build scripts including Skia/esbuild; Android workflow explicitly installs Skia native binaries.
+- Problem: pnpm reports ignored build scripts including Skia/esbuild; Android workflow explicitly installs and verifies Skia native binaries.
 - Impact: local/native behavior can depend on deliberate follow-up commands rather than a single generic install.
 - Risk: Medium.
-- Possible solution: document/approve required build-script policy and keep supply-chain risk explicit; do not enable scripts globally without review.
+- Possible solution: review/approve only required scripts as a scoped supply-chain decision; do not enable scripts globally without evidence.
 
 ## TECH-003 — Dev-client workflow mismatch
 - Area: Mobile / Developer Experience
@@ -29,10 +30,10 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 ## TECH-004 — Mobile regression coverage gap
 - Area: Quality
 - Priority: P1
-- Problem: backend coverage is materially stronger than mobile behavioral coverage; several `null.length` runtime crashes were found manually.
-- Impact: UI/API-boundary regressions may escape CI.
-- Risk: High.
-- Possible solution: add focused tests for API normalization, session lifecycle, auth states, localization and critical screens before broad E2E expansion.
+- Problem: backend coverage remains stronger than mobile behavioral coverage.
+- Progress: Phase 20 now tests API configuration/client behavior, session timing, SecureStore fail-closed persistence, locale policy, and Wallet/Legal/Support/Responsible Gaming null collection normalization.
+- Remaining risk: full SessionProvider refresh/logout interaction, critical auth UI states and broader native E2E remain under-tested.
+- Possible solution: continue focused boundary tests before broad E2E expansion.
 
 ## TECH-005 — Locale contract divergence
 - Area: Mobile / API / Database
@@ -48,15 +49,14 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 - Problem: backend and mobile have not always enforced identical complexity/copy rules.
 - Impact: direct API and mobile UX may accept/reject different passwords.
 - Risk: High.
-- Possible solution: define server-authoritative canonical policy and generate/mirror client validation/copy from it where practical.
+- Possible solution: define server-authoritative canonical policy and mirror client validation/copy from it where practical.
 
 ## TECH-007 — PR artifact source-SHA provenance
 - Area: Release / CI
 - Priority: P1
-- Problem: pull-request workflows may use synthetic merge `GITHUB_SHA` instead of the actual source branch head for artifact identity.
-- Impact: artifact provenance can point to a CI merge commit rather than exact source commit.
-- Risk: High for release traceability.
-- Possible solution: explicitly derive `pull_request.head.sha` when applicable and optionally retain CI merge SHA separately.
+- Problem: historical PR artifacts could use synthetic merge `GITHUB_SHA` instead of exact source-branch identity.
+- Progress: workflow/script now carry `VANTA_GIT_SHA` (source) and `VANTA_CI_SHA` separately; artifact names use source SHA.
+- Remaining: close only after a successful native workflow proves the emitted artifact/metadata.
 
 ## TECH-008 — Automatic migrations at API startup
 - Area: Backend / Database / Operations
@@ -69,17 +69,15 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 ## TECH-009 — No formal JS/TS lint/format gate
 - Area: Mobile / Quality
 - Priority: P2
-- Problem: TypeScript strict/typecheck exists, but no explicit stable JS/TS lint/format gate is currently canonical.
-- Impact: consistency/quality issues rely more on review and compiler than static style/error rules.
-- Risk: Medium.
-- Possible solution: evaluate ESLint/formatter fit without broad reformat churn.
+- Problem: TypeScript strict/typecheck exists, but no explicit stable JS/TS linter/formatter dependency is canonical.
+- Mitigation: CI now enforces changed code/config whitespace and secret-file hygiene without adding dependencies.
+- Possible solution: evaluate ESLint/formatter fit against Expo/React Native and introduce it only as a scoped dependency/policy change without mass reformat churn.
 
 ## TECH-010 — Minimal native E2E automation
 - Area: Quality
 - Priority: P2
 - Problem: physical Android validation is still substantially manual.
 - Impact: repeated release smoke work costs time and may miss regressions.
-- Risk: Medium.
 - Possible solution: add a small E2E suite for authentication/session/navigation/core read flows when native baseline stabilizes.
 
 ## TECH-011 — Documentation accumulated across phase history
@@ -87,7 +85,6 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 - Priority: P3
 - Problem: historical phase documents and current canonical specs coexist and can drift.
 - Impact: new AI/developer sessions can choose stale context if precedence is ignored.
-- Risk: Low/Medium.
 - Possible solution: maintain `docs/README.md`, `AGENTS.md` and explicit canonical docs; archive/deprecate only when safe rather than deleting useful evidence.
 
 ## TECH-012 — Large localization catalogs
@@ -95,7 +92,6 @@ Technical debt is recorded here so it can be prioritized instead of triggering o
 - Priority: P3
 - Problem: localization dictionaries are growing as more player journeys migrate.
 - Impact: higher merge/review cost as one catalog grows.
-- Risk: Low currently.
 - Possible solution: split by domain only when change frequency/size justifies the added structure.
 
 ## Debt rule

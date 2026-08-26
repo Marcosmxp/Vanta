@@ -15,9 +15,7 @@ Vanta has completed Phases 01–19 on `main`. Phase 20 is raising the integrated
 - pnpm `10.15.0` aligned locally and in CI;
 - root `pnpm-lock.yaml` committed;
 - local/CI/native frozen installs validated;
-- CI green;
-- CodeQL green;
-- Native Android build green.
+- controlled release metadata and native artifact workflow established.
 
 ### Canonical foundation established
 
@@ -26,11 +24,25 @@ Vanta has completed Phases 01–19 on `main`. Phase 20 is raising the integrated
 - `STATUS`, `BACKLOG`, `TECH_DEBT`, `RISKS`;
 - engineering `ARCHITECTURE`, `COMPONENTS`, `DATABASE`, `CODING_STANDARDS`, `DEPENDENCIES`, `GIT_WORKFLOW`;
 - quality `TESTING` and `PRODUCTION_READINESS`;
-- canonical `SECURITY_MODEL` and `DATA_PRIVACY` engineering inventory;
+- canonical `SECURITY_MODEL` and `DATA_PRIVACY`;
 - operations `ENVIRONMENTS`, `DEPLOYMENT`, `ROLLBACK`, `BACKUP`, `OBSERVABILITY`, `INCIDENT_RESPONSE`, `EXTERNAL_SERVICES`;
-- documentation index/precedence updated for future Codex sessions.
+- documentation index/precedence for future Codex sessions.
 
-These documents deliberately distinguish implemented development/alpha behavior from future production requirements. They do not claim that production hosting, providers, KMS, backups, monitoring or regulatory authorization already exist.
+### FOUNDATION-005 quality/governance enforcement
+
+Implemented on the Phase 20 branch:
+
+- repository hygiene CI gate for code/config whitespace and tracked secret-like files;
+- critical mobile tests for session timing, SecureStore persistence, locale selection and API null-collection regressions;
+- Android source SHA separated from CI merge SHA in provenance;
+- Android APK inspection for server-only configuration/secret-like files;
+- PR template aligned with scope, database, dependency, environment, release, accessibility, testing and self-review rules;
+- CI/CodeQL/Android concurrency cancels superseded runs;
+- Actions checkout/setup runtimes updated where changed;
+- dependency-health evidence records 2 moderate advisories without hiding them via broad upgrades;
+- target `main` protection policy documented.
+
+GitHub still reports `main` as unprotected. Actual branch-protection/ruleset activation remains an explicit repository-setting action and is not falsely marked complete.
 
 ## Completed in current Phase 20 branch
 
@@ -40,28 +52,27 @@ These documents deliberately distinguish implemented development/alpha behavior 
 - Android physical-device development runtime;
 - registration/login against local Go/PostgreSQL/Redis stack;
 - Home/Profile/Wallet integration;
-- wallet empty-collection crash fix;
-- Legal/Support/Responsible Gaming empty-collection crash fix;
+- Wallet/Legal/Support/Responsible Gaming null-collection crash fixes plus regression-test coverage;
 - force-close/reopen SecureStore session persistence evidence;
-- player-facing localization foundation (`pt-BR`, `en`, `es`);
+- player-facing localization foundation (`pt-BR`, `en`, `es`) and locale-policy tests;
 - localization of core player journeys in progress;
 - navbar icon/motion foundation;
 - stale auth error/password-helper improvements;
-- repository-level AI/developer operating contract;
 - canonical product/project/engineering/security/privacy/quality/operations documentation foundation;
-- Phase 20 release documentation updated for reproducible baseline.
+- repository/PR quality-gate foundation.
 
 ## In progress
 
+- final GitHub Actions validation of the latest quality-gate HEAD;
+- prove native artifact source-SHA provenance and APK inspection through successful artifact output;
 - complete product copy/localization cleanup across remaining screens;
 - verify true silent access-token refresh with protected request after access expiry;
 - remote session revocation/expiry evidence;
 - final native icon/splash/launch experience;
 - broader accessibility/native layout validation;
-- artifact provenance correction for PR source SHA;
-- artifact/config secret inspection;
 - Legal Center completeness/content review;
-- iOS CI/build/simulator path.
+- iOS CI/build/simulator path;
+- scoped dependency-health remediation for current moderate/peer/transitive warnings.
 
 ## Blocked by deliberate production gates
 
@@ -77,6 +88,10 @@ These documents deliberately distinguish implemented development/alpha behavior 
 - staging/production infrastructure selection;
 - implemented/tested production backup/restore, observability, rollback and incident tooling.
 
+## Governance blocker
+
+`main` branch protection is currently disabled. The required target is documented in `docs/engineering/GIT_WORKFLOW.md`. Do not consider repository governance closed until GitHub reports the protection/ruleset as active.
+
 ## Known critical issues
 
 No confirmed P0 issue is currently recorded in the repository audit baseline.
@@ -85,30 +100,13 @@ Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md`, `quality
 
 ## Next priorities
 
-1. finish Phase 20 session evidence and product/native polish gates;
-2. correct source-SHA artifact provenance and inspect artifact/config for secrets;
-3. complete iOS build-path evidence;
-4. keep CI/CodeQL/native build green;
+1. obtain green final-head evidence for CI, CodeQL and native Android quality gates;
+2. enable `main` protection/ruleset in GitHub using the documented required checks;
+3. finish Phase 20 session evidence and product/native polish gates;
+4. complete iOS build-path evidence;
 5. do not merge PR #24 until documented Phase 20 exit criteria are satisfied;
 6. after Phase 20, implement/test production-readiness controls incrementally rather than opening regulated capabilities prematurely.
 
-## Baseline health
-
-| Area | Status |
-|---|---|
-| Git working baseline | GREEN after local sync/clean verification |
-| JavaScript dependency reproducibility | GREEN |
-| Mobile typecheck/tests/bundles | GREEN in latest baseline CI |
-| Backend tests/vet/vulnerability/container checks | GREEN in latest baseline CI |
-| CodeQL | GREEN |
-| Android native build | GREEN |
-| Canonical AI/project/engineering/security/operations docs | GREEN / established |
-| Security/privacy model documentation | GREEN / implementation gaps tracked separately |
-| Physical Android core smoke | PARTIAL / continuing |
-| iOS build path | PENDING |
-| Staging infrastructure | BLOCKED / not selected |
-| Production readiness | BLOCKED / intentionally incomplete |
-
 ## Status update rule
 
-Update this file at meaningful milestone/checkpoint changes, not after every small commit. Do not mark production capabilities complete without evidence from the full authoritative/provider/regulatory/operational boundary.
+GitHub Actions is the authoritative source for the pass/fail state of the latest commit. This file records milestone capability/state and must not claim a specific HEAD is green without corresponding workflow evidence.
