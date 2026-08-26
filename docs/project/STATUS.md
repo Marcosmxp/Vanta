@@ -9,26 +9,28 @@
 
 Vanta has completed Phases 01–19 on `main`. Phase 20 is raising the integrated MVP to a reproducible, testable native alpha while the repository is being professionalized for continuous AI-assisted development.
 
-The deterministic JavaScript baseline is complete:
+### Deterministic baseline
 
-- Node `22.13.0` baseline aligned locally and in CI;
-- pnpm `10.15.0` baseline aligned locally and in CI;
+- Node `22.13.0` aligned locally and in CI;
+- pnpm `10.15.0` aligned locally and in CI;
 - root `pnpm-lock.yaml` committed;
-- local frozen install validated;
-- CI frozen install validated;
-- Native Android frozen install validated;
+- local/CI/native frozen installs validated;
 - CI green;
 - CodeQL green;
 - Native Android build green.
 
-The canonical project/engineering foundation is also established:
+### Canonical foundation established
 
 - root `AGENTS.md` operating contract;
-- canonical `PROJECT`, `MVP`, `REQUIREMENTS`;
-- canonical `STATUS`, `BACKLOG`, `TECH_DEBT`, `RISKS`;
-- canonical engineering `ARCHITECTURE`, `COMPONENTS`, `DATABASE`, `CODING_STANDARDS`, `DEPENDENCIES`, `GIT_WORKFLOW`;
-- canonical quality/testing strategy;
-- documentation index/precedence updated so future Codex sessions can recover current state without chat history.
+- `PROJECT`, `MVP`, `REQUIREMENTS`;
+- `STATUS`, `BACKLOG`, `TECH_DEBT`, `RISKS`;
+- engineering `ARCHITECTURE`, `COMPONENTS`, `DATABASE`, `CODING_STANDARDS`, `DEPENDENCIES`, `GIT_WORKFLOW`;
+- quality `TESTING` and `PRODUCTION_READINESS`;
+- canonical `SECURITY_MODEL` and `DATA_PRIVACY` engineering inventory;
+- operations `ENVIRONMENTS`, `DEPLOYMENT`, `ROLLBACK`, `BACKUP`, `OBSERVABILITY`, `INCIDENT_RESPONSE`, `EXTERNAL_SERVICES`;
+- documentation index/precedence updated for future Codex sessions.
+
+These documents deliberately distinguish implemented development/alpha behavior from future production requirements. They do not claim that production hosting, providers, KMS, backups, monitoring or regulatory authorization already exist.
 
 ## Completed in current Phase 20 branch
 
@@ -46,7 +48,7 @@ The canonical project/engineering foundation is also established:
 - navbar icon/motion foundation;
 - stale auth error/password-helper improvements;
 - repository-level AI/developer operating contract;
-- canonical product/project/engineering/quality documentation foundation;
+- canonical product/project/engineering/security/privacy/quality/operations documentation foundation;
 - Phase 20 release documentation updated for reproducible baseline.
 
 ## In progress
@@ -59,8 +61,7 @@ The canonical project/engineering foundation is also established:
 - artifact provenance correction for PR source SHA;
 - artifact/config secret inspection;
 - Legal Center completeness/content review;
-- iOS CI/build/simulator path;
-- continue operations/security documentation only where it adds real project value.
+- iOS CI/build/simulator path.
 
 ## Blocked by deliberate production gates
 
@@ -72,23 +73,24 @@ The canonical project/engineering foundation is also established:
 - final jurisdiction configuration/licensing/certification;
 - approved game math/bankroll/exposure controls;
 - independent production security assessment;
-- production secrets/KMS/signing/operations readiness.
+- production secrets/KMS/signing;
+- staging/production infrastructure selection;
+- implemented/tested production backup/restore, observability, rollback and incident tooling.
 
 ## Known critical issues
 
 No confirmed P0 issue is currently recorded in the repository audit baseline.
 
-Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md` and the current Phase 20 release/troubleshooting documents.
+Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md`, `quality/PRODUCTION_READINESS.md` and current Phase 20 release/troubleshooting documents.
 
 ## Next priorities
 
 1. finish Phase 20 session evidence and product/native polish gates;
 2. correct source-SHA artifact provenance and inspect artifact/config for secrets;
 3. complete iOS build-path evidence;
-4. establish the remaining security/privacy and operations-readiness documents without duplicating existing sources;
-5. keep CI/CodeQL/native build green;
-6. do not merge PR #24 until documented Phase 20 exit criteria are satisfied;
-7. after Phase 20, proceed into production-readiness roadmap rather than opening regulated capabilities prematurely.
+4. keep CI/CodeQL/native build green;
+5. do not merge PR #24 until documented Phase 20 exit criteria are satisfied;
+6. after Phase 20, implement/test production-readiness controls incrementally rather than opening regulated capabilities prematurely.
 
 ## Baseline health
 
@@ -100,11 +102,13 @@ Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md` and the c
 | Backend tests/vet/vulnerability/container checks | GREEN in latest baseline CI |
 | CodeQL | GREEN |
 | Android native build | GREEN |
-| Canonical AI/project/engineering docs | GREEN / established |
+| Canonical AI/project/engineering/security/operations docs | GREEN / established |
+| Security/privacy model documentation | GREEN / implementation gaps tracked separately |
 | Physical Android core smoke | PARTIAL / continuing |
 | iOS build path | PENDING |
+| Staging infrastructure | BLOCKED / not selected |
 | Production readiness | BLOCKED / intentionally incomplete |
 
 ## Status update rule
 
-Update this file at meaningful milestone/checkpoint changes, not after every small commit. Do not mark production capabilities complete without evidence from the full authoritative/provider/regulatory boundary.
+Update this file at meaningful milestone/checkpoint changes, not after every small commit. Do not mark production capabilities complete without evidence from the full authoritative/provider/regulatory/operational boundary.
