@@ -22,20 +22,23 @@ Channel: alpha
 
 Root `version.json` is the canonical source. Use `pnpm release:check` to detect drift. The `v0.1.0-alpha.1` Git tag is intentionally pending until the intended Phase 20 alpha artifact passes its release gates.
 
+JavaScript dependency resolution is now pinned by root `pnpm-lock.yaml`; controlled local/CI/native installs use `pnpm install --frozen-lockfile` with the project toolchain baseline (`Node 22.13.0`, `pnpm 10.15.0`).
+
 See [`docs/release/versioning-and-release-governance.md`](./docs/release/versioning-and-release-governance.md) and [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Canonical project documentation
 
 Read:
 
-1. [`docs/README.md`](./docs/README.md) — documentation index and precedence.
-2. [`docs/VANTA_PROJECT_CONTEXT.md`](./docs/VANTA_PROJECT_CONTEXT.md) — master recoverable context.
-3. [`docs/context/2026-08-25-phase20-strategy-checkpoint.md`](./docs/context/2026-08-25-phase20-strategy-checkpoint.md) — current Phase 20 continuation checkpoint.
-4. [`docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md`](./docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md) — product/business/game-math/regulatory strategy.
-5. [`docs/ROADMAP.md`](./docs/ROADMAP.md) — current implementation roadmap.
-6. [`docs/PHASE_HISTORY.md`](./docs/PHASE_HISTORY.md) — delivery history.
-7. [`docs/release/phase20-troubleshooting-and-findings.md`](./docs/release/phase20-troubleshooting-and-findings.md) — live native-test issues/fixes.
-8. [`docs/security/phase19-security-audit.md`](./docs/security/phase19-security-audit.md) — latest completed security audit.
+1. [`AGENTS.md`](./AGENTS.md) — stable repository operating contract for Codex/AI-assisted development and contributors.
+2. [`docs/README.md`](./docs/README.md) — documentation index and precedence.
+3. [`docs/VANTA_PROJECT_CONTEXT.md`](./docs/VANTA_PROJECT_CONTEXT.md) — master recoverable context.
+4. [`docs/context/2026-08-25-phase20-strategy-checkpoint.md`](./docs/context/2026-08-25-phase20-strategy-checkpoint.md) — current Phase 20 continuation checkpoint.
+5. [`docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md`](./docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md) — product/business/game-math/regulatory strategy.
+6. [`docs/ROADMAP.md`](./docs/ROADMAP.md) — current implementation roadmap.
+7. [`docs/PHASE_HISTORY.md`](./docs/PHASE_HISTORY.md) — delivery history.
+8. [`docs/release/phase20-troubleshooting-and-findings.md`](./docs/release/phase20-troubleshooting-and-findings.md) — live native-test issues/fixes.
+9. [`docs/security/phase19-security-audit.md`](./docs/security/phase19-security-audit.md) — latest completed security audit.
 
 ## Engineering principles
 
@@ -52,6 +55,7 @@ Read:
 - Player-facing copy explains the product; developer docs explain architecture.
 - Releases must be traceable to version + native build + Git commit.
 - Project phases are not application versions.
+- Dependency resolution is committed and frozen for controlled builds.
 
 ## Product direction
 
@@ -81,7 +85,6 @@ Still blocked before production:
 - approved game mathematics/exposure;
 - final licensing/certification;
 - store policy readiness;
-- independent security assessment;
-- committed JavaScript dependency lockfile/frozen installs for controlled production builds.
+- independent security assessment.
 
 Launch readiness requires evidence, not only code completion.
