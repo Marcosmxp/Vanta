@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 
 import { ApiError, apiClient, type ApiRequestOptions } from '../api/ApiClient';
 import { queryClient } from '../query/queryClient';
+import { ACCESS_REFRESH_SKEW_MS, expiresAtOrBefore } from './sessionPolicy';
 import { clearStoredSession, loadStoredSession, saveStoredSession } from './secureSessionStore';
 import type {
   RegisterInput,
@@ -13,12 +14,6 @@ import type {
 } from './types';
 
 const SessionContext = createContext<SessionContextValue | null>(null);
-const ACCESS_REFRESH_SKEW_MS = 30_000;
-
-function expiresAtOrBefore(isoDate: string, threshold: number): boolean {
-  const timestamp = Date.parse(isoDate);
-  return !Number.isFinite(timestamp) || timestamp <= threshold;
-}
 
 function safeErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
