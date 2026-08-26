@@ -116,9 +116,15 @@ Recurring non-sensitive failures should be added to the relevant troubleshooting
 
 ## Dependency reproducibility
 
-The repository is still missing `pnpm-lock.yaml` during the current Phase 20 normalization. Until it is generated/reviewed/committed, JavaScript builds are not considered fully reproducible.
+Root `pnpm-lock.yaml` is committed and is the authoritative JavaScript dependency lock for the workspace.
 
-Do not create a lockfile manually. Once committed, dependency declaration changes must update it and release/CI installs must use frozen-lockfile mode.
+Controlled installs and CI/native workflows use:
+
+```text
+pnpm install --frozen-lockfile
+```
+
+Dependency declaration changes must update the lockfile. Do not hand-edit or fabricate the lockfile. Use the pinned project toolchain (`Node 22.13.0`, `pnpm 10.15.0`) when intentionally regenerating dependency state, and review dependency/peer/security warnings separately rather than hiding them through unrelated upgrades.
 
 ## Review standard
 
