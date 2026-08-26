@@ -91,6 +91,31 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :app:assembleDebug --no-daemon
 
+      - name: Inspect APK for server-only configuration and secret files
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk'
+          rm -rf apk-inspect
+          mkdir -p apk-inspect
+          unzip -qq "$apk" -d apk-inspect
+
+          secret_files="$(find apk-inspect -type f \( -iname '*.pem' -o -iname '*.key' -o -iname '*.p12' -o -iname '*.pfx' -o -iname '.env' -o -iname '.env.*' \) -print)"
+          if [ -n "$secret_files" ]; then
+            printf 'Forbidden secret-like files were packaged in the APK:\n%s\n' "$secret_files"
+            exit 1
+          fi
+
+          forbidden='VANTA_DATABASE_URL|VANTA_REDIS_URL|VANTA_PII_ENCRYPTION_KEY_B64|VANTA_PII_LOOKUP_KEY_B64|vanta_local_only|postgres://vanta:'
+          matches="$(grep -R -a -l -E "$forbidden" apk-inspect || true)"
+          if [ -n "$matches" ]; then
+            printf 'Server-only configuration markers were found in the APK:\n%s\n' "$matches"
+            exit 1
+          fi
+
+          rm -rf apk-inspect
+          echo 'APK secret/config inspection passed.'
+
       - name: Prepare versioned artifact and provenance
         shell: bash
         run: |
