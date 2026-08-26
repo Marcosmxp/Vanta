@@ -82,13 +82,14 @@ requirement/backlog item
 
 Use `.github/pull_request_template.md` and record:
 
-- objective;
+- objective/requirement ID;
 - product/user impact;
-- changes;
+- scope control;
 - testing evidence;
 - security/financial/regulatory impact;
 - database/environment/dependency changes;
-- breaking changes;
+- rollback/data-recovery implications;
+- release/provenance impact;
 - screenshots when relevant;
 - known limitations/blockers.
 
@@ -98,7 +99,34 @@ Do not mark work complete solely because a build artifact exists.
 
 `main` represents the latest integrated completed state.
 
-Current repository audit found that branch protection is not yet enforced. **Before production**, configure protection/rules so important CI/security checks cannot be bypassed accidentally and force-push/deletion risk is controlled.
+Repository audit on 2026-08-26 confirms that `main` is currently **unprotected**. This is a governance gap; CI can detect failures but cannot prevent a direct push or merge while GitHub branch/ruleset protection is disabled.
+
+### Target protection for `main`
+
+For the current solo workflow, configure GitHub branch protection/rulesets to:
+
+- require changes to reach `main` through a pull request;
+- require the branch to be up to date before merge when practical;
+- require successful checks for:
+  - `Repository hygiene`;
+  - `Mobile validation`;
+  - `Go tests`;
+  - CodeQL JavaScript/TypeScript analysis;
+  - CodeQL Go analysis;
+- block force pushes;
+- block branch deletion;
+- keep required human approvals at zero while the repository is operated by one maintainer, rather than creating an impossible self-approval requirement;
+- require conversation resolution when review threads exist, if the repository settings support it without blocking the solo workflow.
+
+The Android native build currently has path filters and is intentionally **not** a globally required merge check; requiring a conditionally skipped workflow would create stuck PRs. Native/release gates remain mandatory when the changed scope or release checklist requires them.
+
+### Current enforcement status
+
+- CI and CodeQL workflows exist and run on PRs to `main`.
+- `Repository hygiene` additionally rejects whitespace errors and tracked secret-like files.
+- Branch protection/ruleset write access is not exposed through the current repository connector used by this session, so enabling the GitHub setting remains an explicit repository-configuration action.
+
+Do not mark `GIT-GOV-001` done until GitHub reports `main` as protected/ruleset-enforced.
 
 ## Releases
 
@@ -110,8 +138,25 @@ A production hotfix process is not yet active because production is not live. Wh
 
 ## Definition of Ready
 
-A task should be Ready when objective, acceptance criteria, dependencies and major risks are known. Unknown business/legal decisions should be marked rather than invented.
+A task should be Ready when:
+
+- objective and expected user/system outcome are clear;
+- requirement/backlog ID exists when the work is material;
+- acceptance criteria are testable;
+- relevant dependencies and environment assumptions are known;
+- design/product decision exists when needed;
+- database/security/regulatory risks are identified when relevant;
+- unknown business/legal decisions are marked instead of invented.
 
 ## Definition of Done
 
-Use the repository DoD in `AGENTS.md`. Relevant tests/build/security/documentation must be complete before merge.
+Use the repository DoD in `AGENTS.md`. At minimum, for the changed scope:
+
+- implementation satisfies acceptance criteria;
+- tests/typecheck/build gates that apply are green;
+- errors/loading/empty states are handled for changed flows;
+- authorization/security/data impact is reviewed where relevant;
+- dependency and migration changes are explicit and reproducible;
+- no secret or unrelated rewrite was introduced;
+- documentation/status/backlog is updated when behavior or project state changes;
+- known limitations remain visible rather than hidden.
