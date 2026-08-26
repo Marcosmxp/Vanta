@@ -1,7 +1,13 @@
 param(
     [Parameter(Mandatory = $true)]
     [ValidatePattern('^(?:\d{1,3}\.){3}\d{1,3}$')]
-    [string]$LanIp
+    [string]$LanIp,
+
+    [ValidatePattern('^\d+(?:ms|s|m|h)$')]
+    [string]$AccessTokenTtl = '15m',
+
+    [ValidatePattern('^\d+(?:ms|s|m|h)$')]
+    [string]$RefreshTokenTtl = '720h'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -69,8 +75,8 @@ function Show-DockerDiagnostics {
 if (-not (Test-Command docker)) {
     throw 'Docker CLI was not found. Install/start Docker Desktop first.'
 }
-if (-not (Test-Command pnpm)) {
-    throw 'pnpm was not found. Install pnpm 10.15.0 first.'
+if (-not (Test-Command pnpm.cmd)) {
+    throw 'pnpm.cmd was not found. Install pnpm 10.15.0 first.'
 }
 
 try {
@@ -84,10 +90,13 @@ Ensure-FirewallRule -DisplayName 'Vanta API Dev 8080' -Port 8080
 Ensure-FirewallRule -DisplayName 'Vanta Metro Dev 8081' -Port 8081
 
 $env:VANTA_DEV_API_BIND_ADDRESS = $LanIp
+$env:VANTA_AUTH_ACCESS_TTL = $AccessTokenTtl
+$env:VANTA_AUTH_REFRESH_TTL = $RefreshTokenTtl
 $env:EXPO_PUBLIC_VANTA_ENV = 'development'
 $env:EXPO_PUBLIC_VANTA_API_URL = "http://${LanIp}:8080"
 
 Write-Host "Starting Vanta backend on http://${LanIp}:8080 ..."
+Write-Host "Auth TTLs: access=${AccessTokenTtl}, refresh=${RefreshTokenTtl}"
 docker compose -f $composeFile up -d --build
 if ($LASTEXITCODE -ne 0) {
     Show-DockerDiagnostics
@@ -117,8 +126,8 @@ if (-not $ready) {
 Write-Host "Vanta API is reachable: $healthUrl"
 
 if (-not (Test-Path (Join-Path $repoRoot 'node_modules'))) {
-    Write-Host 'Installing workspace dependencies...'
-    pnpm install --no-frozen-lockfile
+    Write-Host 'Installing workspace dependencies from the committed lockfile...'
+    pnpm.cmd install --frozen-lockfile
     if ($LASTEXITCODE -ne 0) {
         throw 'Workspace dependency installation failed.'
     }
@@ -131,7 +140,7 @@ Set-Location '$repoRoot'
 `$env:REACT_NATIVE_PACKAGER_HOSTNAME='${LanIp}'
 `$env:EXPO_PACKAGER_PROXY_URL='http://${LanIp}:8081'
 Write-Host 'Starting Metro for physical device at ${LanIp}:8081 ...'
-pnpm --dir apps/mobile exec expo start --dev-client --lan --port 8081
+pnpm.cmd --dir apps/mobile exec expo start --dev-client --lan --port 8081
 "@
 
 Start-Process powershell.exe -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-Command', $metroCommand
@@ -141,6 +150,8 @@ Write-Host 'Vanta physical-device development runtime is ready.'
 Write-Host "API:   http://${LanIp}:8080"
 Write-Host "Health: $healthUrl"
 Write-Host "Metro: http://${LanIp}:8081"
+Write-Host "Access TTL:  $AccessTokenTtl"
+Write-Host "Refresh TTL: $RefreshTokenTtl"
 Write-Host ''
 Write-Host 'Keep both PowerShell windows open, keep the PC and phone on the same Wi-Fi, then open the installed Vanta app.'
 Write-Host 'For this debug APK, set the device Dev Settings debug server host to the Metro address above if the app still points to localhost.'

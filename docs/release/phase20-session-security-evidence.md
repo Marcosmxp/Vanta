@@ -1,0 +1,140 @@
+# Phase 20 — Physical Session Security Evidence
+
+**Status:** IN PROGRESS  
+**Scope:** `AUTH-REFRESH-001`, `AUTH-REVOCATION-002`  
+**Environment:** local development runtime + physical Android device only
+
+## Objective
+
+Produce reproducible evidence that the physical Android app:
+
+1. silently rotates an expiring access/refresh session without visible re-login; and
+2. fails closed after the same device session is revoked remotely.
+
+The evidence procedure must not print, persist or commit access tokens, refresh tokens, token hashes or passwords.
+
+## Existing behavior under test
+
+The mobile session layer refreshes before a protected request when the access token is within the 30-second refresh window, retries once after a 401, and clears the local session when refresh is rejected with 401.
+
+The backend rotates both access and refresh tokens with a refresh-generation compare-and-swap. Refresh mismatch/reuse/race and revoked/expired sessions fail closed.
+
+Remote session revocation is exposed through the authenticated security API.
+
+## Controlled short-TTL runtime
+
+Normal development defaults remain:
+
+```text
+access token: 15m
+refresh token: 30d / 720h
+```
+
+For physical refresh testing only, start a new local runtime with a one-minute access TTL:
+
+```powershell
+.\scripts\start-physical-device-dev.ps1 -LanIp <YOUR_LAN_IP> -AccessTokenTtl 1m
+```
+
+Then sign in again on Android. Existing sessions retain the expiry timestamps they were originally issued with, so a new login is required after changing the TTL.
+
+After the test, return to the normal development default by starting the launcher without the override or with `-AccessTokenTtl 15m`.
+
+## AUTH-REFRESH-001 — Silent refresh
+
+With the short-TTL runtime active and the physical Android app signed in:
+
+```powershell
+.\scripts\observe-physical-session-refresh.ps1
+```
+
+The script:
+
+- selects an active Android session from local PostgreSQL;
+- reads only session id, refresh generation and timestamps;
+- masks the session id in terminal output;
+- never queries token values or token hashes;
+- waits until the mobile 30-second refresh window opens;
+- asks the tester to open/refresh a protected screen;
+- passes only if `refresh_generation` increases and `access_expires_at` advances.
+
+Recommended protected screens:
+
+```text
+Wallet
+Profile
+Security
+```
+
+### Acceptance
+
+- physical app remains authenticated;
+- protected request succeeds;
+- `refresh_generation` increases;
+- access expiry advances;
+- no token/credential appears in terminal/log evidence.
+
+## AUTH-REVOCATION-002 — Remote revocation
+
+Keep the physical Android app signed in, then run:
+
+```powershell
+.\scripts\test-physical-session-revocation.ps1 -LanIp <YOUR_LAN_IP>
+```
+
+The script prompts interactively for the same account email/password, creates a temporary helper session, lists other active Android sessions, and revokes the chosen physical session through:
+
+```text
+DELETE /v1/security/sessions/{sessionID}
+```
+
+The password is entered as `SecureString`, plaintext exists only transiently in process memory for the login request, and session tokens are never printed. The temporary helper session is logged out in `finally` where possible.
+
+After the script confirms server-side status `revoked`, open a protected screen on the phone.
+
+### Acceptance
+
+- security API returns HTTP 204 for the owned Android session;
+- subsequent security snapshot reports that session as `revoked`;
+- physical app cannot continue using the revoked access token;
+- refresh is rejected;
+- local session is cleared;
+- app returns to authentication rather than leaving stale authorized UI.
+
+## Evidence record
+
+Do not mark either backlog item `Done` until the actual run is recorded.
+
+```text
+Date/time:
+Device:
+Android version:
+Vanta version/build:
+Source commit:
+LAN/API target:
+
+AUTH-REFRESH-001
+Session id (masked):
+Generation before:
+Generation after:
+Access expiry before:
+Access expiry after:
+Protected screen used:
+Physical result: PASS / FAIL
+
+AUTH-REVOCATION-002
+Target session id (masked):
+API revocation 204: YES / NO
+Security snapshot revoked: YES / NO
+Protected screen used after revocation:
+Returned to authentication: YES / NO
+Physical result: PASS / FAIL
+```
+
+## Safety / cleanup
+
+- never paste token values into this file;
+- never commit account passwords or runtime secrets;
+- restore normal access TTL after the controlled refresh test;
+- keep PostgreSQL/Redis loopback-only as defined by the development Compose model;
+- do not use these development scripts against staging/production.

@@ -48,6 +48,8 @@ services:
       VANTA_DATABASE_URL: postgres://vanta:vanta_local_only@postgres:5432/vanta?sslmode=disable
       VANTA_REDIS_URL: redis://redis:6379/0
       VANTA_LOG_LEVEL: debug
+      VANTA_AUTH_ACCESS_TTL: "${VANTA_AUTH_ACCESS_TTL:-15m}"
+      VANTA_AUTH_REFRESH_TTL: "${VANTA_AUTH_REFRESH_TTL:-720h}"
     ports:
       - "${VANTA_DEV_API_BIND_ADDRESS:-127.0.0.1}:8080:8080"
     read_only: true
