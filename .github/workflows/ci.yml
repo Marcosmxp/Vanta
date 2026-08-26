@@ -10,6 +10,49 @@ permissions:
   contents: read
 
 jobs:
+  repository:
+    name: Repository hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate changed-file whitespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --check "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
+          else
+            before='${{ github.event.before }}'
+            if [ -n "$before" ] && [ "$before" != '0000000000000000000000000000000000000000' ]; then
+              git diff --check "$before...${{ github.sha }}"
+            else
+              git diff --check HEAD^ HEAD
+            fi
+          fi
+
+      - name: Reject tracked secret-like files
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          while IFS= read -r path; do
+            case "$path" in
+              .env.example|*/.env.example)
+                continue
+                ;;
+              .env|*/.env|.env.*|*/.env.*|*.pem|*.key|*.p12|*.pfx|*.jks|*.keystore)
+                printf 'Forbidden secret-like tracked file: %s\n' "$path"
+                failed=1
+                ;;
+            esac
+          done < <(git ls-files)
+          exit "$failed"
+
   mobile:
     name: Mobile validation
     runs-on: ubuntu-latest
@@ -46,7 +89,7 @@ jobs:
       - name: Typecheck mobile application
         run: pnpm mobile:typecheck
 
-      - name: Run mobile API boundary tests
+      - name: Run mobile tests
         run: pnpm mobile:test
 
       - name: Validate application Android bundle
