@@ -74,6 +74,51 @@ Security
 - access expiry advances;
 - no token/credential appears in terminal/log evidence.
 
+### Physical evidence — 2026-08-26/27
+
+Environment/evidence metadata:
+
+```text
+Device: physical Android handset (model not recorded)
+Android version: not recorded
+Vanta release: 0.1.0-alpha.1
+Android versionCode: 2
+Source commit under test: 26a0288495f57d89c65d6d1d8e0b629cc14646fc
+LAN/API target: 192.168.1.70:8080
+Access TTL: 1m
+Refresh TTL: 720h
+Session id (masked): session_...37f2
+```
+
+Three consecutive rotations were observed on the same physical Android session:
+
+```text
+Run 1
+Generation:           1 -> 2
+Access expiry before: 2026-08-26 23:37:32Z
+Access expiry after:  2026-08-26 23:38:22Z
+Last seen UTC:         2026-08-26 23:37:22Z
+Result:                PASS
+
+Run 2
+Generation:           2 -> 3
+Access expiry before: 2026-08-26 23:38:22Z
+Access expiry after:  2026-08-26 23:38:59Z
+Last seen UTC:         2026-08-26 23:37:59Z
+Result:                PASS
+
+Run 3
+Generation:           3 -> 4
+Access expiry before: 2026-08-26 23:38:59Z
+Access expiry after:  2026-08-26 23:40:04Z
+Last seen UTC:         2026-08-26 23:39:04Z
+Result:                PASS
+```
+
+The objective server/session evidence is therefore satisfied: generation advanced on every run, access expiry advanced on every run, and the evidence harness did not query or print token values/hashes.
+
+The specific protected screen used was not separately recorded. Final closure of `AUTH-REFRESH-001` still requires the tester to explicitly confirm that the physical app remained in the authenticated experience without a visible re-login during the successful rotations.
+
 ## AUTH-REVOCATION-002 — Remote revocation
 
 Keep the physical Android app signed in, then run:
@@ -106,21 +151,9 @@ After the script confirms server-side status `revoked`, open a protected screen 
 Do not mark either backlog item `Done` until the actual run is recorded.
 
 ```text
-Date/time:
-Device:
-Android version:
-Vanta version/build:
-Source commit:
-LAN/API target:
-
 AUTH-REFRESH-001
-Session id (masked):
-Generation before:
-Generation after:
-Access expiry before:
-Access expiry after:
-Protected screen used:
-Physical result: PASS / FAIL
+Technical rotation evidence: PASS (3 consecutive rotations recorded above)
+Physical no-visible-relogin confirmation: PENDING EXPLICIT TESTER CONFIRMATION
 
 AUTH-REVOCATION-002
 Target session id (masked):
