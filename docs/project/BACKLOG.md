@@ -28,10 +28,19 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 - Evidence: physical Android session `session_...37f2` completed three consecutive rotations (`1 -> 2`, `2 -> 3`, `3 -> 4`) with advancing access expiry under the controlled 1m access TTL; the tester explicitly confirmed the app remained logged in without visible re-authentication. Token values/hashes were not queried or printed. Detailed timestamps are recorded in `docs/release/phase20-session-security-evidence.md`.
 - Dependencies: physical Android dev runtime.
 
+### AUTH-PERSIST-003 — Diagnose session loss after Android process close
+- Type: Bug / Security / Testing
+- Status: In Progress
+- Description: after successful physical silent-refresh evidence under the controlled 1m access TTL, closing Vanta from Android recent apps and reopening returned to the introduction/authentication flow instead of restoring the persisted session.
+- Acceptance: determine whether the stored session was missing, the server session was revoked/rejected during bootstrap refresh, or navigation incorrectly entered anonymous state; prove a valid session survives process close/reopen without visible re-login; preserve fail-closed behavior for genuinely revoked/expired sessions.
+- Evidence: physical Android report after `AUTH-REFRESH-001` rotations `1 -> 4`; no in-app logout was reported for the observed close/reopen behavior.
+- Safety: do not weaken refresh-token rotation/reuse detection or SecureStore protections to make persistence pass.
+
 ### AUTH-REVOCATION-002 — Validate remote revocation/expired refresh
 - Type: Security / Testing
 - Status: Ready
 - Description: prove revoked/expired server session returns the app to authentication rather than leaving stale authorized UI.
+- Dependency: resolve or explain `AUTH-PERSIST-003` first so normal process-close behavior is not confused with remote revocation evidence.
 
 ### REL-PROVENANCE-001 — Use PR source SHA in artifact provenance
 - Type: Infrastructure / Security
