@@ -42,6 +42,8 @@ After the test, return to the normal development default by starting the launche
 
 ## AUTH-REFRESH-001 — Silent refresh
 
+**Status:** DONE
+
 With the short-TTL runtime active and the physical Android app signed in:
 
 ```powershell
@@ -115,11 +117,13 @@ Last seen UTC:         2026-08-26 23:39:04Z
 Result:                PASS
 ```
 
-The objective server/session evidence is therefore satisfied: generation advanced on every run, access expiry advanced on every run, and the evidence harness did not query or print token values/hashes.
+The tester explicitly confirmed after the successful runs that the physical Vanta app remained logged in and did not request visible re-authentication. This completes the physical silent-refresh acceptance criteria.
 
-The specific protected screen used was not separately recorded. Final closure of `AUTH-REFRESH-001` still requires the tester to explicitly confirm that the physical app remained in the authenticated experience without a visible re-login during the successful rotations.
+Final result: **PASS / DONE**.
 
 ## AUTH-REVOCATION-002 — Remote revocation
+
+**Status:** READY FOR PHYSICAL TEST
 
 Keep the physical Android app signed in, then run:
 
@@ -148,12 +152,11 @@ After the script confirms server-side status `revoked`, open a protected screen 
 
 ## Evidence record
 
-Do not mark either backlog item `Done` until the actual run is recorded.
-
 ```text
 AUTH-REFRESH-001
 Technical rotation evidence: PASS (3 consecutive rotations recorded above)
-Physical no-visible-relogin confirmation: PENDING EXPLICIT TESTER CONFIRMATION
+Physical no-visible-relogin confirmation: YES
+Final result: PASS / DONE
 
 AUTH-REVOCATION-002
 Target session id (masked):
