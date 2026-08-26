@@ -1,28 +1,41 @@
-# Vanta Product Experience Documentation
+# Vanta Product Documentation
 
-**Status:** canonical product-UX index for the active Vanta branch.
+**Status:** canonical product index for the active Vanta branch.
 
-This directory translates the higher-level product strategy into concrete player-experience rules. It does not replace code-level design tokens, navigation architecture, legal review or security policy.
+This directory defines what Vanta is, what the current MVP includes, which product requirements exist and how the intended player experience should behave. It does not replace code-level design tokens, architecture, legal review or security policy.
 
 ## Read order
 
-1. [`ux-motion-guidelines.md`](./ux-motion-guidelines.md) — visual language, app launch, assets, navigation, motion, states, accessibility and UX acceptance criteria.
-2. [`player-copy-content-guidelines.md`](./player-copy-content-guidelines.md) — player-facing language, errors, blocked states, financial/security wording, localization and content acceptance criteria.
+1. [`PROJECT.md`](./PROJECT.md) — canonical product definition, target user, value proposition, scope, business direction and success criteria.
+2. [`MVP.md`](./MVP.md) — Native Alpha MUST/SHOULD/COULD/NOT IN MVP boundaries and exit criteria.
+3. [`REQUIREMENTS.md`](./REQUIREMENTS.md) — stable requirement IDs, priority, status and acceptance boundaries by domain.
+4. [`ux-motion-guidelines.md`](./ux-motion-guidelines.md) — visual language, app launch, assets, navigation, motion, states, accessibility and UX acceptance criteria.
+5. [`player-copy-content-guidelines.md`](./player-copy-content-guidelines.md) — player-facing language, errors, blocked states, financial/security wording, localization and content acceptance criteria.
 
-Higher-level context remains in:
+Project execution/status records:
+- [`../project/STATUS.md`](../project/STATUS.md)
+- [`../project/BACKLOG.md`](../project/BACKLOG.md)
+- [`../project/TECH_DEBT.md`](../project/TECH_DEBT.md)
+- [`../project/RISKS.md`](../project/RISKS.md)
+
+Higher-level strategic context remains in:
 - [`../VANTA_PROJECT_CONTEXT.md`](../VANTA_PROJECT_CONTEXT.md)
 - [`../VANTA_PRODUCT_BUSINESS_STRATEGY.md`](../VANTA_PRODUCT_BUSINESS_STRATEGY.md)
 - [`../ROADMAP.md`](../ROADMAP.md)
 
 ## Source-of-truth boundaries
 
-- **Product docs here:** what the player experience should be and why.
+- **`PROJECT.md`:** what the product is and is not.
+- **`MVP.md`:** current Native Alpha scope boundary.
+- **`REQUIREMENTS.md`:** requirement IDs/status/acceptance boundaries.
+- **Product UX docs here:** how the player experience should behave and why.
 - **`apps/mobile/src/design-system`:** executable visual tokens/components.
 - **Navigation code:** actual route/state implementation.
 - **Backend/security docs:** authorization, financial authority, session policy and regulated controls.
 - **Legal documents/backend:** approved legal text, versions and verified operator/regulator information.
+- **`docs/project/*`:** operational project status, backlog, debt and risks.
 
-When product documentation and implementation differ, treat the mismatch as implementation debt; do not silently rewrite the product rule to match an accidental implementation.
+When product documentation and implementation differ, treat the mismatch as implementation debt or requirement-status work; do not silently rewrite an approved product rule to match an accidental implementation.
 
 ## Permanent product principle
 
