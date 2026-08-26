@@ -107,8 +107,9 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### OPS-DOC-001 — Canonical operations documentation
 - Type: Documentation
-- Status: Backlog
-- Description: create/update ENVIRONMENTS, DEPLOYMENT, ROLLBACK, BACKUP/RESTORE, OBSERVABILITY and INCIDENT_RESPONSE before production readiness.
+- Status: Done
+- Description: canonical ENVIRONMENTS, DEPLOYMENT, ROLLBACK, BACKUP/RESTORE, OBSERVABILITY, INCIDENT_RESPONSE and EXTERNAL_SERVICES documentation created, with production unknowns explicitly marked instead of invented.
+- Note: implementation/rehearsal of production infrastructure remains separate work and is tracked by `docs/quality/PRODUCTION_READINESS.md`.
 
 ### DB-MIGRATION-001 — Separate production migration execution from app boot
 - Type: Infrastructure / Database
