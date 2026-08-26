@@ -8,7 +8,8 @@ const releaseVersion = metadata.channel === 'stable'
   ? metadata.version
   : `${metadata.version}-${metadata.channel}.${metadata.iteration}`;
 
-const gitSha = process.env.GITHUB_SHA || process.env.VANTA_GIT_SHA || 'unknown';
+const gitSha = process.env.VANTA_GIT_SHA || process.env.GITHUB_SHA || 'unknown';
+const ciSha = process.env.VANTA_CI_SHA || process.env.GITHUB_SHA || 'unknown';
 const shortSha = gitSha === 'unknown' ? 'unknown' : gitSha.slice(0, 7);
 const buildDate = process.env.VANTA_BUILD_DATE || new Date().toISOString();
 const platform = process.env.VANTA_BUILD_PLATFORM || 'unknown';
@@ -24,6 +25,7 @@ const manifest = {
   buildNumber: metadata.build,
   gitSha,
   gitShortSha: shortSha,
+  ciSha,
   buildDate,
   environment,
   platform,
@@ -34,4 +36,4 @@ fs.mkdirSync(path.dirname(absoluteTarget), { recursive: true });
 fs.writeFileSync(absoluteTarget, `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(`Wrote Vanta build provenance to ${target}.`);
-console.log(`${releaseVersion} build ${metadata.build} commit ${shortSha}`);
+console.log(`${releaseVersion} build ${metadata.build} source ${shortSha}`);
