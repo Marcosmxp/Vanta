@@ -21,6 +21,16 @@ function Invoke-PsqlLines {
     return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
 }
 
+function ConvertFrom-UnixMilliseconds {
+    param([Parameter(Mandatory = $true)][string]$Value)
+
+    $milliseconds = 0L
+    if (-not [int64]::TryParse($Value, [ref]$milliseconds)) {
+        throw "PostgreSQL returned an invalid Unix timestamp: $Value"
+    }
+    return [DateTimeOffset]::FromUnixTimeMilliseconds($milliseconds)
+}
+
 function Mask-SessionId {
     param([Parameter(Mandatory = $true)][string]$SessionId)
     if ($SessionId.Length -lt 13) {
@@ -33,9 +43,9 @@ function Get-AndroidSessions {
     $sql = @"
 SELECT session_id,
        refresh_generation,
-       to_char(access_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-       to_char(refresh_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-       to_char(last_seen_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+       (EXTRACT(EPOCH FROM access_expires_at) * 1000)::bigint,
+       (EXTRACT(EPOCH FROM refresh_expires_at) * 1000)::bigint,
+       (EXTRACT(EPOCH FROM last_seen_at) * 1000)::bigint,
        device_label
 FROM sessions
 WHERE platform = 'android' AND revoked_at IS NULL
@@ -52,9 +62,9 @@ LIMIT 10;
         $sessions += [pscustomobject]@{
             SessionId        = $parts[0]
             Generation       = [int64]$parts[1]
-            AccessExpiresAt  = [DateTimeOffset]::Parse($parts[2])
-            RefreshExpiresAt = [DateTimeOffset]::Parse($parts[3])
-            LastSeenAt       = [DateTimeOffset]::Parse($parts[4])
+            AccessExpiresAt  = ConvertFrom-UnixMilliseconds $parts[2]
+            RefreshExpiresAt = ConvertFrom-UnixMilliseconds $parts[3]
+            LastSeenAt       = ConvertFrom-UnixMilliseconds $parts[4]
             DeviceLabel      = $parts[5]
         }
     }
@@ -67,9 +77,9 @@ function Get-SessionState {
     $escaped = $SessionId.Replace("'", "''")
     $sql = @"
 SELECT refresh_generation,
-       to_char(access_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-       to_char(refresh_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-       to_char(last_seen_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+       (EXTRACT(EPOCH FROM access_expires_at) * 1000)::bigint,
+       (EXTRACT(EPOCH FROM refresh_expires_at) * 1000)::bigint,
+       (EXTRACT(EPOCH FROM last_seen_at) * 1000)::bigint,
        revoked_at IS NOT NULL
 FROM sessions
 WHERE session_id = '$escaped';
@@ -87,17 +97,15 @@ WHERE session_id = '$escaped';
 
     return [pscustomobject]@{
         Generation       = [int64]$parts[0]
-        AccessExpiresAt  = [DateTimeOffset]::Parse($parts[1])
-        RefreshExpiresAt = [DateTimeOffset]::Parse($parts[2])
-        LastSeenAt       = [DateTimeOffset]::Parse($parts[3])
+        AccessExpiresAt  = ConvertFrom-UnixMilliseconds $parts[1]
+        RefreshExpiresAt = ConvertFrom-UnixMilliseconds $parts[2]
+        LastSeenAt       = ConvertFrom-UnixMilliseconds $parts[3]
         Revoked          = $parts[4] -eq 't'
     }
 }
 
-try {
-    docker info | Out-Null
-}
-catch {
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
     throw 'Docker Desktop is not running or the Docker daemon is unavailable.'
 }
 
@@ -143,8 +151,8 @@ $secondsUntilWindow = [math]::Ceiling(($refreshWindow - [DateTimeOffset]::UtcNow
 if ($secondsUntilWindow -gt 90) {
     Write-Host ''
     Write-Warning "The access token is still about $secondsUntilWindow seconds from the mobile refresh window."
-    Write-Host "For a fast controlled test, restart the runtime with:"
-    Write-Host ".\scripts\start-physical-device-dev.ps1 -LanIp <YOUR_LAN_IP> -AccessTokenTtl 1m"
+    Write-Host 'For a fast controlled test, restart the runtime with:'
+    Write-Host '.\scripts\start-physical-device-dev.ps1 -LanIp <YOUR_LAN_IP> -AccessTokenTtl 1m'
     Write-Host 'Then sign in again on Android so the new short TTL applies to a newly issued session.'
     exit 2
 }
@@ -176,7 +184,7 @@ while ([DateTimeOffset]::UtcNow -lt $deadline) {
 
         Write-Host ''
         Write-Host 'PASS — silent refresh rotation observed.' -ForegroundColor Green
-        Write-Host "Generation:          $($initial.Generation) -> $($current.Generation)"
+        Write-Host "Generation:           $($initial.Generation) -> $($current.Generation)"
         Write-Host "Access expiry before: $($initial.AccessExpiresAt.UtcDateTime.ToString('u'))"
         Write-Host "Access expiry after:  $($current.AccessExpiresAt.UtcDateTime.ToString('u'))"
         Write-Host "Last seen UTC:        $($current.LastSeenAt.UtcDateTime.ToString('u'))"
