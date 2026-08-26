@@ -12,6 +12,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$mobileRoot = (Resolve-Path (Join-Path $repoRoot 'apps/mobile')).Path
 $composeFile = 'infrastructure/docker/compose.dev.yml'
 Set-Location $repoRoot
 
@@ -132,13 +133,13 @@ if (-not (Test-Path (Join-Path $repoRoot 'node_modules'))) {
 }
 
 $metroCommand = @"
-Set-Location '$repoRoot'
+Set-Location '$mobileRoot'
 `$env:EXPO_PUBLIC_VANTA_ENV='development'
 `$env:EXPO_PUBLIC_VANTA_API_URL='http://${LanIp}:8080'
 `$env:REACT_NATIVE_PACKAGER_HOSTNAME='${LanIp}'
 `$env:EXPO_PACKAGER_PROXY_URL='http://${LanIp}:8081'
-Write-Host 'Starting Metro for physical device at ${LanIp}:8081 ...'
-pnpm.cmd --dir apps/mobile exec expo start --dev-client --lan --port 8081
+Write-Host 'Starting Metro for physical device from apps/mobile at ${LanIp}:8081 ...'
+pnpm.cmd exec expo start --dev-client --lan --port 8081 --clear
 "@
 
 Start-Process powershell.exe -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-Command', $metroCommand
