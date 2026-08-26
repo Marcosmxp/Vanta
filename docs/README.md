@@ -12,12 +12,19 @@ For a new ChatGPT/Codex/developer session, use this order:
 4. [`product/MVP.md`](./product/MVP.md) — current Native Alpha scope and exit criteria.
 5. [`product/REQUIREMENTS.md`](./product/REQUIREMENTS.md) — stable product/domain requirement IDs and status.
 6. [`project/BACKLOG.md`](./project/BACKLOG.md) — prioritized actionable work.
-7. [`project/TECH_DEBT.md`](./project/TECH_DEBT.md) and [`project/RISKS.md`](./project/RISKS.md) — known debt and risk register.
-8. [`VANTA_PROJECT_CONTEXT.md`](./VANTA_PROJECT_CONTEXT.md) — recoverable historical/project context and permanent background.
-9. [`VANTA_PRODUCT_BUSINESS_STRATEGY.md`](./VANTA_PRODUCT_BUSINESS_STRATEGY.md) — strategic product/business/game-economics/regulatory direction.
-10. [`ROADMAP.md`](./ROADMAP.md) — sequenced technical, security, regulatory and commercial execution.
-11. Relevant domain documentation under `product/`, `security/`, `architecture/` and `release/`.
-12. [`PHASE_HISTORY.md`](./PHASE_HISTORY.md) — chronological delivery history.
+7. [`engineering/ARCHITECTURE.md`](./engineering/ARCHITECTURE.md) — current implemented system architecture and boundaries.
+8. [`engineering/COMPONENTS.md`](./engineering/COMPONENTS.md) — mobile/backend component responsibility map.
+9. [`engineering/DATABASE.md`](./engineering/DATABASE.md) — database, ledger and migration rules.
+10. [`engineering/CODING_STANDARDS.md`](./engineering/CODING_STANDARDS.md) — TypeScript/Go/SQL implementation standards.
+11. [`engineering/DEPENDENCIES.md`](./engineering/DEPENDENCIES.md) — dependency and lockfile change control.
+12. [`engineering/GIT_WORKFLOW.md`](./engineering/GIT_WORKFLOW.md) — branch/commit/PR workflow.
+13. [`quality/TESTING.md`](./quality/TESTING.md) — testing strategy, commands, baseline and regression rules.
+14. [`project/TECH_DEBT.md`](./project/TECH_DEBT.md) and [`project/RISKS.md`](./project/RISKS.md) — known debt and risk register.
+15. [`VANTA_PROJECT_CONTEXT.md`](./VANTA_PROJECT_CONTEXT.md) — recoverable historical/project context and permanent background.
+16. [`VANTA_PRODUCT_BUSINESS_STRATEGY.md`](./VANTA_PRODUCT_BUSINESS_STRATEGY.md) — strategic product/business/game-economics/regulatory direction.
+17. [`ROADMAP.md`](./ROADMAP.md) — sequenced technical, security, regulatory and commercial execution.
+18. Relevant detailed domain documentation under `product/`, `security/`, `architecture/` and `release/`.
+19. [`PHASE_HISTORY.md`](./PHASE_HISTORY.md) — chronological delivery history.
 
 For small scoped tasks, do not mechanically reread every document. Read the minimum relevant context required by `AGENTS.md`.
 
@@ -36,6 +43,20 @@ For small scoped tasks, do not mechanically reread every document. Read the mini
 - [`project/BACKLOG.md`](./project/BACKLOG.md) — actionable prioritized work.
 - [`project/TECH_DEBT.md`](./project/TECH_DEBT.md) — debt register; discovery does not imply immediate refactor.
 - [`project/RISKS.md`](./project/RISKS.md) — technical/security/product/operations risk register.
+
+## Engineering and quality
+
+Canonical engineering summaries:
+
+- [`engineering/ARCHITECTURE.md`](./engineering/ARCHITECTURE.md) — real current architecture, trust/persistence/environment boundaries and change rules.
+- [`engineering/COMPONENTS.md`](./engineering/COMPONENTS.md) — logical mobile/backend modules and responsibility boundaries.
+- [`engineering/DATABASE.md`](./engineering/DATABASE.md) — PostgreSQL/Redis authority, schema domains, ledger invariants and migration policy.
+- [`engineering/CODING_STANDARDS.md`](./engineering/CODING_STANDARDS.md) — implementation conventions for TypeScript/React Native, Go and SQL.
+- [`engineering/DEPENDENCIES.md`](./engineering/DEPENDENCIES.md) — dependency evaluation, pinned toolchain and lockfile policy.
+- [`engineering/GIT_WORKFLOW.md`](./engineering/GIT_WORKFLOW.md) — simple solo-project Git/PR workflow and release relationship.
+- [`quality/TESTING.md`](./quality/TESTING.md) — risk-based testing strategy and evidence rules.
+
+Detailed/historical architecture records remain under `architecture/`; the engineering files above summarize the current canonical operating model rather than deleting those records.
 
 ## Product experience standards
 
@@ -65,9 +86,9 @@ Phase 20 is in PR #24 on `feat/phase20-native-builds`.
 - [`release/phase20-troubleshooting-and-findings.md`](./release/phase20-troubleshooting-and-findings.md) — real failures encountered during Windows/Android testing and fixes.
 - [`release/versioning-and-release-governance.md`](./release/versioning-and-release-governance.md) — SemVer/build/tag/changelog/release rules.
 
-## Architecture records
+## Detailed architecture records
 
-Current key architecture references:
+Current detailed references:
 - [`architecture/README.md`](./architecture/README.md)
 - [`architecture/backend-runtime-phase17.md`](./architecture/backend-runtime-phase17.md)
 - [`architecture/mobile-backend-integration.md`](./architecture/mobile-backend-integration.md)
@@ -81,13 +102,13 @@ When two sources conflict, use this precedence:
 
 1. Current code/migrations/tests on the branch intentionally being developed for implementation truth.
 2. Root `AGENTS.md` for stable operating/safety/development rules.
-3. `docs/product/PROJECT.md`, `docs/product/MVP.md`, `docs/product/REQUIREMENTS.md` and `docs/project/STATUS.md` for current product/project definition and state.
+3. Current product/project/engineering/quality canonical records for present scope, state and engineering rules.
 4. Current `main` for last completed/merged repository state.
 5. `docs/VANTA_PROJECT_CONTEXT.md` for recoverable context/background.
 6. Current dated context checkpoint for an in-progress phase.
 7. `docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md` for strategic intent.
 8. `docs/ROADMAP.md` for sequenced future execution.
-9. Current domain-specific specs (`docs/security/`, `docs/product/`, current architecture/release specs).
+9. Current detailed domain specs (`docs/security/`, `docs/product/`, `docs/architecture/`, `docs/release/`).
 10. `docs/PHASE_HISTORY.md` and older ADR/bootstrap/historical planning evidence.
 
 A branch document may intentionally describe in-progress state newer than `main`; it must not be confused with already-merged production truth.
@@ -115,7 +136,7 @@ Player-facing copy and developer documentation are different things.
 
 - App UI: simple language about actions, status, safety and required legal disclosure.
 - Product docs: scope, requirements, interaction/visual/content intent and acceptance criteria.
-- Engineering docs: server authority, ledger, settlement, APIs, threat models and implementation detail.
+- Engineering docs: server authority, ledger, APIs, persistence and implementation boundaries.
 - Security/math/risk docs: invariants, evidence requirements, failure modes, simulation and production gates.
 - Audit/regulatory evidence: enough detail for verification.
 
