@@ -1,21 +1,22 @@
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { kycEn, kycEs, kycPtBR, type KycTranslationKey } from './kycTranslations';
 import { detectDeviceLocale, isSupportedLocale, type SupportedLocale } from './localePolicy';
 import { productEn, productEs, productPtBR, type ProductTranslationKey } from './productTranslations';
 import { securityEn, securityEs, securityPtBR, type SecurityTranslationKey } from './securityTranslations';
 import { en, es, ptBR, type TranslationKey } from './translations';
 
 export type { SupportedLocale } from './localePolicy';
-export type AppTranslationKey = TranslationKey | ProductTranslationKey | SecurityTranslationKey;
+export type AppTranslationKey = TranslationKey | ProductTranslationKey | SecurityTranslationKey | KycTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
 
 const STORAGE_KEY = 'vanta.locale.v1';
 const dictionaries: Record<SupportedLocale, AppTranslationDictionary> = {
-  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR },
-  en: { ...en, ...productEn, ...securityEn },
-  es: { ...es, ...productEs, ...securityEs },
+  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR, ...kycPtBR },
+  en: { ...en, ...productEn, ...securityEn, ...kycEn },
+  es: { ...es, ...productEs, ...securityEs, ...kycEs },
 };
 
 interface LocalizationContextValue {
