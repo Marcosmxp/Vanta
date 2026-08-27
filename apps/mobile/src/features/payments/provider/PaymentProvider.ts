@@ -19,6 +19,4 @@ export const disconnectedPaymentCapabilities: PaymentCapabilitySnapshot = {
   maxWithdrawalMinor: null,
   depositMethods: [],
   withdrawalMethods: [],
-  message:
-    'Pagamentos reais permanecem indisponíveis até que provider, ledger, KYC/AML, limites e idempotência estejam integrados.',
 };
