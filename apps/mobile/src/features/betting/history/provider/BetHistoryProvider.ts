@@ -14,5 +14,4 @@ export const disconnectedBetHistorySnapshot: BetHistorySnapshot = {
   availability: 'disconnected',
   items: [],
   nextCursor: null,
-  message: 'O histórico ficará disponível quando a sessão autenticada estiver ligada à API Vanta.',
 };
