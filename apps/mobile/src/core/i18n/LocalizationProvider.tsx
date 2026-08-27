@@ -3,18 +3,19 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 import { detectDeviceLocale, isSupportedLocale, type SupportedLocale } from './localePolicy';
 import { productEn, productEs, productPtBR, type ProductTranslationKey } from './productTranslations';
+import { securityEn, securityEs, securityPtBR, type SecurityTranslationKey } from './securityTranslations';
 import { en, es, ptBR, type TranslationKey } from './translations';
 
 export type { SupportedLocale } from './localePolicy';
-export type AppTranslationKey = TranslationKey | ProductTranslationKey;
+export type AppTranslationKey = TranslationKey | ProductTranslationKey | SecurityTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
 
 const STORAGE_KEY = 'vanta.locale.v1';
 const dictionaries: Record<SupportedLocale, AppTranslationDictionary> = {
-  'pt-BR': { ...ptBR, ...productPtBR },
-  en: { ...en, ...productEn },
-  es: { ...es, ...productEs },
+  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR },
+  en: { ...en, ...productEn, ...securityEn },
+  es: { ...es, ...productEs, ...securityEs },
 };
 
 interface LocalizationContextValue {
