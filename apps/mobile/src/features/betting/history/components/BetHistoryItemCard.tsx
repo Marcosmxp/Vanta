@@ -1,19 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { formatCurrencyMinor, formatDateTime, formatNumber, useI18n } from '../../../../core/i18n';
 import { Badge, Card, darkTheme } from '../../../../design-system';
 import type { BetHistoryItem, BetStatus } from '../types';
-import { formatBetDate, formatEuroMinor, formatMultiplierBps } from '../utils/formatting';
 
 export interface BetHistoryItemCardProps {
   bet: BetHistoryItem;
   onPress: () => void;
 }
-
-const statusLabels: Record<BetStatus, string> = {
-  accepted: 'Em processamento',
-  settled: 'Liquidada',
-  voided: 'Anulada',
-};
 
 const statusTones: Record<BetStatus, 'warning' | 'success' | 'neutral'> = {
   accepted: 'warning',
@@ -22,9 +16,20 @@ const statusTones: Record<BetStatus, 'warning' | 'success' | 'neutral'> = {
 };
 
 export function BetHistoryItemCard({ bet, onPress }: BetHistoryItemCardProps) {
+  const { locale, t } = useI18n();
+  const statusLabel = bet.status === 'accepted'
+    ? t('betting.status.accepted')
+    : bet.status === 'settled'
+      ? t('betting.status.settled')
+      : t('betting.status.voided');
+  const multiplier = bet.multiplierBps === null
+    ? '—'
+    : `${formatNumber(bet.multiplierBps / 10_000, locale, 2)}×`;
+  const placedAt = formatDateTime(bet.placedAt, locale) ?? t('betting.dateUnavailable');
+
   return (
     <Card
-      accessibilityLabel={`Abrir aposta ${bet.betId}`}
+      accessibilityLabel={`${t('betting.open')} ${bet.betId}`}
       elevated
       onPress={onPress}
       style={styles.card}
@@ -36,27 +41,27 @@ export function BetHistoryItemCard({ bet, onPress }: BetHistoryItemCardProps) {
             {bet.betId}
           </Text>
         </View>
-        <Badge label={statusLabels[bet.status]} tone={statusTones[bet.status]} />
+        <Badge label={statusLabel} tone={statusTones[bet.status]} />
       </View>
 
       <View style={styles.metricsRow}>
         <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Aposta</Text>
-          <Text style={styles.metricValue}>{formatEuroMinor(bet.stakeMinor)}</Text>
+          <Text style={styles.metricLabel}>{t('betting.metric.stake')}</Text>
+          <Text style={styles.metricValue}>{formatCurrencyMinor(bet.stakeMinor, bet.currency, locale)}</Text>
         </View>
         <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Multiplicador</Text>
-          <Text style={styles.metricValue}>{formatMultiplierBps(bet.multiplierBps)}</Text>
+          <Text style={styles.metricLabel}>{t('betting.metric.multiplier')}</Text>
+          <Text style={styles.metricValue}>{multiplier}</Text>
         </View>
         <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Retorno</Text>
+          <Text style={styles.metricLabel}>{t('betting.metric.payout')}</Text>
           <Text style={styles.metricValue}>
-            {bet.payoutMinor === null ? '—' : formatEuroMinor(bet.payoutMinor)}
+            {bet.payoutMinor === null ? '—' : formatCurrencyMinor(bet.payoutMinor, bet.currency, locale)}
           </Text>
         </View>
       </View>
 
-      <Text style={styles.timestamp}>{formatBetDate(bet.placedAt)}</Text>
+      <Text style={styles.timestamp}>{placedAt}</Text>
     </Card>
   );
 }
