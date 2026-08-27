@@ -18,12 +18,10 @@ export const disconnectedSecuritySnapshot: SecuritySnapshot = {
   availability: 'unavailable',
   mfaStatus: 'disabled',
   sessions: [],
-  message: 'O Security Center ficará disponível quando a sessão autenticada estiver ligada à API.',
 };
 
 export const disconnectedSecurityCapabilities: SecurityCapabilities = {
   canRevokeSession: false,
   canRevokeOtherSessions: false,
   canBeginMfaEnrollment: false,
-  message: 'Ações de segurança permanecem bloqueadas sem coordenação server-side.',
 };
