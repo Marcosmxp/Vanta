@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, darkTheme } from '../../../design-system';
-import type { MfaStatus, SecurityCapabilities, SecuritySnapshot } from '../types';
+import type { SecurityCapabilities, SecuritySnapshot } from '../types';
 
 export interface SecurityStatusCardProps {
   snapshot: SecuritySnapshot;
@@ -10,58 +11,63 @@ export interface SecurityStatusCardProps {
   onRevokeOtherSessions?: () => void;
 }
 
-const mfaLabel: Record<MfaStatus, string> = {
-  disabled: 'MFA desativado',
-  enabled: 'MFA ativo',
-  required: 'MFA obrigatório',
-};
-
 export function SecurityStatusCard({
   snapshot,
   capabilities,
   onBeginMfaEnrollment,
   onRevokeOtherSessions,
 }: SecurityStatusCardProps) {
+  const { t } = useI18n();
   const activeSessions = snapshot.sessions.filter((session) => session.status === 'active').length;
   const unrecognized = snapshot.sessions.filter((session) => session.trust === 'unrecognized').length;
+  const availabilityLabel = snapshot.availability === 'ready'
+    ? t('security.availability.ready')
+    : snapshot.availability === 'restricted'
+      ? t('security.availability.restricted')
+      : t('security.availability.unavailable');
+  const mfaLabel = snapshot.mfaStatus === 'enabled'
+    ? t('security.mfa.enabled')
+    : snapshot.mfaStatus === 'required'
+      ? t('security.mfa.required')
+      : t('security.mfa.disabled');
 
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
         <View style={styles.copy}>
-          <Text style={styles.eyebrow}>PROTEÇÃO DA CONTA</Text>
-          <Text style={styles.title}>Segurança centralizada</Text>
+          <Text style={styles.eyebrow}>{t('security.status.eyebrow')}</Text>
+          <Text style={styles.title}>{t('security.status.title')}</Text>
         </View>
         <Badge
-          label={snapshot.availability === 'ready' ? 'Online' : snapshot.availability === 'restricted' ? 'Restrito' : 'Offline'}
+          label={availabilityLabel}
           tone={snapshot.availability === 'ready' ? 'success' : snapshot.availability === 'restricted' ? 'warning' : 'neutral'}
         />
       </View>
 
       <View style={styles.metrics}>
         <View style={styles.metric}>
-          <Text style={styles.metricValue}>{mfaLabel[snapshot.mfaStatus]}</Text>
-          <Text style={styles.metricLabel}>Autenticação forte</Text>
+          <Text style={styles.metricValue}>{mfaLabel}</Text>
+          <Text style={styles.metricLabel}>{t('security.metric.mfa')}</Text>
         </View>
         <View style={styles.metric}>
           <Text style={styles.metricValue}>{activeSessions}</Text>
-          <Text style={styles.metricLabel}>Sessões ativas</Text>
+          <Text style={styles.metricLabel}>{t('security.metric.activeSessions')}</Text>
         </View>
         <View style={styles.metric}>
           <Text style={styles.metricValue}>{unrecognized}</Text>
-          <Text style={styles.metricLabel}>Dispositivos não reconhecidos</Text>
+          <Text style={styles.metricLabel}>{t('security.metric.unrecognizedDevices')}</Text>
         </View>
       </View>
 
       <View style={styles.actions}>
         <Button
-          label={snapshot.mfaStatus === 'enabled' ? 'MFA já ativo' : 'Configurar MFA'}
+          label={snapshot.mfaStatus === 'enabled' ? t('security.action.mfaActive') : t('security.action.configureMfa')}
           fullWidth
           disabled={!capabilities.canBeginMfaEnrollment || snapshot.mfaStatus === 'enabled'}
           onPress={onBeginMfaEnrollment}
         />
         <Button
-          label="Encerrar outras sessões"
+          label={t('security.action.revokeOthers')}
           variant="secondary"
           fullWidth
           disabled={!capabilities.canRevokeOtherSessions}
@@ -69,9 +75,7 @@ export function SecurityStatusCard({
         />
       </View>
 
-      <Text style={styles.note}>
-        {capabilities.message ?? 'Alterações de segurança só são confirmadas depois da resposta autoritativa do servidor.'}
-      </Text>
+      <Text style={styles.note}>{t('security.note')}</Text>
     </Card>
   );
 }
