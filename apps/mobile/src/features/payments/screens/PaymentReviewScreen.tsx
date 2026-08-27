@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { formatCurrencyMinor, useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, darkTheme } from '../../../design-system';
 import type { PaymentFlowKind } from '../types';
-import { formatEuroMinor } from '../utils/money';
 
 export interface PaymentReviewScreenProps {
   kind: PaymentFlowKind;
@@ -22,42 +22,48 @@ export function PaymentReviewScreen({
   onConfirm,
   onEdit,
 }: PaymentReviewScreenProps) {
+  const { locale, t } = useI18n();
   const isDeposit = kind === 'deposit';
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Badge label="Revisão" tone="brand" />
-          <Text style={styles.title}>{isDeposit ? 'Confirmar depósito' : 'Confirmar levantamento'}</Text>
-          <Text style={styles.subtitle}>
-            Verifique os dados antes de enviar a intenção ao backend. Nenhum saldo é alterado nesta tela.
+          <Badge label={t('payment.review.badge')} tone="brand" />
+          <Text style={styles.title}>
+            {isDeposit ? t('payment.review.depositTitle') : t('payment.review.withdrawalTitle')}
           </Text>
+          <Text style={styles.subtitle}>{t('payment.review.subtitle')}</Text>
         </View>
 
         <Card style={styles.card}>
-          <Row label="Operação" value={isDeposit ? 'Depósito' : 'Levantamento'} />
-          <Row label="Montante" value={formatEuroMinor(amountMinor)} />
-          <Row label="Método" value={methodLabel} />
-          <Row label="Moeda" value="EUR" />
+          <Row
+            label={t('payment.review.operation')}
+            value={isDeposit ? t('payment.review.deposit') : t('payment.review.withdrawal')}
+          />
+          <Row label={t('payment.review.amount')} value={formatCurrencyMinor(amountMinor, 'EUR', locale)} />
+          <Row label={t('payment.review.method')} value={methodLabel} />
+          <Row label={t('payment.review.currency')} value="EUR" />
         </Card>
 
         <Card style={styles.noticeCard}>
-          <Text style={styles.noticeTitle}>Validação obrigatória no servidor</Text>
-          <Text style={styles.noticeText}>
-            A operação só pode avançar após autenticação, ownership da carteira, KYC/AML, jurisdição, limites, idempotência e regras do provider.
-          </Text>
+          <Text style={styles.noticeTitle}>{t('payment.review.noticeTitle')}</Text>
+          <Text style={styles.noticeText}>{t('payment.review.noticeText')}</Text>
         </Card>
 
         <View style={styles.actions}>
           <Button
-            label={isDeposit ? 'Confirmar depósito' : 'Confirmar levantamento'}
+            label={
+              isDeposit ? t('payment.review.confirmDeposit') : t('payment.review.confirmWithdrawal')
+            }
             fullWidth
             loading={submitting}
             disabled={!onConfirm}
             onPress={onConfirm}
           />
-          {onEdit ? <Button label="Editar" variant="secondary" fullWidth onPress={onEdit} /> : null}
+          {onEdit ? (
+            <Button label={t('payment.review.edit')} variant="secondary" fullWidth onPress={onEdit} />
+          ) : null}
         </View>
       </View>
     </SafeAreaView>
