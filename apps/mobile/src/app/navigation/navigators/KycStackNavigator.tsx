@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n } from '../../../core/i18n';
 import { useSession } from '../../../core/session/SessionProvider';
 import { SystemState, darkTheme } from '../../../design-system';
 import { createApiKycStatusProvider } from '../../../features/kyc/provider/ApiKycStatusProvider';
@@ -38,6 +39,7 @@ function initialRoute(status: KycStatus): keyof KycStackParamList {
 }
 
 export function KycStackNavigator() {
+  const { t } = useI18n();
   const { request } = useSession();
   const provider = createApiKycStatusProvider(request);
   const statusQuery = useQuery({
@@ -50,8 +52,8 @@ export function KycStackNavigator() {
       <SafeAreaView style={{ flex: 1, backgroundColor: darkTheme.colors.background.app }}>
         <SystemState
           kind="loading"
-          title="A confirmar estado de verificação"
-          description="O estado KYC é carregado da API autenticada antes de apresentar o fluxo."
+          title={t('kyc.nav.loadingTitle')}
+          description={t('kyc.nav.loadingDescription')}
         />
       </SafeAreaView>
     );
@@ -62,8 +64,8 @@ export function KycStackNavigator() {
       <SafeAreaView style={{ flex: 1, backgroundColor: darkTheme.colors.background.app }}>
         <SystemState
           kind="error"
-          title="Verificação indisponível"
-          description={statusQuery.error instanceof Error ? statusQuery.error.message : 'Não foi possível confirmar o estado KYC.'}
+          title={t('kyc.nav.unavailableTitle')}
+          description={t('kyc.nav.unavailableDescription')}
         />
       </SafeAreaView>
     );
@@ -82,30 +84,30 @@ export function KycStackNavigator() {
         contentStyle: { backgroundColor: darkTheme.colors.background.app },
       }}
     >
-      <Stack.Screen name="Intro" component={KycIntroScreen} options={{ title: 'Verificação' }} />
-      <Stack.Screen name="DocumentType" component={KycDocumentTypeScreen} options={{ title: 'Documento' }} />
+      <Stack.Screen name="Intro" component={KycIntroScreen} options={{ title: t('kyc.nav.intro') }} />
+      <Stack.Screen name="DocumentType" component={KycDocumentTypeScreen} options={{ title: t('kyc.nav.document') }} />
       <Stack.Screen
         name="DocumentCapture"
         component={KycDocumentCaptureScreen}
-        options={{ title: 'Captura do documento' }}
+        options={{ title: t('kyc.nav.capture') }}
       />
-      <Stack.Screen name="Selfie" component={KycSelfieScreen} options={{ title: 'Confirmação facial' }} />
+      <Stack.Screen name="Selfie" component={KycSelfieScreen} options={{ title: t('kyc.nav.selfie') }} />
       <Stack.Screen
         name="Processing"
         component={KycProcessingScreen}
-        options={{ title: 'Em análise', gestureEnabled: false, headerBackVisible: false }}
+        options={{ title: t('kyc.nav.processing'), gestureEnabled: false, headerBackVisible: false }}
       />
       <Stack.Screen
         name="Approved"
         component={KycApprovedScreen}
-        options={{ title: 'Verificado', gestureEnabled: false, headerBackVisible: false }}
+        options={{ title: t('kyc.nav.approved'), gestureEnabled: false, headerBackVisible: false }}
       />
       <Stack.Screen
         name="Rejected"
         component={KycRejectedScreen}
-        options={{ title: 'Verificação', gestureEnabled: false, headerBackVisible: false }}
+        options={{ title: t('kyc.nav.rejected'), gestureEnabled: false, headerBackVisible: false }}
       />
-      <Stack.Screen name="Retry" component={KycRetryScreen} options={{ title: 'Nova tentativa' }} />
+      <Stack.Screen name="Retry" component={KycRetryScreen} options={{ title: t('kyc.nav.retry') }} />
     </Stack.Navigator>
   );
 }
