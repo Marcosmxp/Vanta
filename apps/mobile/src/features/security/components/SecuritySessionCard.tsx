@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useI18n } from '../../../core/i18n';
 import { Badge, Card, darkTheme } from '../../../design-system';
 import type { SecuritySession } from '../types';
 
@@ -9,15 +10,20 @@ export interface SecuritySessionCardProps {
 }
 
 export function SecuritySessionCard({ session, onPress }: SecuritySessionCardProps) {
+  const { t } = useI18n();
   const tone = session.current ? 'brand' : session.trust === 'unrecognized' ? 'warning' : 'neutral';
   const statusLabel = session.current
-    ? 'Este dispositivo'
+    ? t('security.session.current')
     : session.trust === 'unrecognized'
-      ? 'Não reconhecido'
-      : 'Reconhecido';
+      ? t('security.session.unrecognized')
+      : t('security.session.recognized');
 
   return (
-    <Card onPress={onPress} accessibilityLabel={`Abrir sessão ${session.deviceLabel}`} style={styles.card}>
+    <Card
+      onPress={onPress}
+      accessibilityLabel={`${t('security.session.open')} ${session.deviceLabel}`}
+      style={styles.card}
+    >
       <View style={styles.header}>
         <View style={styles.copy}>
           <Text style={styles.title}>{session.deviceLabel}</Text>
@@ -27,9 +33,9 @@ export function SecuritySessionCard({ session, onPress }: SecuritySessionCardPro
       </View>
 
       <View style={styles.details}>
-        <Text style={styles.detail}>{session.countryCode ?? 'Localização protegida'}</Text>
-        <Text style={styles.detail}>{session.ipMasked ?? 'IP protegido'}</Text>
-        <Text style={styles.detail}>Última atividade: {session.lastSeenAt}</Text>
+        <Text style={styles.detail}>{session.countryCode ?? t('security.session.locationProtected')}</Text>
+        <Text style={styles.detail}>{session.ipMasked ?? t('security.session.ipProtected')}</Text>
+        <Text style={styles.detail}>{t('security.session.lastActivity')}: {session.lastSeenAt}</Text>
       </View>
     </Card>
   );
