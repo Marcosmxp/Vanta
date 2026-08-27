@@ -40,15 +40,31 @@ export function MainStackNavigator() {
       }}
     >
       <Stack.Screen name="Tabs" component={MainTabsNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="BetHistory" component={BetHistoryRouteScreen} options={{ title: 'Apostas' }} />
-      <Stack.Screen name="BetDetails" component={BetDetailsRouteScreen} options={{ title: 'Detalhe da aposta' }} />
+      <Stack.Screen
+        name="BetHistory"
+        component={BetHistoryRouteScreen}
+        options={{ title: t('betting.nav.history') }}
+      />
+      <Stack.Screen
+        name="BetDetails"
+        component={BetDetailsRouteScreen}
+        options={{ title: t('betting.nav.details') }}
+      />
       <Stack.Screen
         name="WalletTransactionDetails"
         component={WalletTransactionDetailsRouteScreen}
         options={{ title: 'Detalhe do movimento' }}
       />
-      <Stack.Screen name="Deposit" component={DepositRouteScreen} options={{ title: 'Depositar' }} />
-      <Stack.Screen name="Withdrawal" component={WithdrawalRouteScreen} options={{ title: 'Levantar' }} />
+      <Stack.Screen
+        name="Deposit"
+        component={DepositRouteScreen}
+        options={{ title: t('payment.nav.deposit') }}
+      />
+      <Stack.Screen
+        name="Withdrawal"
+        component={WithdrawalRouteScreen}
+        options={{ title: t('payment.nav.withdrawal') }}
+      />
       <Stack.Screen name="SecurityCenter" component={SecurityCenterRouteScreen} options={{ title: t('security.nav.title') }} />
       <Stack.Screen
         name="SecuritySessionDetails"
