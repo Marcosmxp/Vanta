@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { useI18n } from '../../../core/i18n';
 import { darkTheme } from '../../../design-system';
 import { BetDetailsRouteScreen } from '../screens/BetDetailsRouteScreen';
 import { BetHistoryRouteScreen } from '../screens/BetHistoryRouteScreen';
@@ -26,6 +27,8 @@ import { MainTabsNavigator } from './MainTabsNavigator';
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export function MainStackNavigator() {
+  const { t } = useI18n();
+
   return (
     <Stack.Navigator
       initialRouteName="Tabs"
@@ -46,11 +49,11 @@ export function MainStackNavigator() {
       />
       <Stack.Screen name="Deposit" component={DepositRouteScreen} options={{ title: 'Depositar' }} />
       <Stack.Screen name="Withdrawal" component={WithdrawalRouteScreen} options={{ title: 'Levantar' }} />
-      <Stack.Screen name="SecurityCenter" component={SecurityCenterRouteScreen} options={{ title: 'Segurança' }} />
+      <Stack.Screen name="SecurityCenter" component={SecurityCenterRouteScreen} options={{ title: t('security.nav.title') }} />
       <Stack.Screen
         name="SecuritySessionDetails"
         component={SecuritySessionDetailsRouteScreen}
-        options={{ title: 'Detalhe da sessão' }}
+        options={{ title: t('security.nav.sessionDetails') }}
       />
       <Stack.Screen
         name="ResponsibleGaming"
