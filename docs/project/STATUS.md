@@ -1,6 +1,6 @@
 # Vanta — Project Status
 
-**Last updated:** 2026-08-26  
+**Last updated:** 2026-08-27  
 **Current controlled release:** `0.1.0-alpha.1`  
 **Current milestone:** Phase 20 — Native MVP Builds and Device Validation  
 **Active branch/PR:** `feat/phase20-native-builds` / PR #24
@@ -65,6 +65,8 @@ The active `main` ruleset requires pull requests and the five repository/securit
 - Home/Profile/Wallet integration;
 - Wallet/Legal/Support/Responsible Gaming null-collection crash fixes plus regression-test coverage;
 - force-close/reopen SecureStore session persistence evidence;
+- physical Android silent-refresh evidence with three consecutive refresh rotations and no visible re-login (`AUTH-REFRESH-001`);
+- physical Android remote-session-revocation fail-closed evidence, including explicit re-authentication gate and return to introduction/auth flow (`AUTH-REVOCATION-002`);
 - player-facing localization foundation (`pt-BR`, `en`, `es`) and locale-policy tests;
 - localization of core player journeys in progress;
 - navbar icon/motion foundation;
@@ -77,8 +79,6 @@ The active `main` ruleset requires pull requests and the five repository/securit
 ## In progress
 
 - complete product copy/localization cleanup across remaining screens;
-- verify true silent access-token refresh with protected request after access expiry;
-- remote session revocation/expiry evidence;
 - final native icon/splash/launch experience;
 - broader accessibility/native layout validation;
 - Legal Center completeness/content review;
@@ -108,7 +108,7 @@ Open P1/P2 work is tracked in `BACKLOG.md`, `TECH_DEBT.md`, `RISKS.md`, `quality
 
 ## Next priorities
 
-1. finish Phase 20 session evidence and product/native polish gates;
+1. finish remaining Phase 20 product/native polish and release-evidence gates;
 2. complete iOS build-path evidence;
 3. continue critical mobile regression coverage without broad test-framework churn;
 4. keep CI/CodeQL/native build green;
