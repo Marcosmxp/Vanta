@@ -6,20 +6,71 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
+  repository:
+    name: Repository hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Validate changed-file whitespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
+          else
+            before='${{ github.event.before }}'
+            if [ -n "$before" ] && [ "$before" != '0000000000000000000000000000000000000000' ]; then
+              range="$before...${{ github.sha }}"
+            else
+              range="HEAD^...HEAD"
+            fi
+          fi
+
+          # Markdown commonly uses two trailing spaces as an intentional hard line break.
+          # Keep whitespace enforcement for code/config while avoiding false failures in docs.
+          git diff --check "$range" -- . ':(exclude,glob)**/*.md' ':(exclude,glob)*.md'
+
+      - name: Reject tracked secret-like files
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          while IFS= read -r path; do
+            case "$path" in
+              .env.example|*/.env.example)
+                continue
+                ;;
+              .env|*/.env|.env.*|*/.env.*|*.pem|*.key|*.p12|*.pfx|*.jks|*.keystore)
+                printf 'Forbidden secret-like tracked file: %s\n' "$path"
+                failed=1
+                ;;
+            esac
+          done < <(git ls-files)
+          exit "$failed"
+
   mobile:
     name: Mobile validation
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22.13.0'
 
@@ -32,8 +83,13 @@ jobs:
           npm --version
           pnpm --version
 
+      - name: Validate canonical release metadata
+        run: |
+          node scripts/sync-release-version.mjs --check
+          node scripts/validate-mobile-release-config.mjs
+
       - name: Install workspace dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Audit JavaScript dependencies
         run: pnpm audit --audit-level=high
@@ -41,7 +97,7 @@ jobs:
       - name: Typecheck mobile application
         run: pnpm mobile:typecheck
 
-      - name: Run mobile API boundary tests
+      - name: Run mobile tests
         run: pnpm mobile:test
 
       - name: Validate application Android bundle
@@ -85,10 +141,10 @@ jobs:
         working-directory: backend
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: '1.27.0'
           cache-dependency-path: backend/go.sum

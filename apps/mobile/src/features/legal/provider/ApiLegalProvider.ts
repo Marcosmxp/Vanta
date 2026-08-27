@@ -3,10 +3,26 @@ import type { SessionContextValue } from '../../../core/session/types';
 import type { LegalProvider } from './LegalProvider';
 import type { LegalDocumentDetail, LegalSnapshot } from '../types';
 
+function normalizeLegalSnapshot(snapshot: LegalSnapshot): LegalSnapshot {
+  return {
+    ...snapshot,
+    documents: Array.isArray(snapshot.documents) ? snapshot.documents : [],
+    regulatory: snapshot.regulatory
+      ? {
+          ...snapshot.regulatory,
+          licenseReferences: Array.isArray(snapshot.regulatory.licenseReferences)
+            ? snapshot.regulatory.licenseReferences
+            : [],
+        }
+      : null,
+  };
+}
+
 export function createApiLegalProvider(publicRequest: SessionContextValue['publicRequest']): LegalProvider {
   return {
     async getSnapshot(): Promise<LegalSnapshot> {
-      return publicRequest<LegalSnapshot>('/v1/legal');
+      const snapshot = await publicRequest<LegalSnapshot>('/v1/legal');
+      return normalizeLegalSnapshot(snapshot);
     },
     async getDocument(documentId: string): Promise<LegalDocumentDetail | null> {
       try {

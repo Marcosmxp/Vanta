@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 
+import { useI18n } from '../../../core/i18n';
 import { useSession } from '../../../core/session/SessionProvider';
 import { createApiBetHistoryProvider } from '../../../features/betting/history/provider/ApiBetHistoryProvider';
 import { disconnectedBetHistorySnapshot } from '../../../features/betting/history/provider/BetHistoryProvider';
@@ -10,6 +11,7 @@ import type { MainStackParamList } from '../types';
 type Props = NativeStackScreenProps<MainStackParamList, 'BetHistory'>;
 
 export function BetHistoryRouteScreen({ navigation }: Props) {
+  const { t } = useI18n();
   const { request } = useSession();
   const provider = createApiBetHistoryProvider(request);
   const historyQuery = useQuery({
@@ -20,10 +22,8 @@ export function BetHistoryRouteScreen({ navigation }: Props) {
   const snapshot = historyQuery.data ?? {
     ...disconnectedBetHistorySnapshot,
     message: historyQuery.isPending
-      ? 'A carregar o histórico autenticado.'
-      : historyQuery.error instanceof Error
-        ? historyQuery.error.message
-        : disconnectedBetHistorySnapshot.message,
+      ? t('betting.history.loading')
+      : t('betting.history.unavailableDescription'),
   };
 
   return (

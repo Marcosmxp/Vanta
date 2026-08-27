@@ -1,56 +1,132 @@
 # Vanta Security Policy
 
-Vanta is being designed as a security-sensitive financial/gaming system.
+Vanta is a security-sensitive financial/gaming system under active development.
 
 ## Core invariants
 
 - Mobile clients are untrusted.
-- Game outcomes are generated and settled server-side.
+- Game outcomes are generated, validated and settled server-side.
 - The database and ledger are never directly reachable from the mobile client.
 - No production secret belongs in source control or client bundles.
-- Every bet/payment mutation must support idempotent processing.
+- Every financial/game mutation must support idempotent processing.
 - Monetary history must be auditable and append-oriented.
-- Redis may support cache, rate limiting, and ephemeral coordination but is not a financial source of truth.
-- Route visibility is never authorization; player ownership and policy are enforced by the API.
+- PostgreSQL is canonical financial/regulatory truth.
+- Redis may support cache, rate limiting and ephemeral coordination but is not financial truth.
+- Route visibility is never authorization.
 - Refresh-token rotation must be atomic and replay-safe.
 - Responsible Gaming restrictions cannot be weakened by client state.
+- A player closing/minimizing/reopening the app should not require routine password login while a valid secure session exists.
+- Sensitive financial/security actions should use step-up authentication according to policy rather than forcing full login on every app open.
+- Operator economics must come from approved game mathematics and pre-action limits, never hidden user-specific outcome changes.
+
+## Untrusted-client model
+
+Assume released client code can be inspected, modified or automated. Therefore client compromise must not grant authority to change wallet balance, approve identity state, weaken Responsible Gaming controls, choose authoritative outcomes, change settlement, confirm payments, authorize withdrawals or access another player's records.
+
+Obfuscation may increase analysis cost but is not a trusted security boundary.
+
+## Session security
+
+Current foundations:
+- SecureStore mobile persistence;
+- short-lived access tokens;
+- rotating refresh tokens;
+- server-side token hashes;
+- replay/race detection;
+- server revocation;
+- authentication throttling.
+
+Expected normal UX:
+- minimize → session remains;
+- force-close/reopen → session restored;
+- access expiry → silent refresh;
+- revoked/expired refresh → authentication.
+
+Future production work:
+- explicit idle + absolute session lifetime;
+- MFA/passkeys;
+- device/new-login alerts;
+- step-up for withdrawals/security changes;
+- secure recovery;
+- policy-driven session revocation after password/security events.
+
+## Game/financial security
+
+Every production game action must validate authentication, authorization, identity/jurisdiction/Responsible Gaming policy, ruleset, balance and applicable risk limits before authoritative outcome generation and ledger settlement.
+
+Approved game configurations require versioned mathematics/risk metadata and immutable historical linkage.
+
+Positive house edge does not prove solvency. Bankroll, max payout, aggregate exposure, risk of ruin and tail behavior must be approved before production wager activation.
 
 ## Required verification
 
-Changes affecting authentication, authorization, financial state, Responsible Gaming, support ownership, KYC/payment boundaries or infrastructure must keep the security gates green. The standard PR gate includes:
+Changes affecting authentication, authorization, session persistence, financial state, game math, Responsible Gaming, support ownership, identity/payment boundaries or infrastructure must keep security gates green.
 
-- TypeScript and mobile API boundary tests;
-- Android application and Storybook exports;
-- JavaScript dependency audit;
-- Go module verification, `gofmt`, race-enabled tests and `go vet`;
+Standard PR gates include:
+- TypeScript/mobile boundary tests;
+- Android app/Storybook exports;
+- JS dependency audit;
+- Go module verification;
+- `gofmt`;
+- race-enabled tests;
+- `go vet`;
 - PostgreSQL/Redis integration security tests;
-- Go vulnerability scanning;
+- `govulncheck`;
 - API/container/Compose validation;
-- CodeQL for JavaScript/TypeScript and Go.
+- CodeQL JS/TS + Go.
 
-A green CI run is necessary but is not evidence of regulatory certification or authorization to process real money.
+A green CI run is necessary but is not evidence of regulatory certification.
+
+## Release/supply-chain requirements
+
+Before controlled production release:
+- exact version/build/Git provenance;
+- dependency lockfile committed;
+- frozen dependency installation;
+- production signing protected outside source;
+- secret scanning;
+- artifact inspection;
+- environment separation;
+- no debug-only production behavior;
+- HTTPS outside development.
+
+Planned hardening includes KMS/HSM, key rotation, platform device-attestation services, device-risk signals, controlled release signing, independent penetration testing and incident-response/revocation playbooks.
+
+See `docs/release/versioning-and-release-governance.md`.
 
 ## Repository hygiene
 
 Do not commit:
-
-- `.env` files containing real credentials;
-- signing keys or certificates;
-- payment/KYC provider secrets;
+- real `.env` credentials;
+- signing private keys/certificates;
+- payment/identity-provider secrets;
 - database passwords;
 - service-account files;
-- production exports or customer data;
-- access/refresh tokens, OTPs, recovery codes or authentication cookies;
-- raw KYC documents, selfies or support exports containing customer information.
+- production exports/customer data;
+- access/refresh tokens;
+- OTPs/recovery codes;
+- authentication cookies;
+- raw identity documents/selfies;
+- support exports with customer information.
 
-Use `.env.example` only for documented placeholder variables.
+Use `.env.example` only for documented placeholders.
 
 ## Production blockers
 
-Real-money operation must remain fail-closed until the applicable security and compliance dependencies are implemented and reviewed, including production payment/KYC providers, signed/replay-safe callbacks, step-up authentication where required, production key management, device attestation and final jurisdiction/regulatory controls.
+Production operation remains fail-closed until applicable dependencies are implemented/reviewed, including production identity/compliance providers, payments/reconciliation, replay-safe callbacks, MFA/passkey/step-up, device trust, production key management, approved game mathematics, exposure/bankroll controls, fraud/risk monitoring, final jurisdiction controls and independent security assessment.
 
-The current detailed residual-risk register is maintained under `docs/security/`.
+## Canonical security design references
+
+- `docs/security/README.md` — security documentation index.
+- `docs/security/phase19-security-audit.md` — latest completed audit/regression evidence.
+- `docs/security/phase20-security-architecture.md` — current trust model and production hardening plan.
+- `docs/security/session-device-security-roadmap.md` — persistent session, MFA/passkeys, step-up and device-trust policy.
+- `docs/architecture/game-math-financial-risk-engine.md` — RTP, variance, bankroll, exposure, risk-of-ruin and game-integrity architecture.
 
 ## Vulnerability reporting
 
-During private development, security findings should be tracked in a restricted channel rather than public GitHub issues when they expose exploitable implementation details. Reports should include affected boundary, reproducible evidence, impact, proposed remediation and validation status without embedding live credentials or customer data.
+During development, findings that expose exploitable implementation details should be tracked in a restricted channel rather than a public issue.
+
+Reports should contain the affected boundary, reproduction/evidence, impact, remediation and validation status without live credentials/customer data.
+
+For recurring non-sensitive runtime failures, use phase troubleshooting docs instead.

@@ -1,8 +1,11 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { releaseMetadata } from '../../../app/config/releaseMetadata';
+import { useI18n } from '../../../core/i18n';
 import { Badge, Button, SystemState, darkTheme } from '../../../design-system';
 import { ProfileIdentityCard } from '../components/ProfileIdentityCard';
+import { ProfileLanguageCard } from '../components/ProfileLanguageCard';
 import { ProfileMenuCard, type ProfileDestination } from '../components/ProfileMenuCard';
 import { ProfilePreferencesCard } from '../components/ProfilePreferencesCard';
 import { ProfileVerificationCard } from '../components/ProfileVerificationCard';
@@ -20,6 +23,7 @@ export function ProfileOverviewScreen({
   onOpenDestination,
   onSignOut,
 }: ProfileOverviewScreenProps) {
+  const { t } = useI18n();
   const ready = snapshot.availability === 'ready';
 
   return (
@@ -27,11 +31,9 @@ export function ProfileOverviewScreen({
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.headerCopy}>
-            <Text style={styles.eyebrow}>PERFIL</Text>
-            <Text style={styles.title}>A sua conta Vanta.</Text>
-            <Text style={styles.subtitle}>
-              Identidade, verificação e preferências apresentadas a partir do estado autenticado do servidor.
-            </Text>
+            <Text style={styles.eyebrow}>{t('profile.eyebrow')}</Text>
+            <Text style={styles.title}>{t('profile.title')}</Text>
+            <Text style={styles.subtitle}>{t('profile.subtitle')}</Text>
           </View>
           <Badge label="18+" tone="neutral" />
         </View>
@@ -45,78 +47,54 @@ export function ProfileOverviewScreen({
         ) : (
           <SystemState
             kind="error"
-            title="Perfil indisponível"
-            description={snapshot.message ?? 'Os dados da conta só serão apresentados depois de confirmados pela API autenticada.'}
+            title={t('profile.unavailableTitle')}
+            description={t('profile.unavailableDescription')}
           />
         )}
 
+        <ProfileLanguageCard />
         <ProfileMenuCard onOpenDestination={onOpenDestination} />
 
         <View style={styles.sessionSection}>
-          <Text style={styles.eyebrow}>SESSÃO</Text>
+          <Text style={styles.eyebrow}>{t('profile.session')}</Text>
           <Button
-            label="Terminar sessão"
+            label={t('profile.signOut')}
             variant="secondary"
             fullWidth
             disabled={!onSignOut}
             onPress={onSignOut}
           />
-          <Text style={styles.sessionNote}>
-            O logout real só será ativado quando o session coordinator puder revogar refresh tokens e encerrar a sessão no backend.
-          </Text>
+          <Text style={styles.sessionNote}>{t('profile.sessionNote')}</Text>
         </View>
 
-        <Text style={styles.footerNote}>
-          Dados legais completos, documentos KYC e segredos de autenticação não pertencem ao read model desta tela.
-        </Text>
+        <View style={styles.buildSection} accessibilityLabel={`Vanta ${releaseMetadata.releaseVersion}, build ${releaseMetadata.buildNumber}`}>
+          <Text style={styles.eyebrow}>{t('profile.about')}</Text>
+          <Text style={styles.buildVersion}>Vanta {releaseMetadata.releaseVersion}</Text>
+          <Text style={styles.buildMeta}>
+            Build {releaseMetadata.buildNumber} · {releaseMetadata.channel.toUpperCase()}
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: darkTheme.colors.background.app,
-  },
+  safeArea: { flex: 1, backgroundColor: darkTheme.colors.background.app },
   content: {
     paddingHorizontal: darkTheme.spacing.lg,
     paddingTop: darkTheme.spacing.lg,
     paddingBottom: darkTheme.spacing['4xl'],
     gap: darkTheme.spacing.xl,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: darkTheme.spacing.md,
-  },
-  headerCopy: {
-    flex: 1,
-    gap: darkTheme.spacing.sm,
-  },
-  eyebrow: {
-    ...darkTheme.typography.labelSmall,
-    color: darkTheme.colors.brand.primary,
-    letterSpacing: 1.3,
-  },
-  title: {
-    ...darkTheme.typography.heading1,
-    color: darkTheme.colors.text.primary,
-  },
-  subtitle: {
-    ...darkTheme.typography.bodyLarge,
-    color: darkTheme.colors.text.secondary,
-  },
-  sessionSection: {
-    gap: darkTheme.spacing.md,
-  },
-  sessionNote: {
-    ...darkTheme.typography.caption,
-    color: darkTheme.colors.text.secondary,
-  },
-  footerNote: {
-    ...darkTheme.typography.caption,
-    textAlign: 'center',
-    color: darkTheme.colors.text.disabled,
-  },
+  header: { flexDirection: 'row', alignItems: 'flex-start', gap: darkTheme.spacing.md },
+  headerCopy: { flex: 1, gap: darkTheme.spacing.sm },
+  eyebrow: { ...darkTheme.typography.labelSmall, color: darkTheme.colors.brand.primary, letterSpacing: 1.3 },
+  title: { ...darkTheme.typography.heading1, color: darkTheme.colors.text.primary },
+  subtitle: { ...darkTheme.typography.bodyLarge, color: darkTheme.colors.text.secondary },
+  sessionSection: { gap: darkTheme.spacing.md },
+  sessionNote: { ...darkTheme.typography.caption, color: darkTheme.colors.text.secondary },
+  buildSection: { alignItems: 'center', gap: darkTheme.spacing.xs },
+  buildVersion: { ...darkTheme.typography.bodyStrong, color: darkTheme.colors.text.primary },
+  buildMeta: { ...darkTheme.typography.caption, color: darkTheme.colors.text.disabled },
 });

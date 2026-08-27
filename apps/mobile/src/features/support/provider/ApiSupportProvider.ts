@@ -13,10 +13,20 @@ export const apiSupportCapabilities: SupportCapabilities = {
   message: 'Os pedidos são persistidos, cifrados e associados à conta autenticada pelo backend.',
 };
 
+function normalizeSupportSnapshot(snapshot: SupportSnapshot): SupportSnapshot {
+  return {
+    ...snapshot,
+    topics: Array.isArray(snapshot.topics) ? snapshot.topics : [],
+    channels: Array.isArray(snapshot.channels) ? snapshot.channels : [],
+    recentRequests: Array.isArray(snapshot.recentRequests) ? snapshot.recentRequests : [],
+  };
+}
+
 export function createApiSupportProvider(request: SessionContextValue['request']): SupportProvider {
   return {
     async getSnapshot(): Promise<SupportSnapshot> {
-      return request<SupportSnapshot>('/v1/support');
+      const snapshot = await request<SupportSnapshot>('/v1/support');
+      return normalizeSupportSnapshot(snapshot);
     },
     async getRequest(requestId: string): Promise<SupportRequestSummary | null> {
       try {

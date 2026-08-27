@@ -1,73 +1,100 @@
 # Vanta — Master Project Context
 
-**Purpose:** this file is the recoverable project memory for Vanta. A new ChatGPT/Codex session should be able to read this document and continue development without relying on old chat history.
+**Purpose:** recoverable project memory for Vanta. A new ChatGPT/Codex session should be able to read this file and continue without relying on old chat history.
 
-**Last consolidated:** 2026-08-24, immediately after Phase 19 was merged to `main`.
+**Last consolidated:** 2026-08-25 during Phase 20 on `feat/phase20-native-builds` / PR #24.
 
 ---
 
-## 1. Product identity
+## 1. Product identity and current state
 
 - Official product name: **Vanta**.
 - Repository: `Marcosmxp/Vanta`.
 - Default branch: `main`.
-- Product: native mobile betting/gaming platform under active development.
-- Current MVP target: **v0.0.0.1**.
-- First game: **Plinko**.
+- Active Phase 20 branch: `feat/phase20-native-builds`.
+- Active PR: **#24 — Native MVP Builds and Device Validation**.
+- Phases 01–19 are complete/merged on `main`.
+- Phase 20 is **IN PROGRESS** and is not yet safe to merge.
+- First Vanta Original: **Plinko**.
 - Possible later games: Crash, Mines, Dice and other server-authoritative games.
-- Current development goal: finish a secure native MVP foundation without pretending regulated real-money capabilities exist before their providers, controls and certifications are actually ready.
+- Product direction: premium mobile gaming product with fintech-grade financial UX and security, not a visually noisy generic casino.
+- Current regulated boundary: production game actions, live payment execution, production KYC upload/liveness, production MFA/step-up and licensing claims remain intentionally blocked.
 
-The former product name **AURABET** is obsolete. Any PDF, DOCX, screenshot or planning artifact using AURABET is historical unless explicitly migrated to Vanta.
+The former product name **AURABET** is obsolete. Historical files using that name do not override current Vanta documents.
+
+### Current native-version reality
+
+The repository currently has inconsistent version declarations:
+- `apps/mobile/app.json`: marketing version `0.0.1`, Android `versionCode: 1`, iOS `buildNumber: 1`;
+- root/mobile `package.json`: `0.0.0`.
+
+This is recognized technical debt. Release/version policy is now defined in `docs/release/versioning-and-release-governance.md`. Phase numbering is project management and must not be used as the software version.
 
 ---
 
-## 2. Permanent development rules
+## 2. Permanent engineering rules
 
-These decisions were established during the project and must be preserved unless deliberately changed by a later ADR:
+These rules remain in force unless explicitly replaced by an ADR:
 
-1. **Security is an architectural requirement from day one.**
+1. Security is an architectural requirement from day one.
 2. Mobile is always an **untrusted client**.
-3. Financial truth and game outcomes are **server-authoritative**.
-4. PostgreSQL is the canonical persistent source of truth for financial and regulated state.
-5. Redis is only for ephemeral/cache/rate-limit/coordination use; it must never become financial truth.
-6. No secrets, RNG secrets, privileged credentials, database credentials, PSP credentials or admin credentials belong in the client.
-7. No fabricated production financial state. Storybook fixtures are allowed only as isolated presentation fixtures.
-8. No local client state may approve authentication, KYC, MFA, Responsible Gaming protection, deposits, withdrawals, settlements or account privilege.
-9. Financial mutations require idempotency and auditable server-side processing.
-10. Route visibility is never authorization. Every server operation derives ownership from the authenticated principal.
-11. Commits, branches, files, modules, types and functions must use professional, descriptive names. Avoid ambiguous names such as `update`, `fix stuff`, `changes`, `helpers2`.
-12. Prefer free/open-source/local development tooling for the MVP. Paid Figma is not a dependency.
-13. Figma was explicitly abandoned as the primary workflow. Vanta uses **code-first design + Storybook**.
-14. Never claim a regulated capability, provider integration, license, successful payment or approved KYC state that does not actually exist.
-15. A phase is not complete until required CI/security gates are green and documentation is current.
+3. Financial truth and production game outcomes are **server-authoritative**.
+4. PostgreSQL is canonical persistent truth for financial/regulatory state.
+5. Redis is ephemeral only: cache, rate limiting and coordination; never financial truth.
+6. No production secret, authoritative game secret, privileged credential, database credential, provider credential or admin credential belongs in the client.
+7. No fabricated production financial/KYC/license state.
+8. Client state cannot approve authentication, KYC, MFA, Responsible Gaming, payments, settlement or account privilege.
+9. Financial mutation requires idempotency, transactional posting and auditability.
+10. Route visibility is not authorization; ownership is derived from the authenticated principal.
+11. Financial/game security must remain valid even if the released client is inspected, modified or automated.
+12. Commits, branches, files, types and modules use professional descriptive names and Conventional Commits.
+13. Code-first design + Storybook remains the primary workflow; paid Figma is not a dependency.
+14. A phase is not complete until required CI/security gates pass and documentation is current.
+15. No feature is called production-ready merely because its UI exists.
 
 ---
 
-## 3. Visual/product direction
+## 3. Product goals
 
-Vanta should feel like a premium financial product with gaming capability, not a cheap casino interface.
+### Primary goal
 
-### References used for product direction
+Build Vanta into a secure, trustworthy and commercially viable gaming platform whose user experience is simple while financial, security and regulatory complexity stays on the server.
 
-- Stake: Originals/game UX/Plinko patterns.
-- Betclic: mobile navigation.
-- DraftKings: wallet/account/product architecture.
-- FanDuel: betting interaction and bottom navigation patterns.
-- BetMGM: premium dark visual language.
-- Portuguese regulated operators such as Solverde.pt, Betano and ESC Online: KYC/deposit/wallet/compliance UX references.
+### Product objectives
 
-### Approved visual language
+- frictionless account/session experience;
+- premium, recognizable visual identity;
+- clear wallet and transaction experience;
+- server-authoritative games;
+- strong Responsible Gaming controls;
+- legal/regulatory transparency;
+- measurable unit economics;
+- controlled game mathematics and financial exposure;
+- reproducible releases with exact version/build provenance;
+- ability to expand jurisdiction by jurisdiction rather than pretending one authorization covers all markets.
 
+### Success principles
+
+- **player-facing copy explains what the user can do**, not internal architecture;
+- technical terms such as ledger, settlement, read model and server-authoritative belong in engineering/audit documentation except where legally required;
+- security controls should be strong without unnecessarily forcing repeated password login;
+- blocked capabilities should explain what is unavailable in plain language, not expose implementation details.
+
+---
+
+## 4. Visual and UX direction
+
+Approved visual language:
 - premium dark technological minimalism;
 - obsidian/graphite surfaces;
-- red accent;
-- fintech-style wallet and transaction treatment;
-- immersive game surface;
-- avoid excessive neon and cheap casino styling;
-- semantic green only for success;
-- bottom navigation: **Home / Jogar / Carteira / Perfil**, with Jogar emphasized.
+- Vanta red accent;
+- fintech-style wallet/account treatment;
+- immersive game surfaces;
+- restrained decorative assets;
+- avoid cheap neon/casino clutter;
+- semantic green only for positive/success state.
 
-### Approved palette
+Approved palette remains:
 
 ```text
 Background      #0B0D10
@@ -84,113 +111,156 @@ Warning         #FFB020
 Danger          #FF4D5A
 ```
 
-Typography direction: Inter/Geist-like, with tabular finance numbers.
+### Bottom navigation
 
-Phase 08 corrected earlier experimental reds. Approved red tokens must remain based on `#FF3B30` / `#D92D25` unless a deliberate design-system change is approved later.
-
----
-
-## 4. Repository shape
-
-Canonical monorepo structure:
+Canonical tabs remain:
 
 ```text
-Vanta/
-├── apps/
-│   ├── mobile/
-│   └── admin/
-├── backend/
-├── packages/
-├── contracts/
-├── infrastructure/
-├── docs/
-├── scripts/
-├── .github/workflows/
-├── .gitignore
-└── README.md
+Home / Jogar / Carteira / Perfil
 ```
 
-`apps/admin` is not the current MVP focus.
+New product decision:
+- use **icons + labels**, not text-only tabs;
+- active indicator/pill should animate between tabs;
+- icon/label feedback should be subtle and accessible;
+- `Jogar` may remain emphasized but must not visually overpower all other navigation.
+
+### Motion system
+
+Vanta should not feel static. Motion becomes a design-system concern:
+
+```text
+motion/
+├── durations
+├── easing
+├── screenTransitions
+├── bottomNavigation
+├── pressFeedback
+├── cards
+├── feedbackStates
+├── gameMotion
+└── reducedMotion
+```
+
+Guideline:
+- navigation: subtle and fast;
+- microinteractions: tactile, restrained;
+- game outcomes: more expressive;
+- reading/financial/legal decisions: minimal motion;
+- respect Android/iOS Reduce Motion preferences.
+
+Typical navigation motion target: approximately 200–300 ms with small fade/translation rather than large sliding effects.
+
+### Assets and branding
+
+The base UI is structurally good but still reads as prototype without brand assets. Add selectively:
+- final logo/app icon;
+- Android adaptive icon;
+- correct native splash;
+- game thumbnails/artwork;
+- onboarding/state illustrations where useful;
+- consistent icon family;
+- Vanta Original game assets.
+
+Do not add imagery merely to fill space.
+
+### App launch experience
+
+The generic/stretched Expo-looking startup experience is not acceptable for public UX.
+
+Desired flow:
+
+```text
+native Vanta splash
+→ short Vanta brand animation
+→ authenticated Home or Auth/Onboarding
+```
+
+Requirements:
+- native splash uses correct scaling and Vanta background;
+- no white flash, stretched artwork or technical Expo branding;
+- JS intro should be short (roughly 600–900 ms maximum) and must not delay the user unnecessarily;
+- session bootstrap can occur behind the launch transition;
+- Android system splash behavior must be respected.
 
 ---
 
 ## 5. Mobile architecture
 
-### Technology
-
-- React Native + TypeScript.
-- Expo.
-- React Navigation.
-- TanStack Query.
-- Zustand where local feature state is appropriate.
-- React Hook Form + Zod.
-- React Native Reanimated.
-- React Native Skia.
-- Expo SecureStore for sensitive session credentials.
-- MMKV only for non-sensitive local data when needed.
-- Storybook for code-first component and screen review.
-- Vitest for API/security boundary tests.
+Technology:
+- React Native + TypeScript;
+- Expo;
+- React Navigation;
+- TanStack Query;
+- React Hook Form + Zod;
+- React Native Reanimated;
+- React Native Skia;
+- Expo SecureStore;
+- Storybook;
+- Vitest.
 
 Sensitive tokens must remain in secure storage, not AsyncStorage/MMKV/navigation/logs/analytics.
 
-### Navigation shape
+Root state supports Auth, KYC, Main, SessionExpired, AccountBlocked and Maintenance.
 
-Root-level state supports:
-
-- Auth
-- KYC
-- Main
-- SessionExpired
-- AccountBlocked
-- Maintenance
-
-Main contains the tab shell plus typed stack destinations such as bet history/details, wallet transaction details, Security Center, Responsible Gaming, Support and Legal.
-
-Opaque IDs may be used in route params (`betId`, `transactionId`, `sessionId`, `requestId`, `documentId`). Full financial/security/KYC records must not be routed between screens.
+Opaque route IDs are permitted; full security/financial/KYC records must not be copied through navigation params.
 
 ---
 
-## 6. Backend architecture
+## 6. Session UX and authentication
 
-### Technology
+A player **must not be forced to log in again simply because the app was minimized, closed or restarted** while a valid session exists.
 
-- Go modular monolith.
-- REST HTTP APIs; WebSocket remains optional for future realtime game needs.
-- PostgreSQL.
-- Redis for ephemeral coordination/rate limiting/cache only.
-- Transactional Outbox foundation rather than Kafka in the MVP.
-- Docker for local/runtime packaging.
-- GitHub Actions for CI.
-- OpenTelemetry remains the observability direction.
-- Terraform/infrastructure-as-code remains the deployment direction.
-- Cloudflare may be used at the edge, but trusted-proxy policy must be explicit before production.
+Current implementation provides:
+- SecureStore session persistence;
+- short-lived access token;
+- rotating refresh token;
+- server-side token hashes;
+- replay/race detection;
+- remote session revocation;
+- single-flight refresh on mobile.
 
-### Domain boundaries
+Current default token TTLs:
+- access token: 15 minutes;
+- refresh token: 30 days.
 
-Current/target modules include:
+Required UX:
 
-- identity/auth
-- identity/security
-- player/profile
-- kyc
-- wallet
-- ledger
-- betting/history
-- games/plinko
-- payments
-- compliance/legal
-- responsiblegaming
-- support
-- platform/status
-- risk/fraud/notification/audit as later expansion areas
+```text
+minimize → return authenticated
+close app → reopen → restore session
+expired access token → silent refresh
+revoked/expired refresh → reauthenticate
+```
 
-Microservices are not required for the MVP. Keep the modular monolith unless actual scaling/operational evidence justifies decomposition.
+Sensitive operations should later use **step-up authentication**, not full password login on every app open. Candidate actions include withdrawal, password/email/phone changes, disabling MFA and changing payment destinations.
+
+Future security work should include passkeys/biometrics/MFA where appropriate. Biometric unlock may protect local access after inactivity, but does not replace server authorization.
 
 ---
 
-## 7. Financial architecture
+## 7. Backend architecture
 
-Canonical concepts:
+- Go modular monolith;
+- REST APIs; realtime only where justified;
+- PostgreSQL;
+- Redis ephemeral controls;
+- transactional outbox direction;
+- Docker;
+- GitHub Actions;
+- OpenTelemetry direction;
+- IaC/Terraform direction;
+- explicit trusted-proxy policy before reverse-proxy production deployment.
+
+Domain boundaries include identity/auth, identity/security, player/profile, KYC, wallet, ledger, betting/history, games/plinko, payments, compliance/legal, Responsible Gaming, support, platform/status and future risk/fraud/audit/notifications.
+
+Do not split into microservices without operational evidence.
+
+---
+
+## 8. Financial architecture
+
+Canonical financial concepts:
 
 ```text
 wallets
@@ -198,356 +268,313 @@ ledger_accounts
 ledger_transactions
 ledger_entries
 bets
-bet settlement state
+settlement state
 ```
 
-The ledger is immutable/double-entry style. Mutable `users.balance`-style fields are not acceptable as financial truth.
-
-Important invariants:
-
-- ledger entries must sum to zero per financial transaction;
-- financial posting is transactional;
-- wallet/player ownership is validated server-side;
-- idempotency is mandatory for financial command boundaries;
-- overspend is prevented under concurrent requests;
-- Redis never decides canonical balances;
-- payment-provider success alone must not directly mutate the wallet; reconciliation + ledger posting own the canonical effect.
-
-Phase 19 added concurrent overspend regression testing against real PostgreSQL.
+Rules:
+- immutable/double-entry-style ledger;
+- no mutable `users.balance` as financial truth;
+- entries balance per financial transaction;
+- ownership checked server-side;
+- posting is transactional;
+- idempotency at command boundaries;
+- concurrent overspend prevention;
+- provider success does not directly become canonical wallet balance;
+- reconciliation + ledger posting own final financial effect.
 
 ---
 
-## 8. Game architecture — Plinko
+## 9. Game mathematics and operator economics
 
-Plinko is completely **server-authoritative** by design.
+A core decision is that operator margin means **positive long-run mathematical expectation**, never user-specific outcome changes.
 
-Server responsibilities:
-
-1. authenticate and identify player;
-2. validate account/KYC/jurisdiction/Responsible Gaming state;
-3. validate the approved ruleset and stake;
-4. reserve/post money transactionally;
-5. generate outcome with CSPRNG;
-6. determine path/slot/multiplier/payout;
-7. settle through the ledger;
-8. persist bet/audit data;
-9. return the authorized result.
-
-Mobile responsibilities:
-
-- collect allowed stake/risk/row selection;
-- request the authorized action;
-- render/animate the result returned by the server;
-- refresh authoritative wallet/history state.
-
-The client must never generate the production RNG result or infer canonical payout.
-
-**Current boundary:** the visual Plinko foundation and backend engine exist, but no public production real-money bet-placement endpoint is exposed yet. This is intentional.
-
----
-
-## 9. Identity and session model
-
-Implemented runtime foundation includes:
-
-- registration and login backed by PostgreSQL;
-- bcrypt password hashing;
-- PII protection using AES-256-GCM;
-- deterministic lookup protection using HMAC-SHA256;
-- opaque access tokens with short lifetime;
-- opaque rotating refresh tokens stored server-side only as hashes;
-- session/device records;
-- revocation;
-- refresh replay/race detection;
-- Redis-backed authentication throttling;
-- SecureStore-backed mobile session persistence;
-- single-flight refresh coordination in the mobile client;
-- logout with remote revocation.
-
-Phase 19 hardened refresh rotation with an atomic compare-and-swap on expected token hash + generation and added a concurrent replay integration test.
-
-Rate limiting now normalizes `RemoteAddr` to canonical IP rather than using ephemeral TCP ports as part of the bucket key.
-
-Before Cloudflare/reverse-proxy deployment, a trusted-proxy policy must be designed so forwarding headers are accepted only from trusted proxy networks.
-
----
-
-## 10. KYC and compliance state
-
-Implemented:
-
-- KYC UX foundation;
-- KYC status model and PostgreSQL persistence;
-- mobile integration for status;
-- legal/privacy/regulatory surfaces;
-- versioned legal documents/read models;
-- operator/regulatory disclosure contracts;
-- explicit prevention of fabricated `licensed` state without configured operator/license references.
-
-Not implemented/open for production:
-
-- document upload provider;
-- camera/liveness provider;
-- signed KYC provider callbacks;
-- callback replay protection;
-- production verified-media handling;
-- final SRIJ licensing/certification;
-- final jurisdiction-specific legal approval.
-
-Vanta must never display an unverified claim that it is licensed for real-money operation.
-
----
-
-## 11. Payments
-
-Mobile deposit/withdraw flows and provider contracts exist. They provide amount/method/review/processing/result UX and Storybook states.
-
-Actual execution remains closed until there is a secure PSP integration.
-
-Required before opening real payment mutation:
-
-- authenticated server-side payment intents;
-- server-side limits/KYC/AML/jurisdiction/Responsible Gaming checks;
-- PSP tokenization/hosted SDK; Vanta must not store PAN/CVV;
-- withdrawal destination ownership;
-- signed webhooks;
-- webhook replay protection + idempotent processing;
-- reconciliation;
-- ledger posting as canonical financial effect;
-- fraud/risk controls;
-- approved withdrawal step-up/MFA policy.
-
----
-
-## 12. Responsible Gaming
-
-Implemented UI and server-backed state include:
-
-- deposit limits;
-- loss limits;
-- wager limits;
-- session-duration limits;
-- pending changes;
-- cooling-off/effective-at policy determined server-side;
-- time-out;
-- self-exclusion;
-- idempotent mutation commands;
-- mobile integration/refetch of authoritative state.
-
-There is no client command to end a time-out early or cancel self-exclusion. Protection enforcement must remain server-side and fail-closed.
-
----
-
-## 13. Support, Legal and regulatory information
-
-Support:
-
-- authenticated/player-scoped requests;
-- idempotent creation;
-- encrypted message bodies at rest;
-- ownership checks against IDOR;
-- request detail by opaque `requestId`.
-
-Legal:
-
-- public/read-only legal center;
-- versioned documents;
-- integrity metadata;
-- privacy/controller/regulator disclosure models;
-- no fabricated production channels/license/operator information.
-
-Sensitive content such as passwords, OTPs, tokens, recovery codes, PAN/CVV or raw KYC media must not be collected through support flows.
-
----
-
-## 14. System states
-
-Phase 16 introduced reusable application states:
-
-- Loading
-- Empty
-- Offline
-- Error
-- Maintenance
-
-Sensitive operations remain fail-closed during unavailable states. Maintenance is server/platform-controlled rather than a local client toggle.
-
----
-
-## 15. Runtime and environments
-
-Phase 17 established the executable backend runtime:
-
-- PostgreSQL migrations;
-- Redis connection;
-- Go API process;
-- Docker image;
-- Docker Compose development runtime;
-- `.env.example` including `EXPO_PUBLIC_VANTA_ENV=development`;
-- readiness/health endpoints;
-- platform status;
-- request IDs;
-- security headers/timeouts/recovery;
-- CI integration services for PostgreSQL and Redis.
-
-Docker is a development/server concern, never something installed on the mobile device.
-
-Development can continue through GitHub/CI without requiring the developer workstation to have Docker until local/device testing becomes necessary.
-
----
-
-## 16. Security posture after Phase 19
-
-Phase 19 is **COMPLETE / MERGED** in `main` at:
+For each game/ruleset:
 
 ```text
-b12c56928eba8e79f1c48a2361683e1e1746e224
+RTP = Σ(probability_i × payout_i)
+House Edge = 1 - RTP
 ```
 
-Validated/fixed issues:
+Requirements before production game activation:
+- theoretical RTP calculation;
+- payout table versioning;
+- volatility/variance model;
+- probability of extreme outcomes;
+- max bet and max payout;
+- bankroll model;
+- risk-of-ruin analysis;
+- aggregate exposure;
+- Monte Carlo/stress simulation;
+- confidence/tolerance checks against theoretical RTP;
+- immutable association between each historical result and exact ruleset/math version.
 
-1. **F19-001 High** — refresh-token rotation race/replay was made atomic.
-2. **F19-002 High** — authentication rate-limit buckets no longer include ephemeral source ports.
-3. **F19-003 Medium** — arbitrary panic values are no longer emitted in logs.
-4. **F19-004 Medium** — `TouchSession` timestamp comparison no longer relies on ambiguous PostgreSQL timestamp/interval parameter arithmetic.
-5. **F19-005 High** — reachable vulnerabilities identified by `govulncheck` were remediated by upgrading `github.com/jackc/pgx/v5` to `v5.9.2` and `golang.org/x/text` to `v0.39.0`; the module graph was normalized by `go mod tidy`.
+The result must never be changed after acceptance to protect operator exposure. Risk protection occurs **before acceptance** through limits/exposure controls.
 
-Security regression coverage includes:
+Low/medium/high risk modes may change distribution/variance while each has a deliberately approved RTP.
 
-- refresh replay concurrency;
-- ledger overspend concurrency;
-- Support IDOR;
-- Security Center cross-player revocation;
-- authentication throttling across changing TCP ports;
-- strict JSON/body limits;
-- server-generated request IDs;
-- production HTTP security headers;
-- sanitized panic responses;
-- mobile HTTPS configuration;
-- mobile API error/204/invalid-JSON behavior;
-- dependency audits and vulnerability scans.
+Game math configuration must go through calculation + simulation + review before production deployment.
 
-See `docs/security/phase19-security-audit.md` for the detailed record.
+---
+
+## 10. Plinko architecture
+
+Plinko remains server-authoritative.
+
+Server:
+1. authenticate player;
+2. verify account/KYC/jurisdiction/RG policy;
+3. verify ruleset/stake;
+4. evaluate exposure/limits;
+5. reserve funds transactionally;
+6. generate authoritative outcome;
+7. resolve slot/multiplier/payout;
+8. settle ledger;
+9. persist result/audit;
+10. return authorized result.
+
+Mobile:
+- collect allowed inputs;
+- request action;
+- animate returned result;
+- refresh authoritative wallet/history.
+
+Current boundary: visual Plinko exists and is validated on Android, but production game placement remains disabled.
+
+---
+
+## 11. Security posture
+
+Assume the released app can be inspected, modified and automated. Therefore compromising the client must not allow changes to balance, identity approval, Responsible Gaming controls, authoritative game outcome, settlement, payment confirmation, withdrawal authorization or another player's data.
+
+Implemented foundations include:
+- bcrypt password hashing;
+- AES-256-GCM PII encryption;
+- HMAC-SHA256 lookup protection;
+- cryptographically random opaque tokens;
+- server-side token hashes;
+- refresh rotation/replay protection;
+- rate limiting;
+- security headers;
+- SecureStore;
+- ownership checks;
+- CodeQL;
+- dependency audits;
+- race-enabled backend tests;
+- `go vet` and `govulncheck`.
+
+Before production, add/validate:
+- MFA/passkeys and recovery;
+- Play Integrity / App Attest;
+- device-risk signals;
+- step-up authentication;
+- KMS/HSM and key rotation;
+- supply-chain/release signing hardening;
+- immutable security/audit trails;
+- fraud/risk monitoring;
+- independent penetration test;
+- incident response and revocation playbooks.
+
+CI dependency installation should move to a committed lockfile + frozen installation for controlled production releases.
+
+---
+
+## 12. Legal, policy and regulatory UX
+
+Legal documents should be accessible **inside the app** through a Legal Center, while canonical versions may also live on the web/backend.
+
+Expected surfaces where applicable:
+- Terms and Conditions;
+- Privacy Policy;
+- Responsible Gaming policy;
+- KYC/identity information;
+- deposits/withdrawals policy;
+- game rules;
+- promotions/bonus rules;
+- account closure;
+- time-out/self-exclusion;
+- complaints/dispute resolution;
+- operator/support contact;
+- minors/18+ information;
+- data-protection rights;
+- verified operator/license/regulator details only when real.
+
+Do not overload Home/Wallet/Plinko with engineering text. Legal/compliance disclosures appear at the correct decision points.
+
+No unverified licensing claim is allowed.
+
+---
+
+## 13. Business strategy
+
+Vanta should not assume the correct first commercial model is immediately becoming a full multi-jurisdiction B2C operator.
+
+Strategic path to evaluate:
+
+```text
+A. Vanta Technology / Vanta Originals
+   → build game/platform technology
+
+B. B2B distribution
+   → supply games/technology to licensed operators
+
+C. one carefully selected B2C jurisdiction
+   → obtain required local authorization and operating stack
+
+D. jurisdiction-by-jurisdiction expansion
+   → reuse technology while keeping legal entities/licensing correct
+```
+
+Key business metrics:
+- GGR;
+- NGR;
+- deposit conversion;
+- retention D30/D90/D365;
+- CAC;
+- LTV;
+- LTV/CAC;
+- promo cost;
+- payment cost;
+- fraud loss;
+- gaming tax;
+- corporate tax;
+- contribution margin;
+- operational cost;
+- bankroll/exposure utilization.
+
+### Tax and asset-protection boundary
+
+Only **lawful** tax planning and asset protection are acceptable.
+
+Potential future group design may separate:
+- holding company;
+- technology/IP company;
+- licensed operating companies per jurisdiction;
+- investment/treasury vehicles where legally appropriate.
+
+Goals are liability isolation, governance, investment readiness and lawful tax efficiency — never concealment of beneficial ownership, income or assets.
+
+Every jurisdiction decision must be validated with specialist gaming, corporate and tax counsel. There is no assumption that one authorization automatically covers all European markets.
+
+---
+
+## 14. Release/version governance
+
+The project now requires:
+- SemVer product versions;
+- prerelease channels (`alpha`, `beta`, `rc`);
+- monotonically increasing Android `versionCode` and iOS `buildNumber`;
+- Git tags matching releases;
+- changelog/release notes;
+- build metadata containing version, build, commit SHA, date, environment/channel;
+- one canonical version source rather than several manually divergent values;
+- Conventional Commits and descriptive branches.
+
+See `docs/release/versioning-and-release-governance.md`.
+
+---
+
+## 15. Phase 20 live Android validation — 2026-08-25
+
+The physical-device flow was made operational on Windows/Android.
+
+Validated:
+- Docker Desktop/WSL2 backend runtime;
+- PostgreSQL/Redis/API healthy;
+- API reachable from local LAN;
+- Metro reachable from physical device;
+- Vanta onboarding renders;
+- account creation works after password-policy alignment;
+- login works;
+- Home renders authenticated state;
+- Profile/KYC state renders from backend;
+- Wallet renders backend balance after null-transaction fix;
+- Deposit flow opens but production provider execution remains blocked;
+- Plinko screen renders in protected mode;
+- logout → login again works.
+
+Still pending:
+- force-close/reopen persistent-session evidence;
+- silent access-token expiry/refresh evidence;
+- remote logout-revocation evidence;
+- full Security/RG/Support/Legal interaction smoke tests;
+- final icons/splash/motion/copy polish;
+- artifact secret inspection;
+- iOS compile/simulator path;
+- iOS physical-device validation;
+- final version/release normalization.
+
+No iPhone is currently available for local physical testing. Do not claim physical iOS validation. Use macOS CI/simulator/build validation and later TestFlight/cloud/borrowed-device testing.
+
+---
+
+## 16. Phase 20 failures and fixes
+
+A detailed record is maintained in `docs/release/phase20-troubleshooting-and-findings.md`.
+
+Important cases:
+- PostgreSQL 18 Docker data mount incompatibility;
+- Windows Docker/WSL2 startup prerequisites;
+- physical-device Metro host/QR/dev-client mismatch;
+- stale Metro cache runtime error;
+- registration password-policy mismatch;
+- Wallet API returning `transactions: null`;
+- stale login error message after a later successful authentication;
+- workflow initially producing unnecessary multiple APK variants, later reduced to one Android physical-device debug APK.
+
+These are retained as engineering history because they can recur.
 
 ---
 
 ## 17. CI quality gates
 
-Current pull-request validation includes:
-
-### Mobile
-
-- workspace dependency installation;
-- `pnpm audit --audit-level=high`;
+Mobile:
+- dependency audit;
 - TypeScript typecheck;
-- Vitest API/security boundary tests;
-- Android application bundle/export validation;
-- Storybook Android bundle/export validation.
+- Vitest boundary tests;
+- Android app/Storybook export validation.
 
-### Backend
+Backend:
+- module graph verification;
+- formatting;
+- PostgreSQL/Redis integration;
+- race-enabled tests;
+- vet;
+- vulnerability scan;
+- API build;
+- container/Compose validation.
 
-- Go module graph / `go mod tidy` cleanliness;
-- `gofmt`;
-- PostgreSQL + Redis integration runtime;
-- `go test -race ./...`;
-- `go vet ./...`;
-- `govulncheck`;
-- API binary build;
-- API Docker image build;
-- Docker Compose model validation.
-
-### Static security
-
-- CodeQL JavaScript/TypeScript;
+Static:
+- CodeQL JS/TS;
 - CodeQL Go.
 
-A phase must not be merged while a required gate is red.
+A green CI run is required but is not regulatory certification.
 
 ---
 
-## 18. Current phase status
+## 18. Current roadmap state
 
-- Phases 01–19: **COMPLETE / MERGED**.
-- Phase 20: **NEXT**.
+- Phase 01–19: **COMPLETE / MERGED**.
+- Phase 20: **IN PROGRESS** on PR #24.
+- Phase 20 must not merge until native/runtime/security/documentation exit criteria pass.
+- Post-MVP phases cover production infrastructure, device trust/MFA, KYC/AML, payments, game math + production game pipeline, risk/fraud/admin, regulatory readiness, independent security assessment, store readiness and regulated launch.
 
-Current `main` after Phase 19:
-
-```text
-b12c56928eba8e79f1c48a2361683e1e1746e224
-```
+See `docs/ROADMAP.md` for sequencing.
 
 ---
 
-## 19. Phase 20 — intended goal
+## 19. Resume instructions for a new development session
 
-Phase 20 is the **MVP native build and device-validation phase**, not a declaration of regulated production readiness.
+Read in this order:
 
-Primary objective:
+1. `docs/README.md`;
+2. this file completely;
+3. `docs/context/2026-08-25-phase20-strategy-checkpoint.md`;
+4. `docs/VANTA_PRODUCT_BUSINESS_STRATEGY.md`;
+5. `docs/ROADMAP.md`;
+6. `docs/PHASE_HISTORY.md`;
+7. current phase-specific release/security docs;
+8. inspect `main`, the active branch and open PRs before assuming status.
 
-> Produce reproducible Android and iOS development/preview builds from the integrated Vanta mobile application, validate native runtime boundaries, and document the release process without opening any still-blocked real-money capability.
+Then continue from the first incomplete roadmap/Phase 20 exit item.
 
-Planned work:
-
-- audit Expo/native configuration;
-- normalize app identifiers/package names/bundle IDs;
-- define development/preview/production build profiles without committing secrets;
-- configure icons, adaptive icon, splash and native metadata;
-- validate SecureStore, Reanimated, Skia and native dependencies in actual native builds;
-- configure environment injection for API base URL and environment marker;
-- validate network security configuration (HTTPS outside development);
-- Android build pipeline and installable artifact;
-- iOS build configuration and artifact path where signing/account constraints permit;
-- smoke-test checklist on physical Android and iOS devices/emulators;
-- validate login/register/session refresh/logout;
-- validate Maintenance/AccountBlocked routing;
-- validate Wallet/Profile/History/Security/RG/Support/Legal against backend;
-- validate Plinko visual performance without enabling real-money placement;
-- verify no sensitive token/data appears in logs, navigation state or bundled config;
-- document signing/key handling and what must move to managed production secret storage;
-- version MVP build metadata and release notes;
-- keep deposit/withdraw, production KYC, MFA and production Plinko mutations closed.
-
-Phase 20 exit criteria are detailed in `docs/ROADMAP.md`.
-
----
-
-## 20. Explicit blockers after Phase 20
-
-Even a successful Phase 20 build does **not** mean Vanta can operate with real money.
-
-Still required before regulated production:
-
-- trusted reverse-proxy/client-IP policy;
-- Play Integrity / App Attest and device-abuse strategy;
-- MFA enrollment + step-up authentication;
-- production KYC provider and signed callbacks;
-- production PSP and reconciliation;
-- production Plinko ruleset + public authoritative placement/settlement endpoint;
-- full Responsible Gaming enforcement at every financial/game command;
-- production KMS/HSM/secrets/key rotation;
-- risk/fraud controls;
-- observability/alerting/SLOs;
-- infrastructure/deployment hardening;
-- backups/restore/DR exercises;
-- full legal/regulatory/licensing work;
-- store policy approval for gambling products;
-- independent security assessment / penetration testing;
-- regulatory certification where required.
-
----
-
-## 21. How a new development session should resume
-
-When continuing Vanta in a new chat/Codex session:
-
-1. Read `docs/README.md`.
-2. Read this file completely.
-3. Read `docs/ROADMAP.md`.
-4. Read `docs/PHASE_HISTORY.md`.
-5. Read the latest phase-specific architecture/security document.
-6. Inspect `main` and open PRs before assuming a phase status.
-7. Never restore an old plan merely because an older document mentions it.
-8. Continue from the first incomplete roadmap item.
-9. Keep security boundaries and disabled regulated capabilities intact unless the corresponding server/provider work is intentionally being implemented.
-
-This file is the project-context checkpoint intended to prevent loss of decisions across chats and development environments.
+Never restore an old plan merely because an older PDF, screenshot or chat mentioned it.

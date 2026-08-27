@@ -66,7 +66,8 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 			TotalBalanceMinor:     snapshot.Balance.TotalBalanceMinor,
 			AsOf:                  snapshot.Balance.AsOf,
 		},
-		NextCursor: snapshot.NextCursor,
+		Transactions: make([]transactionResponse, 0, len(snapshot.Transactions)),
+		NextCursor:   snapshot.NextCursor,
 	}
 	for _, transaction := range snapshot.Transactions {
 		response.Transactions = append(response.Transactions, transactionResponse{

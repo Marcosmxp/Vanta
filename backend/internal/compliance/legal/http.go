@@ -78,7 +78,11 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := legalResponse{Availability: string(snapshot.Availability), Message: snapshot.Message}
+	response := legalResponse{
+		Availability: string(snapshot.Availability),
+		Documents:    make([]documentSummaryResponse, 0),
+		Message:      snapshot.Message,
+	}
 	for _, document := range snapshot.Documents {
 		response.Documents = append(response.Documents, mapDocumentSummary(document))
 	}
@@ -90,6 +94,7 @@ func (h *HTTPHandler) Get(w http.ResponseWriter, r *http.Request) {
 			OperatorAddress:      snapshot.Regulatory.OperatorAddress,
 			LicensingStatus:      string(snapshot.Regulatory.LicensingStatus),
 			Regulator:            authorityResponse{Name: snapshot.Regulatory.Regulator.Name, URL: snapshot.Regulatory.Regulator.URL},
+			LicenseReferences:    make([]licenseReferenceResponse, 0),
 			LicenseNotice:        snapshot.Regulatory.LicenseNotice,
 			ComplaintsDocumentID: snapshot.Regulatory.ComplaintsDocumentID,
 		}

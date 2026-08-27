@@ -211,7 +211,14 @@ func (h *HTTPHandler) writeCommandError(w http.ResponseWriter, err error) {
 }
 
 func mapSnapshot(snapshot Snapshot) responsibleGamingResponse {
-	response := responsibleGamingResponse{PlayerID: snapshot.PlayerID, Availability: string(snapshot.Availability), State: string(snapshot.State)}
+	response := responsibleGamingResponse{
+		PlayerID:     snapshot.PlayerID,
+		Availability: string(snapshot.Availability),
+		State:        string(snapshot.State),
+		Limits:       make([]moneyLimitResponse, 0),
+	}
+	response.Policy.TimeOutOptions = make([]policyOptionResponse, 0)
+	response.Policy.SelfExclusionOptions = make([]policyOptionResponse, 0)
 	for _, limit := range snapshot.Limits {
 		item := moneyLimitResponse{LimitID: limit.LimitID, Kind: string(limit.Kind), Period: string(limit.Period), Currency: limit.Currency, AmountMinor: limit.AmountMinor}
 		if limit.PendingChange != nil {

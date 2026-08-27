@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { formatCurrencyMinor, useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, Input, darkTheme } from '../../../design-system';
 import { disconnectedPaymentCapabilities } from '../provider/PaymentProvider';
 import type { PaymentCapabilitySnapshot, PaymentFlowKind } from '../types';
-import { formatEuroMinor, parseEuroAmountToMinor } from '../utils/money';
+import { parseEuroAmountToMinor } from '../utils/money';
 
 export interface PaymentFlowScreenProps {
   kind: PaymentFlowKind;
@@ -18,6 +19,7 @@ export function PaymentFlowScreen({
   capabilities = disconnectedPaymentCapabilities,
   onConfirm,
 }: PaymentFlowScreenProps) {
+  const { locale, t } = useI18n();
   const [amount, setAmount] = useState('');
   const [methodId, setMethodId] = useState<string | null>(null);
   const amountMinor = useMemo(() => parseEuroAmountToMinor(amount), [amount]);
@@ -38,51 +40,51 @@ export function PaymentFlowScreen({
     Boolean(selectedMethod) &&
     Boolean(onConfirm);
 
-  const title = isDeposit ? 'Depositar fundos' : 'Levantar fundos';
-  const actionLabel = isDeposit ? 'Continuar depósito' : 'Continuar levantamento';
+  const title = isDeposit ? t('payment.flow.depositTitle') : t('payment.flow.withdrawalTitle');
+  const actionLabel = isDeposit ? t('payment.flow.depositAction') : t('payment.flow.withdrawalAction');
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.headerCopy}>
-            <Text style={styles.eyebrow}>{isDeposit ? 'DEPÓSITO' : 'LEVANTAMENTO'}</Text>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subtitle}>
-              Valores, métodos e disponibilidade são definidos pelo backend. O cliente apenas recolhe a intenção.
+            <Text style={styles.eyebrow}>
+              {isDeposit ? t('payment.flow.depositEyebrow') : t('payment.flow.withdrawalEyebrow')}
             </Text>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{t('payment.flow.subtitle')}</Text>
           </View>
-          <Badge label="EUR" tone="neutral" />
+          <Badge label={capabilities.currency} tone="neutral" />
         </View>
 
         {capabilities.availability !== 'ready' ? (
           <Card style={styles.noticeCard}>
-            <Badge label="Indisponível" tone="warning" />
-            <Text style={styles.noticeText}>{capabilities.message}</Text>
+            <Badge label={t('payment.flow.unavailable')} tone="warning" />
+            <Text style={styles.noticeText}>{t('payment.flow.unavailableMessage')}</Text>
           </Card>
         ) : null}
 
         <Card style={styles.card}>
           <Input
-            label="Montante"
+            label={t('payment.flow.amount')}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
             placeholder="0,00"
-            trailing={<Text style={styles.currency}>EUR</Text>}
+            trailing={<Text style={styles.currency}>{capabilities.currency}</Text>}
             helperText={
               minMinor !== null && maxMinor !== null
-                ? `Limites autorizados: ${formatEuroMinor(minMinor)} — ${formatEuroMinor(maxMinor)}`
-                : 'Os limites serão carregados da API autenticada.'
+                ? `${t('payment.flow.limits')}: ${formatCurrencyMinor(minMinor, capabilities.currency, locale)} — ${formatCurrencyMinor(maxMinor, capabilities.currency, locale)}`
+                : t('payment.flow.limitsUnavailable')
             }
           />
         </Card>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Método</Text>
+          <Text style={styles.sectionTitle}>{t('payment.flow.method')}</Text>
           {methods.length === 0 ? (
             <Card>
-              <Text style={styles.emptyText}>Nenhum método de pagamento autorizado está disponível.</Text>
+              <Text style={styles.emptyText}>{t('payment.flow.noMethods')}</Text>
             </Card>
           ) : (
             methods.map((method) => {
@@ -101,7 +103,13 @@ export function PaymentFlowScreen({
                       <Text style={styles.methodDescription}>{method.description}</Text>
                     </View>
                     <Badge
-                      label={method.enabled ? (selected ? 'Selecionado' : 'Disponível') : 'Bloqueado'}
+                      label={
+                        method.enabled
+                          ? selected
+                            ? t('payment.flow.methodSelected')
+                            : t('payment.flow.methodAvailable')
+                          : t('payment.flow.methodBlocked')
+                      }
                       tone={selected ? 'brand' : 'neutral'}
                     />
                   </Card>
@@ -120,9 +128,7 @@ export function PaymentFlowScreen({
           }}
         />
 
-        <Text style={styles.footer}>
-          Nenhum valor é creditado ou debitado pelo aplicativo. A operação só existe após validação e commit autoritativo do servidor.
-        </Text>
+        <Text style={styles.footer}>{t('payment.flow.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useI18n } from '../../../core/i18n';
 import { Card, darkTheme } from '../../../design-system';
 
 export type ResponsibleGamingDestination = 'limits' | 'time-out' | 'self-exclusion';
@@ -8,32 +9,17 @@ export interface ResponsibleGamingActionCardProps {
   onOpenDestination: (destination: ResponsibleGamingDestination) => void;
 }
 
-const actions: readonly {
-  destination: ResponsibleGamingDestination;
-  title: string;
-  description: string;
-}[] = [
-  {
-    destination: 'limits',
-    title: 'Limites pessoais',
-    description: 'Consulte limites de depósito, perdas, apostas e duração de sessão.',
-  },
-  {
-    destination: 'time-out',
-    title: 'Time-out',
-    description: 'Peça uma pausa temporária usando apenas opções autorizadas pelo servidor.',
-  },
-  {
-    destination: 'self-exclusion',
-    title: 'Autoexclusão',
-    description: 'Ative uma proteção forte que não pode ser removida antecipadamente pelo cliente.',
-  },
-];
-
 export function ResponsibleGamingActionCard({ onOpenDestination }: ResponsibleGamingActionCardProps) {
+  const { t } = useI18n();
+  const actions: readonly { destination: ResponsibleGamingDestination; title: string; description: string }[] = [
+    { destination: 'limits', title: t('rg.limitsTitle'), description: t('rg.limitsDescription') },
+    { destination: 'time-out', title: t('rg.timeoutTitle'), description: t('rg.timeoutDescription') },
+    { destination: 'self-exclusion', title: t('rg.selfExclusionTitle'), description: t('rg.selfExclusionDescription') },
+  ];
+
   return (
     <Card style={styles.card}>
-      <Text style={styles.title}>Controlos de proteção</Text>
+      <Text style={styles.title}>{t('rg.actionsTitle')}</Text>
       <View style={styles.list}>
         {actions.map((action) => (
           <Pressable

@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, darkTheme } from '../../../design-system';
 import type { SecurityCapabilities, SecuritySession } from '../types';
 
@@ -17,12 +18,14 @@ export function SecuritySessionDetailsScreen({
   capabilities,
   onRevokeSession,
 }: SecuritySessionDetailsScreenProps) {
+  const { t } = useI18n();
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>SESSÃO</Text>
-          <Text style={styles.title}>{session?.deviceLabel ?? 'Detalhe protegido'}</Text>
+          <Text style={styles.eyebrow}>{t('security.detail.eyebrow')}</Text>
+          <Text style={styles.title}>{session?.deviceLabel ?? t('security.detail.protectedTitle')}</Text>
           <Text style={styles.subtitle}>ID: {sessionId}</Text>
         </View>
 
@@ -30,41 +33,48 @@ export function SecuritySessionDetailsScreen({
           <>
             <Card style={styles.card}>
               <View style={styles.row}>
-                <Text style={styles.label}>Estado</Text>
-                <Badge label={session.status === 'active' ? 'Ativa' : 'Revogada'} tone={session.status === 'active' ? 'success' : 'neutral'} />
+                <Text style={styles.label}>{t('security.detail.status')}</Text>
+                <Badge
+                  label={session.status === 'active' ? t('security.detail.status.active') : t('security.detail.status.revoked')}
+                  tone={session.status === 'active' ? 'success' : 'neutral'}
+                />
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Dispositivo</Text>
+                <Text style={styles.label}>{t('security.detail.device')}</Text>
                 <Text style={styles.value}>{session.deviceLabel}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Plataforma</Text>
+                <Text style={styles.label}>{t('security.detail.platform')}</Text>
                 <Text style={styles.value}>{session.platform}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Confiança</Text>
-                <Text style={styles.value}>{session.trust === 'trusted' ? 'Reconhecido' : 'Não reconhecido'}</Text>
+                <Text style={styles.label}>{t('security.detail.trust')}</Text>
+                <Text style={styles.value}>
+                  {session.trust === 'trusted'
+                    ? t('security.detail.trust.trusted')
+                    : t('security.detail.trust.unrecognized')}
+                </Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>MFA usado</Text>
-                <Text style={styles.value}>{session.mfaUsed ? 'Sim' : 'Não'}</Text>
+                <Text style={styles.label}>{t('security.detail.mfaUsed')}</Text>
+                <Text style={styles.value}>{session.mfaUsed ? t('security.detail.yes') : t('security.detail.no')}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>IP</Text>
-                <Text style={styles.value}>{session.ipMasked ?? 'Protegido'}</Text>
+                <Text style={styles.label}>{t('security.detail.ip')}</Text>
+                <Text style={styles.value}>{session.ipMasked ?? t('security.session.ipProtected')}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>País</Text>
-                <Text style={styles.value}>{session.countryCode ?? 'Protegido'}</Text>
+                <Text style={styles.label}>{t('security.detail.country')}</Text>
+                <Text style={styles.value}>{session.countryCode ?? t('security.session.locationProtected')}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Última atividade</Text>
+                <Text style={styles.label}>{t('security.detail.lastActivity')}</Text>
                 <Text style={styles.value}>{session.lastSeenAt}</Text>
               </View>
             </Card>
 
             <Button
-              label={session.current ? 'Sessão atual protegida' : 'Encerrar esta sessão'}
+              label={session.current ? t('security.detail.currentProtected') : t('security.detail.revoke')}
               variant="danger"
               fullWidth
               disabled={session.current || !capabilities.canRevokeSession || session.status !== 'active'}
@@ -73,16 +83,12 @@ export function SecuritySessionDetailsScreen({
           </>
         ) : (
           <Card style={styles.card}>
-            <Text style={styles.emptyTitle}>Detalhe indisponível</Text>
-            <Text style={styles.emptyDescription}>
-              O dispositivo deve ser carregado novamente da API autenticada usando apenas o sessionId da rota.
-            </Text>
+            <Text style={styles.emptyTitle}>{t('security.detail.unavailableTitle')}</Text>
+            <Text style={styles.emptyDescription}>{t('security.detail.unavailableDescription')}</Text>
           </Card>
         )}
 
-        <Text style={styles.footer}>
-          Tokens, cookies, refresh tokens e segredos de autenticação nunca são mostrados nesta tela.
-        </Text>
+        <Text style={styles.footer}>{t('security.detail.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

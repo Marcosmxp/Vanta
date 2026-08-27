@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { useI18n } from '../../../core/i18n';
 import { useSession } from '../../../core/session/SessionProvider';
 import { createApiSecurityProvider } from '../../../features/security/provider/ApiSecurityProvider';
 import {
@@ -13,6 +14,7 @@ import type { MainStackParamList } from '../types';
 type Props = NativeStackScreenProps<MainStackParamList, 'SecurityCenter'>;
 
 export function SecurityCenterRouteScreen({ navigation }: Props) {
+  const { t } = useI18n();
   const { request } = useSession();
   const queryClient = useQueryClient();
   const provider = createApiSecurityProvider(request);
@@ -36,10 +38,8 @@ export function SecurityCenterRouteScreen({ navigation }: Props) {
   const snapshot = snapshotQuery.data ?? {
     ...disconnectedSecuritySnapshot,
     message: snapshotQuery.isPending
-      ? 'A carregar sessões e dispositivos confirmados pelo servidor.'
-      : snapshotQuery.error instanceof Error
-        ? snapshotQuery.error.message
-        : disconnectedSecuritySnapshot.message,
+      ? t('security.snapshot.loading')
+      : t('security.center.unavailableDescription'),
   };
   const capabilities = capabilitiesQuery.data ?? disconnectedSecurityCapabilities;
 

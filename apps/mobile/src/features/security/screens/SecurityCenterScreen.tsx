@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n } from '../../../core/i18n';
 import { SystemState, darkTheme } from '../../../design-system';
 import { SecuritySessionCard } from '../components/SecuritySessionCard';
 import { SecurityStatusCard } from '../components/SecurityStatusCard';
@@ -25,17 +26,16 @@ export function SecurityCenterScreen({
   onBeginMfaEnrollment,
   onRevokeOtherSessions,
 }: SecurityCenterScreenProps) {
+  const { t } = useI18n();
   const sessionsReady = snapshot.availability === 'ready';
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>SECURITY CENTER</Text>
-          <Text style={styles.title}>Controle de acesso e sessões</Text>
-          <Text style={styles.subtitle}>
-            Reveja dispositivos, autenticação forte e atividade de sessão sem expor tokens ou material criptográfico no cliente.
-          </Text>
+          <Text style={styles.eyebrow}>{t('security.center.eyebrow')}</Text>
+          <Text style={styles.title}>{t('security.center.title')}</Text>
+          <Text style={styles.subtitle}>{t('security.center.subtitle')}</Text>
         </View>
 
         <SecurityStatusCard
@@ -47,7 +47,7 @@ export function SecurityCenterScreen({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Sessões e dispositivos</Text>
+            <Text style={styles.sectionTitle}>{t('security.center.sessionsTitle')}</Text>
             <Text style={styles.sectionCount}>{snapshot.sessions.length}</Text>
           </View>
 
@@ -55,12 +55,12 @@ export function SecurityCenterScreen({
             <SystemState
               kind={sessionsReady ? 'empty' : 'error'}
               compact
-              title={sessionsReady ? 'Nenhuma sessão adicional' : 'Sessões não disponíveis'}
+              title={sessionsReady ? t('security.center.noSessionsTitle') : t('security.center.unavailableTitle')}
               description={
                 snapshot.message ??
                 (sessionsReady
-                  ? 'Não existem outras sessões para apresentar neste momento.'
-                  : 'As sessões só serão apresentadas depois de confirmadas pela API autenticada.')
+                  ? t('security.center.noSessionsDescription')
+                  : t('security.center.unavailableDescription'))
               }
             />
           ) : (
@@ -76,9 +76,7 @@ export function SecurityCenterScreen({
           )}
         </View>
 
-        <Text style={styles.footer}>
-          Encerrar uma sessão, ativar MFA ou alterar confiança do dispositivo exige confirmação server-side e auditoria.
-        </Text>
+        <Text style={styles.footer}>{t('security.center.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

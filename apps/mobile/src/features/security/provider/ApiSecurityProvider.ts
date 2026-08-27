@@ -16,7 +16,6 @@ export function createApiSecurityProvider(request: SessionContextValue['request'
         canRevokeSession: true,
         canRevokeOtherSessions: true,
         canBeginMfaEnrollment: false,
-        message: 'Revogação de sessões está ligada à API. Enrollment MFA permanece bloqueado até existir endpoint dedicado.',
       };
     },
     async revokeSession(input) {

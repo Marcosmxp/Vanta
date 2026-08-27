@@ -1,20 +1,14 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { formatCurrencyMinor, formatDateTime, formatNumber, useI18n } from '../../../../core/i18n';
 import { Badge, Card, SystemState, darkTheme } from '../../../../design-system';
 import type { BetDetails, BetStatus } from '../types';
-import { formatBetDate, formatEuroMinor, formatMultiplierBps } from '../utils/formatting';
 
 export interface BetDetailsScreenProps {
   betId: string;
   details?: BetDetails | null;
 }
-
-const statusLabels: Record<BetStatus, string> = {
-  accepted: 'Em processamento',
-  settled: 'Liquidada',
-  voided: 'Anulada',
-};
 
 const statusTones: Record<BetStatus, 'warning' | 'success' | 'neutral'> = {
   accepted: 'warning',
@@ -32,20 +26,37 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 export function BetDetailsScreen({ betId, details = null }: BetDetailsScreenProps) {
+  const { locale, t } = useI18n();
+
+  const statusLabel = details
+    ? details.status === 'accepted'
+      ? t('betting.status.accepted')
+      : details.status === 'settled'
+        ? t('betting.status.settled')
+        : t('betting.status.voided')
+    : null;
+  const riskLabel = details
+    ? details.risk === 'low'
+      ? t('betting.details.risk.low')
+      : details.risk === 'medium'
+        ? t('betting.details.risk.medium')
+        : t('betting.details.risk.high')
+    : null;
+
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Badge label="DETALHE" tone="brand" />
-          <Text style={styles.title}>Detalhe da aposta</Text>
+          <Badge label={t('betting.details.badge')} tone="brand" />
+          <Text style={styles.title}>{t('betting.details.title')}</Text>
           <Text selectable style={styles.betId}>{betId}</Text>
         </View>
 
         {details === null ? (
           <SystemState
             kind="loading"
-            title="A carregar detalhe da aposta"
-            description="O detalhe será obtido pela API autenticada. O cliente não reconstrói nem inventa liquidação localmente."
+            title={t('betting.details.loadingTitle')}
+            description={t('betting.details.loadingDescription')}
           />
         ) : (
           <>
@@ -53,48 +64,69 @@ export function BetDetailsScreen({ betId, details = null }: BetDetailsScreenProp
               <View style={styles.summaryHeader}>
                 <View>
                   <Text style={styles.game}>PLINKO</Text>
-                  <Text style={styles.placedAt}>{formatBetDate(details.placedAt)}</Text>
+                  <Text style={styles.placedAt}>
+                    {formatDateTime(details.placedAt, locale) ?? t('betting.dateUnavailable')}
+                  </Text>
                 </View>
-                <Badge label={statusLabels[details.status]} tone={statusTones[details.status]} />
+                <Badge label={statusLabel ?? '—'} tone={statusTones[details.status]} />
               </View>
 
               <View style={styles.summaryMetrics}>
                 <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Aposta</Text>
-                  <Text style={styles.metricValue}>{formatEuroMinor(details.stakeMinor)}</Text>
-                </View>
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Multiplicador</Text>
-                  <Text style={styles.metricValue}>{formatMultiplierBps(details.multiplierBps)}</Text>
-                </View>
-                <View style={styles.metric}>
-                  <Text style={styles.metricLabel}>Retorno</Text>
+                  <Text style={styles.metricLabel}>{t('betting.metric.stake')}</Text>
                   <Text style={styles.metricValue}>
-                    {details.payoutMinor === null ? '—' : formatEuroMinor(details.payoutMinor)}
+                    {formatCurrencyMinor(details.stakeMinor, details.currency, locale)}
+                  </Text>
+                </View>
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>{t('betting.metric.multiplier')}</Text>
+                  <Text style={styles.metricValue}>
+                    {details.multiplierBps === null
+                      ? '—'
+                      : `${formatNumber(details.multiplierBps / 10_000, locale, 2)}×`}
+                  </Text>
+                </View>
+                <View style={styles.metric}>
+                  <Text style={styles.metricLabel}>{t('betting.metric.payout')}</Text>
+                  <Text style={styles.metricValue}>
+                    {details.payoutMinor === null
+                      ? '—'
+                      : formatCurrencyMinor(details.payoutMinor, details.currency, locale)}
                   </Text>
                 </View>
               </View>
             </Card>
 
             <Card style={styles.detailsCard}>
-              <Text style={styles.sectionTitle}>Auditoria da aposta</Text>
-              <DetailRow label="Bet ID" value={details.betId} />
-              <DetailRow label="Ruleset" value={`${details.rulesetId} · ${details.rulesetVersion}`} />
-              <DetailRow label="Linhas" value={String(details.rows)} />
-              <DetailRow label="Risco" value={details.risk.toUpperCase()} />
-              <DetailRow label="Slot" value={details.slot === null ? '—' : String(details.slot)} />
-              <DetailRow label="Criada" value={formatBetDate(details.placedAt)} />
+              <Text style={styles.sectionTitle}>{t('betting.details.section')}</Text>
+              <DetailRow label={t('betting.details.reference')} value={details.betId} />
               <DetailRow
-                label="Liquidada"
-                value={details.settledAt === null ? '—' : formatBetDate(details.settledAt)}
+                label={t('betting.details.rules')}
+                value={`${details.rulesetId} · ${details.rulesetVersion}`}
+              />
+              <DetailRow label={t('betting.details.rows')} value={String(details.rows)} />
+              <DetailRow label={t('betting.details.risk')} value={riskLabel ?? '—'} />
+              <DetailRow
+                label={t('betting.details.slot')}
+                value={details.slot === null ? '—' : String(details.slot)}
+              />
+              <DetailRow
+                label={t('betting.details.created')}
+                value={formatDateTime(details.placedAt, locale) ?? t('betting.dateUnavailable')}
+              />
+              <DetailRow
+                label={t('betting.details.settled')}
+                value={
+                  details.settledAt === null
+                    ? '—'
+                    : formatDateTime(details.settledAt, locale) ?? t('betting.dateUnavailable')
+                }
               />
             </Card>
           </>
         )}
 
-        <Text style={styles.footer}>
-          Os valores exibidos refletem o read model recebido do backend. O mobile não recalcula payout nem altera o estado da aposta.
-        </Text>
+        <Text style={styles.footer}>{t('betting.details.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

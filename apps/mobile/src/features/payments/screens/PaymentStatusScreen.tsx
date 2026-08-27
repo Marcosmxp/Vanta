@@ -1,32 +1,51 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { formatCurrencyMinor, useI18n } from '../../../core/i18n';
 import { Badge, Button, Card, darkTheme } from '../../../design-system';
 import type { PaymentIntentReadModel } from '../types';
-import { formatEuroMinor } from '../utils/money';
 
 export interface PaymentStatusScreenProps {
   intent: PaymentIntentReadModel;
   onDone?: () => void;
 }
 
-function statusCopy(status: PaymentIntentReadModel['status']) {
-  switch (status) {
-    case 'requires_action':
-      return { label: 'Ação necessária', tone: 'warning' as const, title: 'Confirmação pendente' };
-    case 'processing':
-      return { label: 'Em processamento', tone: 'warning' as const, title: 'Estamos a processar' };
-    case 'succeeded':
-      return { label: 'Concluído', tone: 'success' as const, title: 'Operação concluída' };
-    case 'failed':
-      return { label: 'Falhou', tone: 'danger' as const, title: 'Não foi possível concluir' };
-    case 'cancelled':
-      return { label: 'Cancelado', tone: 'neutral' as const, title: 'Operação cancelada' };
-  }
-}
-
 export function PaymentStatusScreen({ intent, onDone }: PaymentStatusScreenProps) {
-  const copy = statusCopy(intent.status);
+  const { locale, t } = useI18n();
+  const copy = (() => {
+    switch (intent.status) {
+      case 'requires_action':
+        return {
+          label: t('payment.status.requiresActionLabel'),
+          tone: 'warning' as const,
+          title: t('payment.status.requiresActionTitle'),
+        };
+      case 'processing':
+        return {
+          label: t('payment.status.processingLabel'),
+          tone: 'warning' as const,
+          title: t('payment.status.processingTitle'),
+        };
+      case 'succeeded':
+        return {
+          label: t('payment.status.succeededLabel'),
+          tone: 'success' as const,
+          title: t('payment.status.succeededTitle'),
+        };
+      case 'failed':
+        return {
+          label: t('payment.status.failedLabel'),
+          tone: 'danger' as const,
+          title: t('payment.status.failedTitle'),
+        };
+      case 'cancelled':
+        return {
+          label: t('payment.status.cancelledLabel'),
+          tone: 'neutral' as const,
+          title: t('payment.status.cancelledTitle'),
+        };
+    }
+  })();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,26 +53,28 @@ export function PaymentStatusScreen({ intent, onDone }: PaymentStatusScreenProps
         <View style={styles.header}>
           <Badge label={copy.label} tone={copy.tone} />
           <Text style={styles.title}>{copy.title}</Text>
-          <Text style={styles.subtitle}>
-            Este estado é uma projeção do payment intent autorizado pelo backend.
-          </Text>
+          <Text style={styles.subtitle}>{t('payment.status.subtitle')}</Text>
         </View>
 
         <Card style={styles.card}>
-          <Row label="Operação" value={intent.kind === 'deposit' ? 'Depósito' : 'Levantamento'} />
-          <Row label="Montante" value={formatEuroMinor(intent.amountMinor)} />
-          <Row label="Método" value={intent.methodLabel} />
-          <Row label="Payment intent" value={intent.paymentIntentId} />
-          <Row label="Atualizado" value={intent.updatedAt} />
+          <Row
+            label={t('payment.status.operation')}
+            value={intent.kind === 'deposit' ? t('payment.review.deposit') : t('payment.review.withdrawal')}
+          />
+          <Row
+            label={t('payment.status.amount')}
+            value={formatCurrencyMinor(intent.amountMinor, 'EUR', locale)}
+          />
+          <Row label={t('payment.status.method')} value={intent.methodLabel} />
+          <Row label={t('payment.status.reference')} value={intent.paymentIntentId} />
+          <Row label={t('payment.status.updated')} value={intent.updatedAt} />
         </Card>
 
         {intent.userMessage ? <Text style={styles.message}>{intent.userMessage}</Text> : null}
 
-        {onDone ? <Button label="Voltar à carteira" fullWidth onPress={onDone} /> : null}
+        {onDone ? <Button label={t('payment.status.backWallet')} fullWidth onPress={onDone} /> : null}
 
-        <Text style={styles.footer}>
-          O cliente não confirma settlement, não altera saldo e não transforma um status local em sucesso financeiro.
-        </Text>
+        <Text style={styles.footer}>{t('payment.status.footer')}</Text>
       </View>
     </SafeAreaView>
   );

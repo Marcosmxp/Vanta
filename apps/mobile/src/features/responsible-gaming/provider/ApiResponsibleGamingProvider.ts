@@ -2,8 +2,31 @@ import type { SessionContextValue } from '../../../core/session/types';
 import type { ResponsibleGamingProvider } from './ResponsibleGamingProvider';
 import type { ResponsibleGamingSnapshot } from '../types';
 
+function normalizeResponsibleGamingSnapshot(snapshot: ResponsibleGamingSnapshot): ResponsibleGamingSnapshot {
+  const policy = snapshot.policy ?? {
+    timeOutOptions: [],
+    selfExclusionOptions: [],
+    canRequestLimitChange: false,
+    canStartTimeOut: false,
+    canSelfExclude: false,
+  };
+
+  return {
+    ...snapshot,
+    limits: Array.isArray(snapshot.limits) ? snapshot.limits : [],
+    policy: {
+      ...policy,
+      timeOutOptions: Array.isArray(policy.timeOutOptions) ? policy.timeOutOptions : [],
+      selfExclusionOptions: Array.isArray(policy.selfExclusionOptions) ? policy.selfExclusionOptions : [],
+    },
+  };
+}
+
 export function createApiResponsibleGamingProvider(request: SessionContextValue['request']): ResponsibleGamingProvider {
-  const getSnapshot = () => request<ResponsibleGamingSnapshot>('/v1/responsible-gaming');
+  const getSnapshot = async () => {
+    const snapshot = await request<ResponsibleGamingSnapshot>('/v1/responsible-gaming');
+    return normalizeResponsibleGamingSnapshot(snapshot);
+  };
 
   return {
     getSnapshot,

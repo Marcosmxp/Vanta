@@ -1,0 +1,141 @@
+name: Native Android MVP
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'scripts/validate-mobile-release-config.mjs'
+      - 'scripts/sync-release-version.mjs'
+      - 'scripts/write-build-metadata.mjs'
+      - 'version.json'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/native-android.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  android-physical-debug-apk:
+    name: Android physical-device debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      NODE_ENV: development
+      EXPO_PUBLIC_VANTA_ENV: development
+      EXPO_PUBLIC_VANTA_API_URL: http://192.168.1.70:8080
+      VANTA_GIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      VANTA_CI_SHA: ${{ github.sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.13.0'
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install pnpm
+        run: npm install --global pnpm@10.15.0
+
+      - name: Validate release identity
+        id: release
+        shell: bash
+        run: |
+          node scripts/sync-release-version.mjs --check
+          node scripts/validate-mobile-release-config.mjs
+          node <<'NODE'
+          const fs = require('node:fs');
+          const v = require('./version.json');
+          const release = v.channel === 'stable' ? v.version : `${v.version}-${v.channel}.${v.iteration}`;
+          const sourceSha = process.env.VANTA_GIT_SHA;
+          if (!sourceSha || sourceSha.length < 7) {
+            throw new Error('VANTA_GIT_SHA is missing or invalid.');
+          }
+          const shortSha = sourceSha.slice(0, 7);
+          const artifact = `vanta-${release}-build-${v.build}-android-physical-debug-${shortSha}`;
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_RELEASE_VERSION=${release}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_BUILD_NUMBER=${v.build}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `VANTA_ARTIFACT_NAME=${artifact}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_version=${release}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_number=${v.build}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `artifact_name=${artifact}\n`);
+          NODE
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install React Native Skia native binaries
+        run: |
+          pnpm --dir apps/mobile exec install-skia
+          test -f apps/mobile/node_modules/@shopify/react-native-skia/libs/android/arm64-v8a/libskia.a
+
+      - name: Resolve Expo public configuration
+        run: pnpm --dir apps/mobile exec expo config --type public
+
+      - name: Generate Android native project
+        run: pnpm --dir apps/mobile exec expo prebuild --platform android --clean --no-install
+
+      - name: Build Android debug APK
+        working-directory: apps/mobile/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Inspect APK for server-only configuration and secret files
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk'
+          rm -rf apk-inspect
+          mkdir -p apk-inspect
+          unzip -qq "$apk" -d apk-inspect
+
+          secret_files="$(find apk-inspect -type f \( -iname '*.pem' -o -iname '*.key' -o -iname '*.p12' -o -iname '*.pfx' -o -iname '.env' -o -iname '.env.*' \) -print)"
+          if [ -n "$secret_files" ]; then
+            printf 'Forbidden secret-like files were packaged in the APK:\n%s\n' "$secret_files"
+            exit 1
+          fi
+
+          forbidden='VANTA_DATABASE_URL|VANTA_REDIS_URL|VANTA_PII_ENCRYPTION_KEY_B64|VANTA_PII_LOOKUP_KEY_B64|vanta_local_only|postgres://vanta:'
+          matches="$(grep -R -a -l -E "$forbidden" apk-inspect || true)"
+          if [ -n "$matches" ]; then
+            printf 'Server-only configuration markers were found in the APK:\n%s\n' "$matches"
+            exit 1
+          fi
+
+          rm -rf apk-inspect
+          echo 'APK secret/config inspection passed.'
+
+      - name: Prepare versioned artifact and provenance
+        shell: bash
+        run: |
+          mkdir -p release-artifacts
+          cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk "release-artifacts/${VANTA_ARTIFACT_NAME}.apk"
+          VANTA_BUILD_PLATFORM=android-physical-debug \
+            node scripts/write-build-metadata.mjs release-artifacts/build-metadata.json
+          printf '%s\n' \
+            "${VANTA_RELEASE_VERSION} build ${VANTA_BUILD_NUMBER}" \
+            "source ${VANTA_GIT_SHA}" \
+            "ci ${VANTA_CI_SHA}" > release-artifacts/IDENTITY.txt
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.release.outputs.artifact_name }}
+          path: release-artifacts/*
+          if-no-files-found: error
+          retention-days: 7

@@ -47,7 +47,7 @@ export function SystemState({
           )}
         </View>
 
-        <View style={styles.copy}>
+        <View style={[styles.copy, compact && styles.compactCopy]}>
           <Text style={compact ? styles.compactTitle : styles.title}>{title}</Text>
           <Text style={styles.description}>{description}</Text>
         </View>
@@ -102,8 +102,12 @@ const styles = StyleSheet.create({
     color: darkTheme.colors.brand.primary,
   },
   copy: {
-    flex: 1,
+    alignSelf: 'stretch',
     gap: darkTheme.spacing.xs,
+  },
+  compactCopy: {
+    flex: 1,
+    alignSelf: 'auto',
   },
   title: {
     ...darkTheme.typography.heading3,

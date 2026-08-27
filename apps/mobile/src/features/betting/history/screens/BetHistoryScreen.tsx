@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useI18n } from '../../../../core/i18n';
 import { Badge, SystemState, darkTheme } from '../../../../design-system';
 import { BetHistoryItemCard } from '../components/BetHistoryItemCard';
 import { disconnectedBetHistorySnapshot } from '../provider/BetHistoryProvider';
@@ -15,23 +16,22 @@ export function BetHistoryScreen({
   snapshot = disconnectedBetHistorySnapshot,
   onOpenBet,
 }: BetHistoryScreenProps) {
+  const { t } = useI18n();
   const emptyKind = snapshot.availability === 'ready' ? 'empty' : 'error';
   const emptyTitle =
     snapshot.availability === 'ready'
-      ? 'Nenhuma aposta disponível'
+      ? t('betting.history.emptyTitle')
       : snapshot.availability === 'restricted'
-        ? 'Histórico indisponível'
-        : 'Não foi possível carregar o histórico';
+        ? t('betting.history.restrictedTitle')
+        : t('betting.history.unavailableTitle');
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Badge label="APOSTAS" tone="brand" />
-          <Text style={styles.title}>Histórico de apostas</Text>
-          <Text style={styles.description}>
-            Consulte apostas registadas pelo servidor, incluindo stake, estado, multiplicador e retorno.
-          </Text>
+          <Badge label={t('betting.history.badge')} tone="brand" />
+          <Text style={styles.title}>{t('betting.history.title')}</Text>
+          <Text style={styles.description}>{t('betting.history.description')}</Text>
         </View>
 
         {snapshot.items.length === 0 ? (
@@ -41,8 +41,8 @@ export function BetHistoryScreen({
             description={
               snapshot.message ??
               (snapshot.availability === 'ready'
-                ? 'As apostas aparecerão aqui depois de serem registadas pelo backend autoritativo.'
-                : 'O Vanta não apresenta apostas locais como substituto do histórico autenticado.')
+                ? t('betting.history.emptyDescription')
+                : t('betting.history.unavailableDescription'))
             }
           />
         ) : (
@@ -57,9 +57,7 @@ export function BetHistoryScreen({
           </View>
         )}
 
-        <Text style={styles.footer}>
-          Este ecrã é uma projeção read-only. Liquidação, saldo e estado canónico permanecem no backend Vanta.
-        </Text>
+        <Text style={styles.footer}>{t('betting.history.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );
