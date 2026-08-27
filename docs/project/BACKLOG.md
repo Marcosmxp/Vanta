@@ -28,19 +28,13 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 - Evidence: physical Android session `session_...37f2` completed three consecutive rotations (`1 -> 2`, `2 -> 3`, `3 -> 4`) with advancing access expiry under the controlled 1m access TTL; the tester explicitly confirmed the app remained logged in without visible re-authentication. Token values/hashes were not queried or printed. Detailed timestamps are recorded in `docs/release/phase20-session-security-evidence.md`.
 - Dependencies: physical Android dev runtime.
 
-### AUTH-PERSIST-003 — Diagnose session loss after Android process close
-- Type: Bug / Security / Testing
-- Status: In Progress
-- Description: after successful physical silent-refresh evidence under the controlled 1m access TTL, closing Vanta from Android recent apps and reopening returned to the introduction/authentication flow instead of restoring the persisted session.
-- Acceptance: determine whether the stored session was missing, the server session was revoked/rejected during bootstrap refresh, or navigation incorrectly entered anonymous state; prove a valid session survives process close/reopen without visible re-login; preserve fail-closed behavior for genuinely revoked/expired sessions.
-- Evidence: physical Android report after `AUTH-REFRESH-001` rotations `1 -> 4`; no in-app logout was reported for the observed close/reopen behavior.
-- Safety: do not weaken refresh-token rotation/reuse detection or SecureStore protections to make persistence pass.
-
 ### AUTH-REVOCATION-002 — Validate remote revocation/expired refresh
 - Type: Security / Testing
-- Status: Ready
+- Status: Testing
 - Description: prove revoked/expired server session returns the app to authentication rather than leaving stale authorized UI.
-- Dependency: resolve or explain `AUTH-PERSIST-003` first so normal process-close behavior is not confused with remote revocation evidence.
+- Evidence: physical Android session `session_...37f2` was revoked at `2026-08-26 23:46:20.250244Z` with `revoke_reason = player-security-center`. The revocation harness helper session was created at `23:45:52.969190Z` and logged out at `23:46:20.311030Z`, about 61 ms after the Android revocation, which correlates the revocation with the controlled `test-physical-session-revocation.ps1` run. After closing/reopening Vanta, the physical device returned to the introduction/authentication flow instead of restoring stale authorization.
+- Remaining: retain or rerun the harness terminal evidence showing the expected HTTP 204 and authenticated security snapshot reporting the target session as `revoked`; then mark Done.
+- Note: the temporary `AUTH-PERSIST-003` suspicion was closed as a false alarm because the Android session had been deliberately revoked by the security-center endpoint; process close was not the cause of session loss.
 
 ### REL-PROVENANCE-001 — Use PR source SHA in artifact provenance
 - Type: Infrastructure / Security
@@ -90,7 +84,7 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 ### TEST-MOBILE-001 — Add critical mobile regression tests
 - Type: Testing
 - Status: In Progress
-- Description: coverage now protects session expiry/refresh timing, SecureStore fail-closed persistence, locale selection, API configuration/client behavior and the Wallet/Legal/Support/Responsible Gaming null-collection regressions.
+- Description: coverage now protects session expiry/refresh timing, SecureStore persistence, locale selection, API configuration/client behavior and the Wallet/Legal/Support/Responsible Gaming null-collection regressions.
 - Remaining: full SessionProvider silent-refresh/logout interaction and other critical auth-state behavior still require focused tests/evidence.
 
 ---
