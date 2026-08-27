@@ -19,3 +19,31 @@ export function formatCurrencyMinor(amountMinor: number, currency: string, local
     return `${(amountMinor / 100).toFixed(2)} ${symbol}`;
   }
 }
+
+export function formatNumber(value: number, locale: SupportedLocale, fractionDigits = 2) {
+  try {
+    return new Intl.NumberFormat(localeTag(locale), {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }).format(value);
+  } catch {
+    return value.toFixed(fractionDigits);
+  }
+}
+
+export function formatDateTime(value: string, locale: SupportedLocale): string | null {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  try {
+    return new Intl.DateTimeFormat(localeTag(locale), {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return date.toISOString();
+  }
+}
