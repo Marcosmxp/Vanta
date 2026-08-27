@@ -123,7 +123,7 @@ Final result: **PASS / DONE**.
 
 ## AUTH-REVOCATION-002 — Remote revocation
 
-**Status:** READY FOR PHYSICAL TEST
+**Status:** TESTING
 
 Keep the physical Android app signed in, then run:
 
@@ -139,7 +139,7 @@ DELETE /v1/security/sessions/{sessionID}
 
 The password is entered as `SecureString`, plaintext exists only transiently in process memory for the login request, and session tokens are never printed. The temporary helper session is logged out in `finally` where possible.
 
-After the script confirms server-side status `revoked`, open a protected screen on the phone.
+After the script confirms server-side status `revoked`, open a protected screen on the phone or restart the app so bootstrap must validate the persisted session.
 
 ### Acceptance
 
@@ -150,6 +150,44 @@ After the script confirms server-side status `revoked`, open a protected screen 
 - local session is cleared;
 - app returns to authentication rather than leaving stale authorized UI.
 
+### Physical evidence — 2026-08-26/27
+
+The same Android session used for silent-refresh evidence was later observed as:
+
+```text
+Session id (masked): session_...37f2
+Refresh generation: 4
+Revoked at:          2026-08-26 23:46:20.250244Z
+Revoke reason:       player-security-center
+```
+
+The temporary PowerShell helper session created by the revocation harness was independently observed as:
+
+```text
+Device label: Vanta PowerShell revocation probe
+Platform:     windows
+Created at:   2026-08-26 23:45:52.969190Z
+Revoked at:   2026-08-26 23:46:20.311030Z
+Reason:       player-logout
+```
+
+The helper logout occurred about 61 ms after the Android session was marked `player-security-center`. This matches the harness control flow: helper login -> targeted `DELETE /v1/security/sessions/{sessionID}` -> verification -> helper logout in `finally`.
+
+After the targeted Android revocation, the tester closed/reopened Vanta and the physical app returned to the introduction/authentication flow instead of restoring stale authenticated state. This confirms the physical fail-closed behavior after remote revocation.
+
+A temporary suspicion that process close itself caused session loss was rejected: the database shows the Android session had already been deliberately revoked by the security-center endpoint before the app was reopened.
+
+### Remaining evidence for final closure
+
+The database and physical behavior establish targeted revocation plus fail-closed client behavior. Final `Done` status still requires retained terminal evidence from the harness (or one controlled rerun) showing both:
+
+```text
+HTTP 204 for the targeted revocation
+Authenticated /v1/security snapshot reports target status = revoked
+```
+
+No token values, token hashes or passwords are required for that evidence.
+
 ## Evidence record
 
 ```text
@@ -159,12 +197,14 @@ Physical no-visible-relogin confirmation: YES
 Final result: PASS / DONE
 
 AUTH-REVOCATION-002
-Target session id (masked):
-API revocation 204: YES / NO
-Security snapshot revoked: YES / NO
-Protected screen used after revocation:
-Returned to authentication: YES / NO
-Physical result: PASS / FAIL
+Target session id (masked): session_...37f2
+Database revoke reason: player-security-center
+Physical returned to authentication: YES
+Harness/helper correlation: YES
+API revocation 204 retained in terminal evidence: PENDING
+Security snapshot revoked retained in terminal evidence: PENDING
+Physical result: PASS
+Final status: TESTING
 ```
 
 ## Safety / cleanup
