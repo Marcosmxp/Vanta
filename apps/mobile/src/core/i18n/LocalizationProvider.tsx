@@ -9,6 +9,7 @@ import {
 } from './kycNavigationTranslations';
 import { kycEn, kycEs, kycPtBR, type KycTranslationKey } from './kycTranslations';
 import { detectDeviceLocale, isSupportedLocale, type SupportedLocale } from './localePolicy';
+import { paymentEn, paymentEs, paymentPtBR, type PaymentTranslationKey } from './paymentTranslations';
 import { productEn, productEs, productPtBR, type ProductTranslationKey } from './productTranslations';
 import { securityEn, securityEs, securityPtBR, type SecurityTranslationKey } from './securityTranslations';
 import { en, es, ptBR, type TranslationKey } from './translations';
@@ -19,15 +20,23 @@ export type AppTranslationKey =
   | ProductTranslationKey
   | SecurityTranslationKey
   | KycTranslationKey
-  | KycNavigationTranslationKey;
+  | KycNavigationTranslationKey
+  | PaymentTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
 
 const STORAGE_KEY = 'vanta.locale.v1';
 const dictionaries: Record<SupportedLocale, AppTranslationDictionary> = {
-  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR, ...kycPtBR, ...kycNavigationPtBR },
-  en: { ...en, ...productEn, ...securityEn, ...kycEn, ...kycNavigationEn },
-  es: { ...es, ...productEs, ...securityEs, ...kycEs, ...kycNavigationEs },
+  'pt-BR': {
+    ...ptBR,
+    ...productPtBR,
+    ...securityPtBR,
+    ...kycPtBR,
+    ...kycNavigationPtBR,
+    ...paymentPtBR,
+  },
+  en: { ...en, ...productEn, ...securityEn, ...kycEn, ...kycNavigationEn, ...paymentEn },
+  es: { ...es, ...productEs, ...securityEs, ...kycEs, ...kycNavigationEs, ...paymentEs },
 };
 
 interface LocalizationContextValue {
