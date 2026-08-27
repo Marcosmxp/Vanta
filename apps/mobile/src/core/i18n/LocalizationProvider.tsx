@@ -1,6 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import {
+  kycNavigationEn,
+  kycNavigationEs,
+  kycNavigationPtBR,
+  type KycNavigationTranslationKey,
+} from './kycNavigationTranslations';
 import { kycEn, kycEs, kycPtBR, type KycTranslationKey } from './kycTranslations';
 import { detectDeviceLocale, isSupportedLocale, type SupportedLocale } from './localePolicy';
 import { productEn, productEs, productPtBR, type ProductTranslationKey } from './productTranslations';
@@ -8,15 +14,20 @@ import { securityEn, securityEs, securityPtBR, type SecurityTranslationKey } fro
 import { en, es, ptBR, type TranslationKey } from './translations';
 
 export type { SupportedLocale } from './localePolicy';
-export type AppTranslationKey = TranslationKey | ProductTranslationKey | SecurityTranslationKey | KycTranslationKey;
+export type AppTranslationKey =
+  | TranslationKey
+  | ProductTranslationKey
+  | SecurityTranslationKey
+  | KycTranslationKey
+  | KycNavigationTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
 
 const STORAGE_KEY = 'vanta.locale.v1';
 const dictionaries: Record<SupportedLocale, AppTranslationDictionary> = {
-  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR, ...kycPtBR },
-  en: { ...en, ...productEn, ...securityEn, ...kycEn },
-  es: { ...es, ...productEs, ...securityEs, ...kycEs },
+  'pt-BR': { ...ptBR, ...productPtBR, ...securityPtBR, ...kycPtBR, ...kycNavigationPtBR },
+  en: { ...en, ...productEn, ...securityEn, ...kycEn, ...kycNavigationEn },
+  es: { ...es, ...productEs, ...securityEs, ...kycEs, ...kycNavigationEs },
 };
 
 interface LocalizationContextValue {
