@@ -1,6 +1,6 @@
 # Phase 20 — Physical Session Security Evidence
 
-**Status:** IN PROGRESS  
+**Status:** DONE  
 **Scope:** `AUTH-REFRESH-001`, `AUTH-REVOCATION-002`  
 **Environment:** local development runtime + physical Android device only
 
@@ -86,7 +86,7 @@ Final result: **PASS / DONE**.
 
 ## AUTH-REVOCATION-002 — Remote revocation
 
-**Status:** TESTING — final authentication-route confirmation pending
+**Status:** DONE
 
 The controlled harness creates a temporary helper session, targets an active Android session through:
 
@@ -145,23 +145,34 @@ Physical-device behavior after revocation:
 2. closed Vanta from Android recent apps;
 3. reopened Vanta;
 4. Vanta did not restore authenticated access;
-5. Vanta displayed the security state `Sessão expirada` / `Reauthentication required` with a `Voltar a autenticar` action.
+5. Vanta displayed the security state `Sessão expirada` / `Reauthentication required` with a `Voltar a autenticar` action;
+6. the tester selected `Voltar a autenticar`;
+7. Vanta returned to the introduction/authentication flow and did not grant access to protected content.
 
-This proves that stale authorized UI is not restored after remote revocation and that the client fails closed behind an explicit re-authentication gate.
+This completes the physical fail-closed acceptance criteria for remote revocation.
 
 ### Acceptance status
 
 ```text
-Target session id (masked):           session_...65a7
-API targeted revocation HTTP 204:     YES (implied by successful harness completion)
-Security snapshot reports revoked:    YES (implied by successful harness completion)
-Server status printed as revoked:     YES
-Stale authenticated UI restored:      NO
-Security re-authentication gate shown:YES
-Final navigation to auth flow:        PENDING TESTER CONFIRMATION
+Target session id (masked):            session_...65a7
+API targeted revocation HTTP 204:      YES (validated by successful harness completion)
+Security snapshot reports revoked:     YES (validated by successful harness completion)
+Server status printed as revoked:      YES
+Stale authenticated UI restored:       NO
+Security re-authentication gate shown: YES
+Returned to introduction/auth flow:    YES
+Physical result:                       PASS
+Final status:                          DONE
 ```
 
-Final closure requires only one physical UI confirmation: tapping `Voltar a autenticar` must lead to the introduction/login authentication flow without granting access to protected content.
+## Final result
+
+Both physical session-security gates in this evidence scope are complete:
+
+```text
+AUTH-REFRESH-001:    PASS / DONE
+AUTH-REVOCATION-002: PASS / DONE
+```
 
 ## Safety / cleanup
 
