@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { bettingEn, bettingEs, bettingPtBR, type BettingTranslationKey } from './bettingTranslations';
 import {
   kycNavigationEn,
   kycNavigationEs,
@@ -21,7 +22,8 @@ export type AppTranslationKey =
   | SecurityTranslationKey
   | KycTranslationKey
   | KycNavigationTranslationKey
-  | PaymentTranslationKey;
+  | PaymentTranslationKey
+  | BettingTranslationKey;
 
 type AppTranslationDictionary = Record<AppTranslationKey, string>;
 
@@ -34,9 +36,26 @@ const dictionaries: Record<SupportedLocale, AppTranslationDictionary> = {
     ...kycPtBR,
     ...kycNavigationPtBR,
     ...paymentPtBR,
+    ...bettingPtBR,
   },
-  en: { ...en, ...productEn, ...securityEn, ...kycEn, ...kycNavigationEn, ...paymentEn },
-  es: { ...es, ...productEs, ...securityEs, ...kycEs, ...kycNavigationEs, ...paymentEs },
+  en: {
+    ...en,
+    ...productEn,
+    ...securityEn,
+    ...kycEn,
+    ...kycNavigationEn,
+    ...paymentEn,
+    ...bettingEn,
+  },
+  es: {
+    ...es,
+    ...productEs,
+    ...securityEs,
+    ...kycEs,
+    ...kycNavigationEs,
+    ...paymentEs,
+    ...bettingEs,
+  },
 };
 
 interface LocalizationContextValue {
