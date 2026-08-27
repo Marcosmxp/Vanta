@@ -30,11 +30,10 @@ No confirmed P0 item is currently recorded from the latest repository audit/base
 
 ### AUTH-REVOCATION-002 — Validate remote revocation/expired refresh
 - Type: Security / Testing
-- Status: Testing
+- Status: Done
 - Description: prove revoked/expired server session returns the app to authentication rather than leaving stale authorized UI.
-- Evidence: physical Android session `session_...37f2` was revoked at `2026-08-26 23:46:20.250244Z` with `revoke_reason = player-security-center`. The revocation harness helper session was created at `23:45:52.969190Z` and logged out at `23:46:20.311030Z`, about 61 ms after the Android revocation, which correlates the revocation with the controlled `test-physical-session-revocation.ps1` run. After closing/reopening Vanta, the physical device returned to the introduction/authentication flow instead of restoring stale authorization.
-- Remaining: retain or rerun the harness terminal evidence showing the expected HTTP 204 and authenticated security snapshot reporting the target session as `revoked`; then mark Done.
-- Note: the temporary `AUTH-PERSIST-003` suspicion was closed as a false alarm because the Android session had been deliberately revoked by the security-center endpoint; process close was not the cause of session loss.
+- Evidence: final physical Android run targeted `session_...65a7`. The controlled revocation harness reached `Server status: revoked`, which only occurs after the targeted DELETE returns HTTP 204 and a subsequent authenticated `/v1/security` snapshot reports the selected session as `revoked`. On the physical device, Vanta later displayed `Sessão expirada` / `Reauthentication required`; after `Voltar a autenticar`, the app returned to the introduction/authentication flow and did not restore protected access. Detailed evidence is recorded in `docs/release/phase20-session-security-evidence.md`.
+- Note: the earlier `AUTH-PERSIST-003` suspicion was closed as a false alarm because the Android session involved in that observation had already been deliberately revoked by the security-center endpoint; process close was not the cause of session loss.
 
 ### REL-PROVENANCE-001 — Use PR source SHA in artifact provenance
 - Type: Infrastructure / Security
