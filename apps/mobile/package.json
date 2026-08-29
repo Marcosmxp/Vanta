@@ -37,7 +37,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@react-native-community/datetimepicker": "^8.4.4",
+    "@react-native-community/datetimepicker": "^9.1.0",
     "@react-native-community/slider": "^5.0.1",
     "@storybook/addon-ondevice-actions": "10.5.4",
     "@storybook/addon-ondevice-backgrounds": "10.5.4",
